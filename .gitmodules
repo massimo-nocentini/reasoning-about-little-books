@@ -1,0 +1,3 @@
+[submodule "SMLUnit"]
+	path = SMLUnit
+	url = https://github.com/smlsharp/SMLUnit.git

@@ -1,0 +1,20 @@
+(* sources.cm
+ *
+ * COPYRIGHT (c) 2013 Massimo Nocentini
+ * All rights reserved.
+ *)
+
+Group
+is
+    $/basis.cm
+    $/smlnj-lib.cm
+    $/ml-lpt-lib.cm
+    $/controls-lib.cm
+    SMLUnit/src/main/sources.cm
+    
+    hop-skip-jump.sml
+
+    (* mc-culloch-number-machine.sml    *)
+    (* mc-culloch-number-machine-test.sml    *)
+(*   unittest.sml (with:print.depth=20) *)
+
