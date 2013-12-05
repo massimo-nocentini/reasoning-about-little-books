@@ -14,6 +14,8 @@ is
     
     hop-skip-jump.sml
 
+    sexp-expressions.sml
+
     (* mc-culloch-number-machine.sml    *)
     (* mc-culloch-number-machine-test.sml    *)
 (*   unittest.sml (with:print.depth=20) *)
