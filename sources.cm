@@ -1,8 +1,3 @@
-(* sources.cm
- *
- * COPYRIGHT (c) 2013 Massimo Nocentini
- * All rights reserved.
- *)
 
 Group
 is
@@ -15,8 +10,4 @@ is
     hop-skip-jump.sml
 
     sexp-expressions.sml
-
-    (* mc-culloch-number-machine.sml    *)
-    (* mc-culloch-number-machine-test.sml    *)
-(*   unittest.sml (with:print.depth=20) *)
-
+    sexp-expressions-tests.sml (with: parser.quotations=true)

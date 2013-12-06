@@ -63,4 +63,16 @@ fun parse (aFragList: 'a frag list): 'a sexp =
 	% (minify_fraglist aFragList) []
     end
 
+fun to_string (toStringFun: 'a -> string) (aSexp: 'a sexp) : string =
+    let 
+	fun sexp_to_string (Atom anAtom) = toStringFun anAtom
+	  | sexp_to_string (List aList) = "(" ^ (slist_to_string aList) ^ ")"
+	and slist_to_string Null = ""
+	  | slist_to_string (Cons (aSexp, Null)) = sexp_to_string aSexp
+	  | slist_to_string (Cons (aSexp, aList)) = 
+	    (sexp_to_string aSexp) ^ " " ^ (slist_to_string aList)
+    in
+	sexp_to_string aSexp
+    end
+
 end
