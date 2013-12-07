@@ -125,6 +125,19 @@ struct
 	  Assert.assertEqualString "(8 ((4) ()) (7))" computed
       end
 
+  fun atomp_of_atom_should_return_true () =
+      let
+	  val computed = is_atom single_atom
+      in
+	  Assert.assertTrue computed
+      end
+
+  fun atomp_of_empty_list_should_return_false () =
+      let
+	  val computed = is_atom null_list_sexp
+      in
+	  Assert.assertFalse computed
+      end
 
   fun suite () =
       Test.labelTests
@@ -142,7 +155,10 @@ struct
 	("to_string a list with one livel of conses", to_string_list_with_one_level),
 	("to_string eight wrapped three times", to_string_eight_wrapped_three_times),
 	("to_string two level list", to_string_two_level_list),
-	("to string: null inside combination at various level", to_string_null_inside_comb)
+	("to string: null inside combination at various level", to_string_null_inside_comb),
+	("atomp of an atom should return true", atomp_of_atom_should_return_true),
+	("atomp of null list should return false", atomp_of_empty_list_should_return_false)
       ]
 
 end
+    
