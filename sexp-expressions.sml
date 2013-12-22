@@ -62,6 +62,8 @@ structure SExpressions = struct
 	    % (minify_fraglist aFragList) []
 	end
 
+    fun wrap_parsing_with f = f o parse
+
     fun to_string (toStringFun: 'a -> string) (aSexp: 'a sexp) : string =
 	let 
 	    fun sexp_to_string (Atom anAtom) = toStringFun anAtom

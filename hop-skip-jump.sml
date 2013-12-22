@@ -64,7 +64,7 @@ fun letcc_general (SOME before_throwing) f =
 	    f (fn v => Cont.throw current_continuation v))
 
 
-fun letcc f = letcc_general NONE f
+val letcc = letcc_general NONE 
 
 fun rember_up_to_last a lat =
     letcc (fn skip => 		(* as Alonzo Church would have written *)

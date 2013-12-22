@@ -11,3 +11,8 @@ is
 
     sexp-expressions.sml
     sexp-expressions-tests.sml (with: parser.quotations=true)
+
+    little-schemer.sml
+    little-schemer-tests.sml (with: parser.quotations=true)
+
+    chains.sml
