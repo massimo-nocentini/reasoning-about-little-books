@@ -78,6 +78,15 @@ struct
         ("remove from complex shuffled tree using abridged version of remove step 2 should produce a shorted shuffled tree",
 	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_2)
 
+        (* ("remove from atom eight using abridged version step 3 should raise exception", *)
+	(*  remove_from_atom_eight remove_from_sexp_abridged_toward_Y_step_3), *)
+        (* ("remove from flat list using abridged version of remove step 3 should produce a shorter list", *)
+	(*  remove_from_flat_integer_list remove_from_sexp_abridged_toward_Y_step_3), *)
+        (* ("remove from complex tree of eights using abridged version of remove step 3 should return an empty tree", *)
+	(*  remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_3), *)
+        (* ("remove from complex shuffled tree using abridged version of remove step 3 should produce a shorted shuffled tree", *)
+	(*  remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_3) *)
+
 
       ]
 

@@ -6,6 +6,10 @@ SMLUnit.TextUITestRunner.runTest
     {output = TextIO.stdOut}
     (LittleSchemerTests.suite ());
 
+open LittleSchemer;
+val into = Into G;
+
+
 open ChainLittleSchemer;
 
 val third_integer = get_nth 3 (fn i => i + 1) 0;

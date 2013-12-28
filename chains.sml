@@ -26,6 +26,8 @@ structure ChainLittleSchemer =
 	    P o (chain_maker next)
 	end
 	 
+    (* using those functions the client code looks more clear and elegant,
+     respect the more abstract functions above. *)
     fun ints n = Link (n+1, ints)
 
     fun chain_item 1 (Link (element, _))= element
