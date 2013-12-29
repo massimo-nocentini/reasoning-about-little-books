@@ -111,10 +111,10 @@ structure LittleSchemer =
 
     datatype 'a T = Into of 'a T -> 'a
 
-    fun Y f = H f (Into (H f))
-    (* and H f into = f (G into) *)
-    and H f = f o G
-    and G (into as Into aFn) x = aFn into x
+    (* fun Y f = H f (Into (H f)) *)
+    (* (* and H f into = f (G into) *) *)
+    (* and H f = f o G *)
+    fun G (into as Into aFn) x = aFn into x
     (* using the following definition the type-checker takes very long
      time to type-check the phrase.*)
     (* and G (into as Into aFn) = aFn into *)
@@ -205,7 +205,7 @@ structure LittleSchemer =
     	let
 	    fun function_maker (future as (Into _)) =
 		(fn recfun => 
-		   fn Null => Null
+		    fn Null => Null
 		| Cons ((atom as Atom a), alist) =>
 		  if pred a 
 		  then recfun alist
@@ -229,14 +229,14 @@ structure LittleSchemer =
     fun remove_from_sexp_abridged_toward_Y_step_6 pred (List slist)=
     	let
 	    val M = (fn recfun => 
-		   fn Null => Null
-		| Cons ((atom as Atom a), alist) =>
-		  if pred a 
-		  then recfun alist
-		  else Cons (atom, recfun alist)
-		| Cons ((List fsList), snList) => 
-		  Cons (List (recfun fsList), 
-			recfun snList)) 
+			fn Null => Null
+		    | Cons ((atom as Atom a), alist) =>
+		      if pred a 
+		      then recfun alist
+		      else Cons (atom, recfun alist)
+		    | Cons ((List fsList), snList) => 
+		      Cons (List (recfun fsList), 
+			    recfun snList)) 
 
 	    fun function_maker (future as (Into _)) =
 		M (fn arg => G future arg)
@@ -249,7 +249,8 @@ structure LittleSchemer =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
     (* Write ``Mrember_curry'' without using ``function_maker''! Hint:
-     use the most recent definition of ''function_maker'' in two different places.*)
+     use the most recent definition of ''function_maker'' in two
+     different places.*)
     fun remove_from_sexp_abridged_toward_Y_step_7 pred (List slist)=
     	let
 	    val M = (fn recfun => 
@@ -308,29 +309,163 @@ structure LittleSchemer =
       | remove_from_sexp_abridged_toward_Y_step_8 _ _ =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
+    (* You have just worked through the derivation of a function
+     called ``the applicative-order Y-combinator''. The interesting
+     aspect of Y is that it produces recursive definitions without the
+     bother of requiring that the functions be named with ``fun ...''
+     *)
+    val Y = fn M => 
+	       (fn (future as (Into _)) => M (fn arg => G future arg)) 
+		   (Into (fn (future as (Into _)) =>
+			     M (fn arg => G future arg)))
 
-
-    val factorial = 
+    (* Define a helper function ``L'' so that ``length'' is ``Y L'' *)
+    fun length (List aList) =
 	let
-	    fun mkfact fact 0 = 1
-	      | mkfact fact n = n * fact (n-1)
+	    fun L length Null = 0
+	      | L length (Cons (Atom _, cdr)) =
+	      	1 + length cdr
+	      | L length (Cons (List innerList, cdr)) = 
+		(length innerList) + (length cdr)
 	in
-	    Y mkfact
+	    Y L aList
 	end
+      | length (Atom _) = 1
 
-    (* and G (into as Into aFn) x = aFn into x *)
-    datatype factFun = Fun of factFun -> int -> int
+    (* Describe in your own words what a function ``f'' should be for
+    ``Y f'' to work as expected!  Felleisen & Friedman words: ``f'' is
+    a function which we want to be recursive, except that the argument
+    ``recfun'' replaces the recursive call, and the whole expression
+    is wrapped in ``fn recfun => ...'' *)
 
-    val fact =
+    (* Write ``length'' using Y, but not L, by substituting the
+    definition for L. We do this step because the name ``L'' doesn't
+    appear in the body of ``L'', so ``L'' doesn't need to be defined
+    with ``fun L ...'' *)
+    fun length_without_L (List aList) =
+	    Y (fn length => fn Null => 0
+	      | (Cons (Atom _, cdr)) =>
+	      	1 + length cdr
+	      | (Cons (List innerList, cdr)) =>
+		(length innerList) + (length cdr)) 
+	      aList
+      | length_without_L (Atom _) = 1
+
+    (* Does the Y-combinator need to be named with ``fun Y ...''? No,
+     because Y doesn't appear in its own definition. So rewrite
+     ``length'' without using either Y or L!*)
+    fun length_without_L_and_Y (List aList) =
+	(fn M => (fn (future as (Into _)) => M (fn arg => G future arg)) 
+		     (Into (fn (future as (Into _)) =>
+			       M (fn arg => G future arg)))) 
+	    (fn length => fn Null => 0
+	    | (Cons (Atom _, cdr)) =>
+	      1 + length cdr
+	    | (Cons (List innerList, cdr)) =>
+	      (length innerList) + (length cdr)) 
+	    aList
+      | length_without_L_and_Y (Atom _) = 1
+
+    (* We observe that ``length'' does not need to be defuned with
+     ``fun length ...''.  Write an application that corresponds to
+     ``(length aList)'' without using ``length''!*)
+    val length_undefuned:int = 
 	let 
-	    val fact' =
-	     fn (f as Fun f'') =>
-		fn 0 => 1
-	      | n => n * (f'' f) (n-1)
+	    val anAtom = "hello"
+	    val List aList = (parse `(((^anAtom ()) ^anAtom (((^anAtom)) () (^anAtom)) ()) ((() ^anAtom)))`)
 	in
-	    fact' (Fun(fact'))
+	    (fn M => (fn (future as (Into _)) => M (fn arg => G future arg)) 
+			 (Into (fn (future as (Into _)) =>
+				   M (fn arg => G future arg)))) 
+		(fn length => fn Null => 0
+		| (Cons (Atom _, cdr)) =>
+		  1 + length cdr
+		| (Cons (List innerList, cdr)) =>
+		  (length innerList) + (length cdr)) 
+		aList
 	end
 
-    val result = fact(5)
+    (* Does your hat still fit? Perhaps not, if your mind has been
+    stretched. *)
+
+
+    val Y_multiarg = fn G => fn M => 
+	       (fn (future as (Into _)) => M (G future)) 
+		   (Into (fn (future as (Into _)) =>
+			     M (G future)))
+
+    fun G0 (into as Into aFn) = 
+	aFn into ()
+    fun G1 (into as Into aFn) x1 = 
+	aFn into x1
+    fun G2 (into as Into aFn) x1 x2 = 
+	aFn into x1 x2
+    fun G3 (into as Into aFn) x1 x2 x3 = 
+	aFn into x1 x2 x3
+    fun G4 (into as Into aFn) x1 x2 x3 x4 = 
+	aFn into x1 x2 x3 x4
+    fun G5 (into as Into aFn) x1 x2 x3 x4 x5 = 
+	aFn into x1 x2 x3 x4 x5
+    fun G6 (into as Into aFn) x1 x2 x3 x4 x5 x6 =
+	aFn into x1 x2 x3 x4 x5 x6 
+    fun G7 (into as Into aFn) x1 x2 x3 x4 x5 x6 x7 = 
+	aFn into x1 x2 x3 x4 x5 x6 x7
+    fun G8 (into as Into aFn) x1 x2 x3 x4 x5 x6 x7 x8 = 
+	aFn into x1 x2 x3 x4 x5 x6 x7 x8
+    fun G9 (into as Into aFn) x1 x2 x3 x4 x5 x6 x7 x8 x9 = 
+	aFn into x1 x2 x3 x4 x5 x6 x7 x8 x9
+    fun G10 (into as Into aFn) x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 = 
+	aFn into x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 
+
+    (* val Y = Y_multiarg G1 *)
+
+    (* val Yfour : (('a -> 'b -> 'c -> 'd -> 'e) -> 'a -> 'b -> 'c ->
+    'd -> 'e) -> 'a -> 'b -> 'c -> 'd -> 'e = *)
+    (* 	Y_multiarg G4 *)
+(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+cannot be genneralized at its binding declaration: 'a *)
+(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+cannot be generalized at its binding declaration: 'b *)
+(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+cannot be generalized at its binding declaration: 'c *)
+(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+cannot be generalized at its binding declaration: 'd *)
+(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+cannot be generalized at its binding declaration: 'e *)
+
+    (* Define a helper function ``L'' so that ``length'' is ``Y L'' *)
+    fun length_with_accumulator (List aList) =
+	let
+	    fun L length Null acc = acc
+	      | L length (Cons (Atom _, cdr)) acc =
+	      	length cdr (1 + acc)
+	      | L length (Cons (List innerList, cdr)) acc = 
+		let 
+		    val acc_of_car_list = (length innerList 0) 
+		in 
+		    length cdr (acc + acc_of_car_list)
+		end
+	in
+	    Y_multiarg G2 L aList 0
+	end
+      | length_with_accumulator (Atom _) = 1
+
+    (* Define a helper function ``L'' so that ``length'' is ``Y L'' *)
+    fun length_with_collector (List aList) =
+	let
+	    fun L length Null col = col 0
+	      | L length (Cons (Atom _, cdr)) col =
+	      	length cdr (fn future_value => col (1 + future_value))
+	      | L length (Cons (List innerList, cdr)) col = 
+		length innerList (
+		    fn future_length_of_car_list => 
+		       length cdr (fn future_length_of_cdr_list => 
+				      col (future_length_of_car_list + 
+					   future_length_of_cdr_list)))
+	in
+	    Y_multiarg G2 L aList (fn future_length_value => future_length_value)
+	end
+      | length_with_collector (Atom _) = 1
+
 
     end
