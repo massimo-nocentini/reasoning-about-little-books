@@ -409,6 +409,21 @@ structure LittleSchemer =
     (* Does your hat still fit? Perhaps not, if your mind has been
     stretched. *)
 
+    (* All the previous derivation weren't been possible without the following
+     http://www.cs.cornell.edu/courses/cs3110/2008fa/recitations/rec26.html *)
+
+    (* datatype factFun = Fun of factFun -> int -> int *)
+
+    (* val fact = *)
+    (* 	let fun fact' (f: factFun) n = *)
+    (* 		case f of Fun(f'') => *)
+    (* 			  if n = 0 then 1 else n * (f'' f) (n-1) *)
+    (* 	in *)
+    (* 	    fact' (Fun(fact')) *)
+    (* 	end *)
+
+    (* val result = fact(5) *)
+
     val Y_multiarg = fn G => 
 			fn M => 
 			   (fn (future as (Into _)) => M (G future)) 
