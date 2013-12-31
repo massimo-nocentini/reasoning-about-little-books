@@ -1,5 +1,12 @@
 2013-12-31  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* little-mler.sml: Big bang for this file.
+
+	* Makefile: Add a new clause for running the tests and for running
+	a scratch input pad.
+
+	* test-input.sml: give a more SML structure for the suite running.
+
 	* little-schemer-tests.sml (LittleSchemerTests): add the missing
 	tests for the last five steps of Y derivation and add nine tests
 	for the ``length'' function, using the three different techniques.
