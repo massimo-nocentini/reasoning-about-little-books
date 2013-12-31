@@ -1,5 +1,9 @@
 2013-12-31  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* little-schemer-tests.sml (LittleSchemerTests): add the missing
+	tests for the last five steps of Y derivation and add nine tests
+	for the ``length'' function, using the three different techniques.
+
 	* little-schemer.sml: removed unnecessary parens from patterns and
 	introduce a unique parameter for ``fn arg => ...'' expressions in order
 	to substitute it with ``case a of ...'' to have a better indentation.

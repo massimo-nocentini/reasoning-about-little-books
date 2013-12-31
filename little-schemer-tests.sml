@@ -15,9 +15,12 @@ struct
   val complex_tree_of_eights = parse `((((((^(8))) ^(8) ^(8) (^(8) ((^(8))))) ^(8) (^(8) ((^(8)) ^(8))))) ^(8))`
   val complex_tree_shuffled = parse `((((((^(1))) ^(8) ^(3) (^(4) ((^(8))))) ^(6) (^(7) ((^(8)) ^(9))))) ^(8))`
 
+  fun eight_filter 8 = true
+    | eight_filter _ = false
+
   fun remove_from_atom_eight remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn (fn 8 => true | _ => false))	  
+	  val sut = (to_string Int.toString) o (remove_fn eight_filter)	  
       in
 	  (sut atom_eight;
 	   Assert.fail "It shouldn't be allowed to removed from an atomic sexp") 
@@ -26,7 +29,7 @@ struct
 
   fun remove_from_flat_integer_list remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn (fn 8 => true | _ => false))
+	  val sut = (to_string Int.toString) o (remove_fn eight_filter)
 	  val computed = sut flat_integer_list
       in
 	  Assert.assertEqualString "(1 2 3 4 5 6 7)" computed
@@ -34,7 +37,7 @@ struct
 
   fun remove_from_complex_tree_of_eights remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn (fn 8 => true | _ => false))
+	  val sut = (to_string Int.toString) o (remove_fn eight_filter)
 	  val computed = sut complex_tree_of_eights
       in
 	  Assert.assertEqualString "(((((()) ((()))) ((())))))" computed
@@ -42,10 +45,31 @@ struct
 
   fun remove_from_complex_shuffled_tree remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn (fn 8 => true | _ => false))
+	  val sut = (to_string Int.toString) o (remove_fn eight_filter)
 	  val computed = sut complex_tree_shuffled
       in
 	  Assert.assertEqualString "((((((1)) 3 (4 (()))) 6 (7 (() 9)))))" computed
+      end
+
+  fun length_of_atom_eight length_fn () =
+      let
+	  val computed = length_fn atom_eight
+      in
+	  Assert.assertEqualInt 1 computed
+      end
+
+  fun length_of_flat_integer_list length_fn () =
+      let
+	  val computed = length_fn flat_integer_list
+      in
+	  Assert.assertEqualInt 8 computed
+      end
+
+  fun length_of_complex_shuffled_tree length_fn () =
+      let
+	  val computed = length_fn complex_tree_shuffled
+      in
+	  Assert.assertEqualInt 10 computed
       end
 
   fun suite () =
@@ -85,7 +109,73 @@ struct
         ("remove from complex tree of eights using abridged version of remove step 3 should return an empty tree",
 	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_3),
         ("remove from complex shuffled tree using abridged version of remove step 3 should produce a shorted shuffled tree",
-	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_3)
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_3),
+
+        ("remove from atom eight using abridged version step 4 should raise exception",
+	 remove_from_atom_eight remove_from_sexp_abridged_toward_Y_step_4),
+        ("remove from flat list using abridged version of remove step 4 should produce a shorter list",
+	 remove_from_flat_integer_list remove_from_sexp_abridged_toward_Y_step_4),
+        ("remove from complex tree of eights using abridged version of remove step 4 should return an empty tree",
+	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_4),
+        ("remove from complex shuffled tree using abridged version of remove step 4 should produce a shorted shuffled tree",
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_4),
+
+        ("remove from atom eight using abridged version step 5 should raise exception",
+	 remove_from_atom_eight remove_from_sexp_abridged_toward_Y_step_5),
+        ("remove from flat list using abridged version of remove step 5 should produce a shorter list",
+	 remove_from_flat_integer_list remove_from_sexp_abridged_toward_Y_step_5),
+        ("remove from complex tree of eights using abridged version of remove step 5 should return an empty tree",
+	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_5),
+        ("remove from complex shuffled tree using abridged version of remove step 5 should produce a shorted shuffled tree",
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_5),
+
+        ("remove from atom eight using abridged version step 6 should raise exception",
+	 remove_from_atom_eight remove_from_sexp_abridged_toward_Y_step_6),
+        ("remove from flat list using abridged version of remove step 6 should produce a shorter list",
+	 remove_from_flat_integer_list remove_from_sexp_abridged_toward_Y_step_6),
+        ("remove from complex tree of eights using abridged version of remove step 6 should return an empty tree",
+	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_6),
+        ("remove from complex shuffled tree using abridged version of remove step 6 should produce a shorted shuffled tree",
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_6),
+
+        ("remove from atom eight using abridged version step 7 should raise exception",
+	 remove_from_atom_eight remove_from_sexp_abridged_toward_Y_step_7),
+        ("remove from flat list using abridged version of remove step 7 should produce a shorter list",
+	 remove_from_flat_integer_list remove_from_sexp_abridged_toward_Y_step_7),
+        ("remove from complex tree of eights using abridged version of remove step 7 should return an empty tree",
+	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_7),
+        ("remove from complex shuffled tree using abridged version of remove step 7 should produce a shorted shuffled tree",
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_7),
+
+        ("remove from atom eight using abridged version step 8 should raise exception",
+	 remove_from_atom_eight remove_from_sexp_abridged_toward_Y_step_8),
+        ("remove from flat list using abridged version of remove step 8 should produce a shorter list",
+	 remove_from_flat_integer_list remove_from_sexp_abridged_toward_Y_step_8),
+        ("remove from complex tree of eights using abridged version of remove step 8 should return an empty tree",
+	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_8),
+        ("remove from complex shuffled tree using abridged version of remove step 8 should produce a shorted shuffled tree",
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_8),
+
+        ("length of atom eight using length defined with Y combinator",
+	 length_of_atom_eight LittleSchemer.length),
+        ("length of atom eight using length defined with Y combinator using accumulator technique",
+	 length_of_atom_eight LittleSchemer.length_with_accumulator),
+        ("length of atom eight using length defined with Y combinator using collector technique",
+	 length_of_atom_eight (LittleSchemer.length_with_collector (fn length => length))),
+
+        ("length of flat list of ints using length defined with Y combinator",
+	 length_of_flat_integer_list LittleSchemer.length),
+        ("length of flat list of ints using length defined with Y combinator using accumulator technique",
+	 length_of_flat_integer_list LittleSchemer.length_with_accumulator),
+        ("length of flat list of ints using length defined with Y combinator using collector technique",
+	 length_of_flat_integer_list (LittleSchemer.length_with_collector (fn length => length))),
+
+        ("length of complex shuffled tree using length defined with Y combinator",
+	 length_of_complex_shuffled_tree LittleSchemer.length),
+        ("length of complex shuffled tree using length defined with Y combinator using accumulator technique",
+	 length_of_complex_shuffled_tree LittleSchemer.length_with_accumulator),
+        ("length of complex shuffled tree using length defined with Y combinator using collector technique",
+	 length_of_complex_shuffled_tree (LittleSchemer.length_with_collector (fn length => length)))
 
 
       ]

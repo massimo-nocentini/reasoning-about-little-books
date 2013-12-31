@@ -487,7 +487,7 @@ cannot be generalized at its binding declaration: 'e *)
       | length_with_accumulator (Atom _) = 1
 
     (* Define a helper function ``L'' so that ``length'' is ``Y L'' *)
-    fun length_with_collector (List aList) =
+    fun length_with_collector collector (List aList) =
 	let
 	    fun L length Null col = col 0
 	      | L length (Cons (Atom _, cdr)) col =
@@ -499,9 +499,9 @@ cannot be generalized at its binding declaration: 'e *)
 				      col (future_length_of_car_list + 
 					   future_length_of_cdr_list)))
 	in
-	    Y_multiarg G2 L aList (fn future_length_value => future_length_value)
+	    Y_multiarg G2 L aList collector
 	end
-      | length_with_collector (Atom _) = 1
+      | length_with_collector collector (Atom _) = collector 1
 
  
     end
