@@ -79,4 +79,21 @@ structure SExpressions = struct
     fun is_atom (Atom _) = true
       | is_atom _ = false
 
+    fun combine_slist Null another_slist = another_slist
+      | combine_slist (Cons (aSexp, slist)) another_slist = 
+	Cons (aSexp, combine_slist slist another_slist)
+    and combine_sexp aSexp (atom as Atom _) = 
+	(* here we've to invoke again providing as a second argument a
+	 newly built list containing the single atom, in order to
+	 apply the rule (especially for the case where the first
+	 argument is an empty list) of ``combine'' to make the
+	 expected result*)
+	combine_sexp aSexp (List (Cons (atom, Null)))
+      | combine_sexp (anAtom as Atom _) (aSexp as List _) = 
+	combine_sexp (List (Cons (anAtom, Null))) aSexp
+      | combine_sexp (List fst_slist) (List snd_slist) =
+	(* since the second sexp is a list, we've to build a list
+	 again where to ``splash'' the element in the first list *)
+	List (combine_slist fst_slist snd_slist)
+
 end

@@ -1,5 +1,15 @@
 2013-12-31  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* sexp-expressions-tests.sml (SExpressionsTests): Add the
+	necessary tests for the ``combine'' function.
+
+	* sexp-expressions.sml (SExpressions.combine_sexp): Add the
+	implementation of the ``combine'' function, something similar to
+	``@'' in Standard ML.
+
+	* hop-skip-jump.sml (HopSkipAndJump.letcc): make a fun instead of
+	a val in order to better type check it.
+
 	* little-mler.sml: Big bang for this file.
 
 	* Makefile: Add a new clause for running the tests and for running
