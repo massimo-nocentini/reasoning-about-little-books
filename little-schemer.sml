@@ -45,11 +45,11 @@ structure LittleSchemer =
     fun remove_from_sexp_abridged pred (List slist)= 
 	let 
 	    fun R_from_slist Null = Null
-	      | R_from_slist (Cons ((atom as Atom a), alist)) = 
+	      | R_from_slist (Cons (atom as Atom a, alist)) = 
 		if pred a
 		then R_from_slist alist
 		else Cons (atom, R_from_slist alist)
-	      | R_from_slist (Cons ((List fsList), snList)) = 
+	      | R_from_slist (Cons (List fsList, snList)) = 
 		Cons ((List (R_from_slist fsList)), (R_from_slist snList))
 	in
 	    List (R_from_slist slist)
@@ -64,14 +64,16 @@ structure LittleSchemer =
     fun remove_from_sexp_abridged_toward_Y_step_1 pred (List slist)= 
 	let 
 	    fun curry_maker hukairs =
-		fn Null => Null
-	      | Cons ((atom as Atom a), alist) =>
-		if pred a 
-		then curry_maker hukairs alist
-		else Cons (atom, curry_maker hukairs alist)
-	      | Cons ((List fsList), snList) => 
-		Cons ((List (curry_maker hukairs fsList)), 
-		      (curry_maker hukairs snList))
+		fn slist => 
+		   case slist of
+		       Null => Null
+		     | Cons (atom as Atom a, alist) =>
+		       if pred a 
+		       then curry_maker hukairs alist
+		       else Cons (atom, curry_maker hukairs alist)
+		     | Cons (List fsList, snList) => 
+		       Cons (List (curry_maker hukairs fsList), 
+			     (curry_maker hukairs snList))
 
 	    (* The argument for the parameter ``hukairs'' is just
     passed around: when ``curry_maker'' reaches the leafs of the sexp,
@@ -90,14 +92,16 @@ structure LittleSchemer =
     fun remove_from_sexp_abridged_toward_Y_step_2 pred (List slist)= 
 	let 
 	    fun curry_maker hukairs =
-		fn Null => Null
-	      | Cons ((atom as Atom a), alist) =>
-		if pred a 
-		then curry_maker hukairs alist
-		else Cons (atom, curry_maker hukairs alist)
-	      | Cons ((List fsList), snList) => 
-		Cons ((List (curry_maker hukairs fsList)), 
-		      (curry_maker hukairs snList))
+		fn slist =>
+		   case slist of 
+		       Null => Null
+		     | Cons (atom as Atom a, alist) =>
+		       if pred a 
+		       then curry_maker hukairs alist
+		       else Cons (atom, curry_maker hukairs alist)
+		     | Cons (List fsList, snList) => 
+		       Cons (List (curry_maker hukairs fsList), 
+			     (curry_maker hukairs snList))
 
 	    (* Can we use ``curry_maker'' to define Mrember_curry with
 	     ``curry_maker''? Of course, and the argument ``hukairs''
@@ -132,16 +136,19 @@ structure LittleSchemer =
 	     defined before. In what follows we rename ``curry_maker''
 	     in ``function_maker'' since its results are functions.*)
 	    fun function_maker (future as (Into _)) =
-		fn Null => Null
-	      | Cons ((atom as Atom a), alist) =>
-		if pred a 
-		then G future alist
-		else Cons (atom, G future alist)
-	      | Cons ((List fsList), snList) => 
-		Cons (List (G future fsList), G future snList)
+		fn slist => 
+		   case slist of 
+		       Null => Null
+		     | Cons (atom as Atom a, alist) =>
+		       if pred a 
+		       then G future alist
+		       else Cons (atom, G future alist)
+		     | Cons (List fsList, snList) => 
+		       Cons (List (G future fsList), G future snList)
 
 	    (* Write ``Mrember_curry'' using just ``function_maker''... *)
 	    val Mrember_curry = function_maker (Into function_maker)
+
 	(* Why does this definition of ``Mrember_curry'' work?
 	 Because the value of ``G future'' is the same as
 	 ``function_maker (Into function_maker)'' which is the same asp
@@ -179,14 +186,16 @@ structure LittleSchemer =
 	     Yes, because for an arbitrary function f we can always
 	     replace f by (fn arg => f arg). *)
 	    fun function_maker (future as (Into _)) =
-		fn Null => Null
-	      | Cons ((atom as Atom a), alist) =>
-		if pred a 
-		then (fn arg => G future arg) alist
-		else Cons (atom, (fn arg => G future arg) alist)
-	      | Cons ((List fsList), snList) => 
-		Cons (List ((fn arg => G future arg) fsList), 
-		      (fn arg => G future arg) snList)
+		fn slist =>
+		   case slist of
+		       Null => Null
+		     | Cons (atom as Atom a, alist) =>
+		       if pred a 
+		       then (fn arg => G future arg) alist
+		       else Cons (atom, (fn arg => G future arg) alist)
+		     | Cons (List fsList, snList) => 
+		       Cons (List ((fn arg => G future arg) fsList), 
+			     (fn arg => G future arg) snList)
 
 	    val Mrember_curry = function_maker (Into function_maker)
     	in
@@ -205,14 +214,15 @@ structure LittleSchemer =
     	let
 	    fun function_maker (future as (Into _)) =
 		(fn recfun => 
-		    fn Null => Null
-		| Cons ((atom as Atom a), alist) =>
-		  if pred a 
-		  then recfun alist
-		  else Cons (atom, recfun alist)
-		| Cons ((List fsList), snList) => 
-		  Cons (List (recfun fsList), 
-			recfun snList)) 
+		    fn slist =>
+		       case slist of 
+			   Null => Null
+			 | Cons (atom as Atom a, alist) =>
+			   if pred a 
+			   then recfun alist
+			   else Cons (atom, recfun alist)
+			 | Cons (List fsList, snList) => 
+			   Cons (List (recfun fsList), recfun snList)) 
 		    (fn arg => G future arg)
 
 	    val Mrember_curry = function_maker (Into function_maker)
@@ -229,14 +239,15 @@ structure LittleSchemer =
     fun remove_from_sexp_abridged_toward_Y_step_6 pred (List slist)=
     	let
 	    val M = (fn recfun => 
-			fn Null => Null
-		    | Cons ((atom as Atom a), alist) =>
-		      if pred a 
-		      then recfun alist
-		      else Cons (atom, recfun alist)
-		    | Cons ((List fsList), snList) => 
-		      Cons (List (recfun fsList), 
-			    recfun snList)) 
+			fn slist =>
+			   case slist of 
+			       Null => Null
+			     | Cons (atom as Atom a, alist) =>
+			       if pred a 
+			       then recfun alist
+			       else Cons (atom, recfun alist)
+			     | Cons (List fsList, snList) => 
+			       Cons (List (recfun fsList), recfun snList)) 
 
 	    fun function_maker (future as (Into _)) =
 		M (fn arg => G future arg)
@@ -253,19 +264,19 @@ structure LittleSchemer =
      different places.*)
     fun remove_from_sexp_abridged_toward_Y_step_7 pred (List slist)=
     	let
-	    val M = (fn recfun => 
-		   fn Null => Null
-		| Cons ((atom as Atom a), alist) =>
-		  if pred a 
-		  then recfun alist
-		  else Cons (atom, recfun alist)
-		| Cons ((List fsList), snList) => 
-		  Cons (List (recfun fsList), 
-			recfun snList)) 
+	    val M = fn recfun => 
+		       fn slist =>
+			  case slist of
+			      Null => Null
+			    | Cons (atom as Atom a, alist) =>
+			      if pred a 
+			      then recfun alist
+			      else Cons (atom, recfun alist)
+			    | Cons (List fsList, snList) => 
+			      Cons (List (recfun fsList), recfun snList)
 
-	    val function_maker =
-	     (fn (future as (Into _)) =>
-		M (fn arg => G future arg))
+	    val function_maker = fn (future as (Into _)) =>
+				    M (fn arg => G future arg)
 
 	    val Mrember_curry = 
 		(fn (future as (Into _)) => M (fn arg => G future arg)) 
@@ -285,15 +296,16 @@ structure LittleSchemer =
 	    (* M's type: *)
 	    (* ('a SExpressions.slist -> 'a SExpressions.slist) ->  *)
 	    (* 'a SExpressions.slist -> 'a SExpressions.slist *)
-	    val M = (fn recfun => 
-		   fn Null => Null
-		| Cons ((atom as Atom a), alist) =>
-		  if pred a 
-		  then recfun alist
-		  else Cons (atom, recfun alist)
-		| Cons ((List fsList), snList) => 
-		  Cons (List (recfun fsList), 
-			recfun snList)) 
+	    val M = fn recfun => 
+		   fn slist =>
+		      case slist of 
+			  Null => Null
+			| Cons (atom as Atom a, alist) =>
+			  if pred a 
+			  then recfun alist
+			  else Cons (atom, recfun alist)
+			| Cons (List fsList, snList) => 
+			  Cons (List (recfun fsList), recfun snList)
 
 	    (* Y's type: *)
 	    (* (('b -> 'c) -> 'b -> 'c) -> 'b -> 'c *)
@@ -343,11 +355,14 @@ structure LittleSchemer =
     appear in the body of ``L'', so ``L'' doesn't need to be defined
     with ``fun L ...'' *)
     fun length_without_L (List aList) =
-	    Y (fn length => fn Null => 0
-	      | (Cons (Atom _, cdr)) =>
-	      	1 + length cdr
-	      | (Cons (List innerList, cdr)) =>
-		(length innerList) + (length cdr)) 
+	    Y (fn length => 
+		  fn slist =>
+		     case slist of 
+			 Null => 0
+		       | (Cons (Atom _, cdr)) =>
+	      		 1 + length cdr
+		       | (Cons (List innerList, cdr)) =>
+			 (length innerList) + (length cdr)) 
 	      aList
       | length_without_L (Atom _) = 1
 
@@ -358,41 +373,47 @@ structure LittleSchemer =
 	(fn M => (fn (future as (Into _)) => M (fn arg => G future arg)) 
 		     (Into (fn (future as (Into _)) =>
 			       M (fn arg => G future arg)))) 
-	    (fn length => fn Null => 0
-	    | (Cons (Atom _, cdr)) =>
-	      1 + length cdr
-	    | (Cons (List innerList, cdr)) =>
-	      (length innerList) + (length cdr)) 
+	    (fn length => 
+		fn slist => 
+		   case slist of 
+		       Null => 0
+		     | (Cons (Atom _, cdr)) =>
+		       1 + length cdr
+		     | (Cons (List innerList, cdr)) =>
+		       (length innerList) + (length cdr)) 
 	    aList
       | length_without_L_and_Y (Atom _) = 1
 
     (* We observe that ``length'' does not need to be defuned with
      ``fun length ...''.  Write an application that corresponds to
      ``(length aList)'' without using ``length''!*)
-    val length_undefuned:int = 
+    val length_undefuned: int = 
 	let 
-	    val anAtom = "hello"
-	    val List aList = (parse `(((^anAtom ()) ^anAtom (((^anAtom)) () (^anAtom)) ()) ((() ^anAtom)))`)
+	    val hello = "hello"
+	    val List aList = (parse `(((^hello ()) ^hello (((^hello)) () (^hello)) ()) ((() ^hello)))`)
 	in
 	    (fn M => (fn (future as (Into _)) => M (fn arg => G future arg)) 
 			 (Into (fn (future as (Into _)) =>
-				   M (fn arg => G future arg)))) 
-		(fn length => fn Null => 0
-		| (Cons (Atom _, cdr)) =>
-		  1 + length cdr
-		| (Cons (List innerList, cdr)) =>
-		  (length innerList) + (length cdr)) 
+				   M (fn arg => G future arg))))
+		(fn length => 
+		    fn slist =>
+		       case slist of
+			   Null => 0
+			 | (Cons (Atom _, cdr)) =>
+			   1 + length cdr
+			 | (Cons (List innerList, cdr)) =>
+			   (length innerList) + (length cdr))
 		aList
 	end
 
     (* Does your hat still fit? Perhaps not, if your mind has been
     stretched. *)
 
-
-    val Y_multiarg = fn G => fn M => 
-	       (fn (future as (Into _)) => M (G future)) 
-		   (Into (fn (future as (Into _)) =>
-			     M (G future)))
+    val Y_multiarg = fn G => 
+			fn M => 
+			   (fn (future as (Into _)) => M (G future)) 
+			       (Into (fn (future as (Into _)) =>
+					 M (G future)))
 
     fun G0 (into as Into aFn) = 
 	aFn into ()
@@ -422,15 +443,15 @@ structure LittleSchemer =
     (* val Yfour : (('a -> 'b -> 'c -> 'd -> 'e) -> 'a -> 'b -> 'c ->
     'd -> 'e) -> 'a -> 'b -> 'c -> 'd -> 'e = *)
     (* 	Y_multiarg G4 *)
-(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+    (* little-schemer.sml:352.9-353.15 Error: explicit type variable
 cannot be genneralized at its binding declaration: 'a *)
-(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+    (* little-schemer.sml:352.9-353.15 Error: explicit type variable
 cannot be generalized at its binding declaration: 'b *)
-(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+    (* little-schemer.sml:352.9-353.15 Error: explicit type variable
 cannot be generalized at its binding declaration: 'c *)
-(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+    (* little-schemer.sml:352.9-353.15 Error: explicit type variable
 cannot be generalized at its binding declaration: 'd *)
-(* little-schemer.sml:352.9-353.15 Error: explicit type variable
+    (* little-schemer.sml:352.9-353.15 Error: explicit type variable
 cannot be generalized at its binding declaration: 'e *)
 
     (* Define a helper function ``L'' so that ``length'' is ``Y L'' *)
@@ -467,5 +488,5 @@ cannot be generalized at its binding declaration: 'e *)
 	end
       | length_with_collector (Atom _) = 1
 
-
+ 
     end

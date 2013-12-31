@@ -1,0 +1,15 @@
+2013-12-31  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* little-schemer.sml: removed unnecessary parens from patterns and
+	introduce a unique parameter for ``fn arg => ...'' expressions in order
+	to substitute it with ``case a of ...'' to have a better indentation.
+
+2013-12-29  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* little-schemer.sml (LittleSchemer.length_with_collector): done
+	some.
+	(LittleSchemer.length_with_accumulator): imple.
+	(LittleSchemer.length_with_collector.L): implementation of inner
+	function L using the collector paradigm.
+	(LittleSchemer.length_with_collector.L): hel
+

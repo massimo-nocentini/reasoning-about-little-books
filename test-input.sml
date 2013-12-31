@@ -26,3 +26,4 @@ val ninetyth_integer_using_ints = chain_item 90 (ints 0)
 val sixth_fib_number = chain_item 6 (fibs 0 1)
 val sixth_fib_number_using_nth = get_nth 6 (fn (n,m) => (m, n+m)) (0,1)
 val sixth_fib_number_using_nth_projecting = ((fn (n,m) => m) o (get_nth 6 (fn (n,m) => (m, n+m))))  (0,1)
+												    
