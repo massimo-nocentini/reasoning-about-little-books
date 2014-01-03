@@ -16,3 +16,4 @@ is
     little-schemer-tests.sml (with: parser.quotations=true)
 
     chains.sml
+    little-mler.sml (with: parser.quotations=true)

@@ -1,3 +1,17 @@
+2014-01-03  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* little-mler.sml (LittleMLer): Introduce the ``prefixer''
+	function and its variants, using the two strategy for combining
+	slists.
+
+	* sexp-expressions.sml (SExpressions.combine_slist_curried): Add
+	the curried strategy for combining two slists.
+	(SExpressions.combine_slist_staged): Add the staged strategy for
+	combining two slists.
+	(SExpressions.combine_sexp): Refactor the function in order to
+	emphasize the differences among the two curried vs staged
+	strategies for combining two slists.
+
 2013-12-31  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
 	* sexp-expressions-tests.sml (SExpressionsTests): Add the
