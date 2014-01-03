@@ -88,18 +88,12 @@ structure SExpressions = struct
 		(List (Cons (atom, Null)))
 
 	    fun C aSexp (atom as Atom _) = 
-		(* here we've to invoke again providing as a second
-	 argument a newly built list containing the single atom, in
-	 order to apply the rule (especially for the case where the
-	 first argument is an empty list) of ``combine'' to make the
-	 expected result*)
 		C aSexp (put_atom_into_empty_list atom)
 	      | C (atom as Atom _) aSexp = 
 		C (put_atom_into_empty_list atom) aSexp
 	      | C (List fst_slist) (List snd_slist) =
-		(* since the second sexp is a list, we've to build a list
-	 again where to ``splash'' the element in the first list *)
 		List (combine_slist fst_slist snd_slist)
+
 	in C end
 
     (* The following strategy follow the curry-technique, that is
@@ -125,7 +119,11 @@ structure SExpressions = struct
     for each Cons encountered, we introduce a function ``make_cons''
     which capture the action of consing each sexp, allowing to recur
     on the first argument since the second argument of ``make_cons''
-    has to be evaluated before applying ``make_cons'' body.*)
+    has to be evaluated before applying ``make_cons'' body. It is
+    important to note how this strategy mimic the curried one, because
+    in case of null returns the identity function, otherwise in case
+    of a Cons (_, _) it use an helper function which ``simulate'' the
+    consing as done in the curried version.*)
     fun combine_slist_staged Null = (fn anotherList => anotherList)
       | combine_slist_staged (Cons (aSexp, aList)) = 
 	make_cons aSexp (combine_slist_staged aList)
