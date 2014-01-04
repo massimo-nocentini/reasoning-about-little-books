@@ -1,3 +1,16 @@
+2014-01-04  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* little-mler.sml (LittleMLer.prefixer): Adjust the function in
+	order to make the test pass, we've to take apart the sexp produced
+	by ``parse'' since we've to attach the given suffix.
+	(LittleMLer.waiting_prefixer): We have to take apart the result
+	otherwise we've to introduce an additional Cons in order to
+	putting (List combined) onto the result.
+
+	* sexp-expressions-tests.sml (SExpressionsTests): Fixed the tests
+	in order to exercise both the curried both the staged version of
+	combine_slist.
+
 2014-01-03  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
 	* little-mler.sml (LittleMLer): Introduce the ``prefixer''

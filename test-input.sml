@@ -9,3 +9,7 @@ val _ = SMLUnit.TextUITestRunner.runTest
 val _ = SMLUnit.TextUITestRunner.runTest
 	    {output = TextIO.stdOut}
 	    (LittleSchemerTests.suite ());
+
+val _ = SMLUnit.TextUITestRunner.runTest
+	    {output = TextIO.stdOut}
+	    (LittleMLerTests.suite ());
