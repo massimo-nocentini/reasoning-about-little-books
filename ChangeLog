@@ -1,5 +1,9 @@
 2014-01-04  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* sexp-expressions.sml (SExpressions.parse.explode_fragment): add
+	an explanation comment.
+	(SExpressions.parse.minify_fraglist): add an explanation comment.
+
 	* little-mler.sml (LittleMLer.prefixer): Adjust the function in
 	order to make the test pass, we've to take apart the sexp produced
 	by ``parse'' since we've to attach the given suffix.
