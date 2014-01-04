@@ -1,0 +1,13 @@
+OBSERVATIONS AND TODOS
+
+* TODOS
+** sexpressions-tests.sml
+   - unit testing
+     1. [ ] show that the parsing only cares about open and closed
+        parens, any char in the quotation is ignored;
+
+* OBSERVATIONS
+** study ``What a functional programmer can learn from the Visitor pattern'' 
+   maybe there's a connection between the Y-combinator and the
+   arguments discussed in the paper. Can Y be used as a mean of
+   extension for functions?

@@ -1,5 +1,8 @@
 2014-01-04  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* observations-and-todos.org: add a ``journal'' file in the style
+	of org-mode!
+
 	* sexp-expressions.sml (SExpressions.parse.explode_fragment): add
 	an explanation comment.
 	(SExpressions.parse.minify_fraglist): add an explanation comment.
