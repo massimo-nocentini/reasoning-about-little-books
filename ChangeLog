@@ -1,5 +1,14 @@
 2014-01-04  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* little-mler/little-mler.sml (LittleMLer): first application of
+	``plus'' for int arithmetic but get a compiler error.
+
+	* little-mler/plus-over-number.sig: introduce a file for the
+	signature and the functor for doing arithmetics.
+
+	* little-mler/numbers-by-peano.sig (NumberAsNum): Implement the
+	very first module for numbers as nums.
+
 	* sexp-expressions/sources.cm: moved the sexp-expressions code in
 	a dedicated folder with its own sources.cm file for compilation.
 

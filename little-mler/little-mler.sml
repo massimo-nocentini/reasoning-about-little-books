@@ -119,6 +119,54 @@ structure LittleMLer =
 
     (* Good, and here is a way to write down these minimal
     requirements for our building blocks...open
-    ``numbers-by-peano.sig'' *)
+    ``numbers-by-peano.sig'' to continue the adventure, we'll wait
+    here... *)
+
+    (* Have you seen ``NumberAsNum'' and ``NumberAsInt''? Good, let's
+    use a functor to build a structure. What is the signature of
+    ``IntStruct''? It is ``NUMBERS_BY_PEANO'' obviously, because the
+    definition of ``NumberAsInt'' states that the functor produces
+    structures with signature ``NUMBERS_BY_PEANO''. And what does
+    ``()'' behind ``NumberAsInt'' mean? It means that we are using a
+    functor that does not depend on anything else.*)
+    structure IntStruct = NumberAsInt()
+
+    (* Define the structure NumStruct *)
+    structure NumStruct = NumberAsNum()
+				     
+    (* Why are we doing all of this? Is it because we want to use both
+    versions of ``plus'' at the same time and, if possible, create
+    them from the same text? *)
+
+    (* Do we now have both sets of building blocks around at the same
+    time? Basically. Those for ``num''s are collected in ``NumStruct''
+    and those for ``int''s in ``IntStruct''. Is this progress? Yes, if
+    we can now somehow create the two versions of ``plus'' from the
+    two structures. Go read ``plus-over-number.sig'' and come back...*)
+
+    (* ...okay, let's build a structure from ``PlusOverNumber'', pay
+    attention how to satisfy PlusOverNumber dependency. Yet more
+    notation? Yes, consider the functor's dependency: ``(structure a_N
+    : NUMBERS_BY_PEANO)'', it specify that the structure created by
+    PlusOverNumber depends on a yet to be determined structure ``a_N''
+    with signature NUMBERS_BY_PEANO. Here we say that ``a_N'' stands
+    for ``IntStruct''. *)
+    structure IntArith = PlusOverNumber (structure a_N = IntStruct)
+
+    (* Does ``IntStruct'' have the signature NUMBERS_BY_PEANO? That
+    structure was created with ``NumberAsInt'', which always produces
+    structures that have signature NUMBERS_BY_PEANO. And how do we
+    know that? The definition of ``NumberAsInt'' contains
+    NUMBERS_BY_PEANO after :>, and that's what says the resulting
+    structure has signature NUMBERS_BY_PEANO. *)
+
+    (* Time to create ``plus'' over ``num''s! *)
+    structure NumArith = PlusOverNumber (structure a_N = NumStruct)
+
+    (* What is the value of ``IntArith.plus 3 4''? *)
+    (* val three = IntArith.plus 3 4 *)
+    (* We've commented the above value definition since the compiler
+    complains: operator domain: IntArith.number operand: int in
+    expression: IntArith.plus 3*)
 
     end

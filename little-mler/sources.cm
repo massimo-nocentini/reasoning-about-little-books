@@ -13,3 +13,4 @@ is
     little-mler-tests.sml (with: parser.quotations=true)
 
     numbers-by-peano.sig
+    plus-over-number.sig
