@@ -1,10 +1,12 @@
 OBSERVATIONS AND TODOS
 
 * TODOS
-** sexpressions-tests.sml
+** sexp-expressions-tests.sml
    - unit testing
      1. [ ] show that the parsing only cares about open and closed
         parens, any char in the quotation is ignored;
+** sexp-expressions.sml
+   1. [ ] comment very closely the ``parse'' function.
 
 * OBSERVATIONS
 ** study ``What a functional programmer can learn from the Visitor pattern'' 
