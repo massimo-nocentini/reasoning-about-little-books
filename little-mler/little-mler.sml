@@ -118,14 +118,7 @@ structure LittleMLer =
     bool'' respectively.*)
 
     (* Good, and here is a way to write down these minimal
-    requirements for our building blocks *)
-    signature NUMBERS_BY_PEANO =
-    sig
-    	type number
-    	exception Too_small
-    	val succ: number -> number
-    	val pred: number -> number
-    	val is_zero: number -> bool
-    end
+    requirements for our building blocks...open
+    ``numbers-by-peano.sig'' *)
 
     end

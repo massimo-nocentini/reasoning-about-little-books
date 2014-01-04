@@ -9,13 +9,11 @@ is
     
     hop-skip-jump.sml
 
-    sexp-expressions.sml
-    sexp-expressions-tests.sml (with: parser.quotations=true)
+    sexp-expressions/sources.cm
 
     little-schemer.sml
     little-schemer-tests.sml (with: parser.quotations=true)
 
     chains.sml
 
-    little-mler.sml (with: parser.quotations=true)
-    little-mler-tests.sml (with: parser.quotations=true)
+    little-mler/sources.cm

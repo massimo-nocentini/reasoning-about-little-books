@@ -1,0 +1,13 @@
+
+Group
+is
+    $/basis.cm
+    $/smlnj-lib.cm
+    $/ml-lpt-lib.cm
+    $/controls-lib.cm
+
+    ../SMLUnit/src/main/sources.cm
+
+    sexp-expressions.sml (with: parser.quotations=true)
+    sexp-expressions-tests.sml (with: parser.quotations=true)
+

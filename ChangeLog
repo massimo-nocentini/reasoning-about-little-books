@@ -1,5 +1,11 @@
 2014-01-04  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* sexp-expressions/sources.cm: moved the sexp-expressions code in
+	a dedicated folder with its own sources.cm file for compilation.
+
+	* little-mler/numbers-by-peano.sig (NUMBERS_BY_PEANO): add the
+	first signature file for the numbers by Peano.
+
 	* observations-and-todos.org: add a ``journal'' file in the style
 	of org-mode!
 
