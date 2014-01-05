@@ -1,3 +1,11 @@
+2014-01-05  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* little-mler/numbers-with-reveal-conceal.sig
+	(NumberAsIntWithRevealConceal): Add a new signature to introduce
+	two new functions in order to conceal and reveal the type in order
+	to use ``plus'' with both Int building blocks and Num building
+	blocks.
+
 2014-01-04  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
 	* little-mler/little-mler.sml (LittleMLer): first application of

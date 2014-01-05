@@ -23,3 +23,4 @@ val sixth_fib_number_using_nth_projecting = ((fn (n,m) => m) o (get_nth 6 (fn (n
 open LittleMLer;
 
 val zero = num_plus Zero Zero;
+functor aFunctor = NumberAsInt;

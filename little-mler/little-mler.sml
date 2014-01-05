@@ -164,9 +164,68 @@ structure LittleMLer =
     structure NumArith = PlusOverNumber (structure a_N = NumStruct)
 
     (* What is the value of ``IntArith.plus 3 4''? *)
-    (* val three = IntArith.plus 3 4 *)
+    (* val nonsense = IntArith.plus 3 4 *)
     (* We've commented the above value definition since the compiler
     complains: operator domain: IntArith.number operand: int in
     expression: IntArith.plus 3*)
+
+    (* What do we know about ``IntArith''? We know that it is a
+    structure that has signature PLUS_OVER_NUMBER. What do we know
+    about strutures that have signature PLUS_OVER_NUMBER? A structure
+    with signature PLUS_OVER_NUMBER has two components: a type named
+    ``number'' and a value named ``plus''. The value ``plus'' consumes
+    two ``number'' and produces one. And what else do we know about
+    the type ``number'' in PLUS_OVER_NUMBER? Nothing because the
+    signature PLUS_OVER_NUMBER does not reveal anything else about the
+    structures that PlusOverNumber produces. Absolutely. And that's
+    why it is nonsense to ask for the value of `` IntArith.plus 3
+    4''. Okay, that's clear. The function ``IntArith.plus'' consumes
+    values of type ``IntArith.number'', about which PLUS_OVER_NUMBER
+    doesn't reveal anything, but 3 and 4 are ``int''s.*)
+
+    (* Can we determine the value of *)
+    (* val another_nonsense = NumArith.plus (One_more_than Zero)  *)
+    (* 					 (One_more_than (One_more_than Zero)) *)
+    (* Nonsense: little-mler/little-mler.sml:187.9-188.43 Error:
+  operator and operand don't agree [tycon mismatch] operator domain:
+  NumArith.number operand: num in expression: NumArith.plus
+  (One_more_than Zero). The function ``NumArith.plus'' consumes values
+  of type ``NumArith.number'', but ``One_more_than'' and ``Zero'' are
+  ``num''s. *)
+
+    (* Do we have the means to produce ``number''s of the correct type
+    for either ``IntArith.plus'' or ``NumArith.plus''? No, the two
+    structures contains only one function, ``plus'', and it assumes
+    that we have ``number''s ready for consumption. How about the
+    structures ``IntStruct'' and ``NumStruct''? They, too, provide
+    only functions that consume existing ``number''s. So what do we
+    do? Yes, what? Go read ``numbers-with-reveal-conceal.sig'' and
+    come back...*)
+
+    (* ...okay, let's rebuild the structures ``IntStruct'' and
+    ``NumStruct'' with reveal and conceal... *)
+    structure IntStructWithRevealConceal = NumberAsIntWithRevealConceal ()
+    structure NumStructWithRevealConceal = NumberAsNumWithRevealConceal ()
+
+    (* ...and their arithmetic respectively *)
+    structure IntArithWithRevealConceal = PlusOverNumber (
+	structure a_N = IntStructWithRevealConceal)
+
+    structure NumArithWithRevealConceal = PlusOverNumber (
+	structure a_N = NumStructWithRevealConceal)
+
+    (* What kind of structures are ``IntStructWithRevealConceal'' and
+    ``NumStructWithRevealConceal''? Both have signature
+    NUMBERS_WITH_REVEAL_CONCEAL. What kind of structure does
+    PlusOverNumber depend on? It depends on a structure with signature
+    NUMBERS_BY_PEANO. Isn't this a conflict? Does a structure with
+    signature NUMBERS_WITH_REVEAL_CONCEAL provide all the things that
+    a structure with signature NUMBERS_BY_PEANO provides? It does,
+    because NUMBERS_WITH_REVEAL_CONCEAL ``include''s
+    NUMBERS_BY_PEANO. Absolutely and that's why it is okay to supply
+    ``IntStructWithRevealConceal'' and ``NumStructWithRevealConceal''
+    to functor ``PlusOverNumber''. Okay, take a look at the test
+    methods ``reveal_conseal_of_IntStruct'' and
+    ``reveal_conseal_of_NumStruct'' to see that they have sense!*)
 
     end

@@ -18,6 +18,25 @@ struct
 	  assert_pred_on_integers (op =) expected computed 
       end
 
+  fun reveal_conseal_of_IntStruct () = 
+      let 
+	  open IntStructWithRevealConceal
+	  val computed = reveal (succ (conceal 0))
+      in
+	  Assert.assertEqualInt 1 computed
+      end
+
+  (* here it should be useful to have the possibility to handle
+structure as first class citizen: the testing code is equal to the
+testing code of reveal_conseal_of_IntStruct *)
+  fun reveal_conseal_of_NumStruct () = 
+      let 
+	  open NumStructWithRevealConceal
+	  val computed = reveal (succ (conceal 0))
+      in
+	  Assert.assertEqualInt 1 computed
+      end
+
   fun suite () =
       Test.labelTests
       [
@@ -28,7 +47,9 @@ struct
         ("check 123 prefix using waiting slist combination strategy",
 	 check_123_prefixing waiting_prefixer),
         ("check 123 prefix using direct consing slist combination strategy",
-	 check_123_prefixing prefixer)
+	 check_123_prefixing prefixer),
+	("reveal conseal of IntStruct", reveal_conseal_of_IntStruct),
+	("reveal conseal of NumStruct", reveal_conseal_of_NumStruct)
       ]
 
 end
