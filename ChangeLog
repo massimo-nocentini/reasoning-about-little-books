@@ -1,5 +1,13 @@
 2014-01-05  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* little-mler/little-mler.sml (LittleMLer): Finish the first way
+	to use ``plus'' with the two sets of building blocks and reported
+	the insightful text.
+
+	* little-mler/little-mler-tests.sml (LittleMLerTests): add two
+	tests that shows the first way of using ``plus'' with the two sets
+	of building blocks.
+
 	* little-mler/numbers-with-reveal-conceal.sig
 	(NumberAsIntWithRevealConceal): Add a new signature to introduce
 	two new functions in order to conceal and reveal the type in order

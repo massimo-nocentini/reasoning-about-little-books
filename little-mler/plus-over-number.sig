@@ -12,7 +12,8 @@ end
      by ``()''. This one, however, contains something else:
      ``structure a_N : NUMBERS_BY_PEANO''. What does it mean?*)
 functor PlusOverNumber (structure a_N : NUMBERS_BY_PEANO)
-	:> PLUS_OVER_NUMBER = 
+	:> PLUS_OVER_NUMBER
+	=
 	struct
 	
 	type number = a_N.number
@@ -34,3 +35,18 @@ functor PlusOverNumber (structure a_N : NUMBERS_BY_PEANO)
 	    structure ``a_N''. And how do we know that ``a_N''
 	    contains all these things, in particular ``is_zero''?
 	    Because it has signature ``NUMBERS_BY_PEANO''.*)
+
+
+functor PlusOverNumberWithWhereClause (structure a_N : NUMBERS_BY_PEANO)
+	:> PLUS_OVER_NUMBER where type number = a_N.number
+	=
+	struct
+	
+	type number = a_N.number
+
+	fun plus n m = 
+	    if a_N.is_zero n
+	    then m 
+	    else a_N.succ (plus (a_N.pred n) m)
+
+	end

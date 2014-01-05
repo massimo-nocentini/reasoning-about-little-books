@@ -228,4 +228,77 @@ structure LittleMLer =
     methods ``reveal_conseal_of_IntStruct'' and
     ``reveal_conseal_of_NumStruct'' to see that they have sense!*)
 
+    (* What is the value of *)
+    (* val nonsense_again =  *)
+    (* 	let *)
+    (* 	    open NumStructWithRevealConceal *)
+    (* 	    open NumArithWithRevealConceal *)
+    (* 	in reveal (plus (conceal 2) (conceal 8)) end *)
+    (* It is non sense, but this time it is ``signature nonsense''.
+  operator domain: NumArithWithRevealConceal.number
+  operand:         NumStructWithRevealConceal.number
+  in expression:
+    plus (conceal 2)
+ *)
+
+    (* What do we know about NumArithWithRevealConceal? We know that
+    it has signature PLUS_OVER_NUMBER. What do we know about
+    structures with signature PLUS_OVER_NUMBER? A structure with
+    signature PLUS_OVER_NUMBER has two components: a type named
+    ``number'' and a value named ``plus''. The value ``plus'' consumes
+    two ``number''s and produces one. And what else do we know about
+    ``number'' in PLUS_OVER_NUMBER? Nothing!*)
+
+    (* What do we know about structures with signature
+    NUMBERS_WITH_REVEAL_CONCEAL? They contain a type, also named
+    ``number'', an exception and five functions over ``int''s and
+    ``number''s. The function ``conceal'' creates a ``number'' from an
+    ``int'', and ``reveal'' translates the ``number'' back into an
+    ``int''. Do we know anything else about ``number'' in
+    NUMBERS_WITH_REVEAL_CONCEAL? Nothing, because the signature
+    NUMBERS_WITH_REVEAL_CONCEAL does not reveal anything else about
+    the structure.*)
+
+    (* So, how could we possibly know from just looking at the
+    signatures alone that NumStructWithRevealConceal.conceal produces
+    the same kind of ``number''s that NumArithWithRevealConceal.plus
+    consumes? From the signatures alone, we cannot know that the two
+    kinds of ``number''s are the same. Indeed, we could have used two
+    different names for these types, like ``number1'' and
+    ``number2''. But why does that matter? Because we must be able to
+    determine from the signatures, and from the signatures only, that
+    the type of an expression make sense. If we cannot, the expression
+    is nonsense. This is analogous to expressions and ypes, except
+    that now we relate types and signatures.*)
+
+    (* Are there other forms of signature nonsense? *)
+    (* val other_form_of_signature_nonsense =  *)
+    (* 	NumStructWithRevealConceal.Zero *)
+	    (* produces Error: unbound variable or constructor: Zero
+	    in path NumStructWithRevealConceal.Zero, because the
+	    signature doesn't say anything about a constructor
+	    ``Zero'', so we can't know anything about it either. *)
+
+    (* We need to say that ``PlusOverNumber'' produces structures
+    whose type ``number'' is the same as the type ``number'' in
+    ``a_N'', the functor's dependency. And how do we do that? We
+    connect the signature of the structure produced by
+    ``PlusOverNumber'' to the structure on which it depends, changing
+    ``:> PLUS_OVER_NUMBER'' in ``:> PLUS_OVER_NUMBER where type number
+    = a_N.number''.*)
+
+    (* Is ``PLUS_OVER_NUMBER where type number = a_N.number'' a
+    signature?Yes it is a signature and therefore can be used after
+    ``:>''. A ``where'' clause refines what a signature stands for. So
+    here, the signature is like PLUS_OVER_NUMBER but requires that
+    ``number'' in the functor's result must be equal to
+    ``a_N.number''. And how do we make sure in ``struct...end'' that
+    his is the case? We define the type ``number'' to be the type
+    ``number'' of the structure ``a_N'''s type ``number''. Do the two
+    similar looking lines always go together? For Felleisen and
+    Friedman, the do. One makes promises and the other fulfills the
+    promises.*)
+
+    (* The two arithmetics looks the same after the above modification
+    hence we can ask the value of: *)
     end

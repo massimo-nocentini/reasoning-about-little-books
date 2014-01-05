@@ -37,6 +37,38 @@ testing code of reveal_conseal_of_IntStruct *)
 	  Assert.assertEqualInt 1 computed
       end
 
+  local 
+      structure NS = NumberAsNumWithRevealConceal ()
+      structure NA = PlusOverNumberWithWhereClause (
+	  structure a_N = NS)
+  in
+  fun first_attempt_of_num_plus_using_functors_with_where_clause_in_signature_result () =
+      let	  
+	  open NS
+	  open NA
+
+	  val computed = reveal (plus (conceal 9) (conceal 3))
+      in
+	  Assert.assertEqualInt 12 computed
+      end
+  end
+
+  local 
+      structure IS = NumberAsIntWithRevealConceal ()
+      structure IA = PlusOverNumberWithWhereClause (
+	  structure a_N = IS)
+  in
+  fun first_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result () =
+      let	  
+	  open IS
+	  open IA
+
+	  val computed = reveal (plus (conceal 9) (conceal 3))
+      in
+	  Assert.assertEqualInt 12 computed
+      end
+  end
+
   fun suite () =
       Test.labelTests
       [
@@ -49,7 +81,11 @@ testing code of reveal_conseal_of_IntStruct *)
         ("check 123 prefix using direct consing slist combination strategy",
 	 check_123_prefixing prefixer),
 	("reveal conseal of IntStruct", reveal_conseal_of_IntStruct),
-	("reveal conseal of NumStruct", reveal_conseal_of_NumStruct)
+	("reveal conseal of NumStruct", reveal_conseal_of_NumStruct),
+	("first attempt of plus among ``int''susing functors with where clause in signature result",
+	 first_attempt_of_num_plus_using_functors_with_where_clause_in_signature_result),
+	("first attempt of plus among ``num''s using functors with where clause in signature result",
+	 first_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result)
       ]
 
 end
