@@ -18,6 +18,9 @@ functor PlusOverNumber (structure a_N : NUMBERS_BY_PEANO)
 	
 	type number = a_N.number
 
+	(* Observe that it isn't necessary to say a type for both
+	 ``n,m'' since the signature ``PLUS_OVER_NUMBER'' say all
+	 about those types.*)
 	fun plus n m = 
 	    if a_N.is_zero n
 	    then m 
@@ -36,7 +39,11 @@ functor PlusOverNumber (structure a_N : NUMBERS_BY_PEANO)
 	    contains all these things, in particular ``is_zero''?
 	    Because it has signature ``NUMBERS_BY_PEANO''.*)
 
-
+(* We build a new functor in order to keep the code in
+``little-mler.sml'' consistent, that is if someone uncomment the value
+definitions that cause errors, it continue to get this behavior.
+Instead, if we modify the ascribing signature in the above functor,
+the code would be inconsistent. *)
 functor PlusOverNumberWithWhereClause (structure a_N : NUMBERS_BY_PEANO)
 	:> PLUS_OVER_NUMBER where type number = a_N.number
 	=

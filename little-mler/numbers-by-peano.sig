@@ -60,6 +60,7 @@ functor NumberAsNum ()
 	  | pred (One_more_than n) = n
 
 	end
+
 (* ...here is one for ``int''s. The structure for ``int''s must also
 contain the required basic building blocks. *)
 functor NumberAsInt () 

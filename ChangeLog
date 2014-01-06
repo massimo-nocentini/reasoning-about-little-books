@@ -1,3 +1,13 @@
+2014-01-06  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* little-mler/similar.sig (similar): add the signature to check
+	similarity among NUMBERS_BY_PEANO values.
+
+	* little-mler/numbers-by-peano-second-version.sig: add a second
+	version of the functor NumberAsInt in order provide a second
+	alternative for using IntArith.plus. Write the corresponding test
+	case.
+
 2014-01-05  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
 	* little-mler/little-mler.sml (LittleMLer): Finish the first way

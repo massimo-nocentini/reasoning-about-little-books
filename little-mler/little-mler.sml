@@ -229,7 +229,7 @@ structure LittleMLer =
     ``reveal_conseal_of_NumStruct'' to see that they have sense!*)
 
     (* What is the value of *)
-    (* val nonsense_again =  *)
+    (* val nonsense_again = *)
     (* 	let *)
     (* 	    open NumStructWithRevealConceal *)
     (* 	    open NumArithWithRevealConceal *)
@@ -300,5 +300,83 @@ structure LittleMLer =
     promises.*)
 
     (* The two arithmetics looks the same after the above modification
-    hence we can ask the value of: *)
+    hence we can ask some values as done in test methods
+    ``first_attempt_of_num_plus_using_functors_with_where_clause_in_signature_result''
+    and
+    ``first_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result''
+    *) 
+
+    (* Then there is a second way out. Out of what? Out of the dilemma
+    that we don't have anything that PlusOverNumber's ``plus'' can
+    consume. Oh yes. We said that enlarging the signature for the
+    basic building blocks was one way out. Go read
+    ``numbers-by-peano-second-version.sig'' and come back... *)
+
+    (* ... here is yet another definition of ``IntStruct''. What do we
+    know about the signature of this structure? It is like
+    NUMBERS_BY_PEANO, but we also know that the ``number''s are
+    ``int''s. *)
+    structure IntStruct' = NumberAsInt'()
+
+    (* Yes. Now take a look at this definition of ``IntArith' '':*)
+    structure IntArith' = PlusOverNumberWithWhereClause (
+    	structure a_N = IntStruct')
+    (* getting the following type informations from the compiler:
+structure IntArith' :
+    sig
+      type number = number
+      val plus : number -> number -> number
+    end *)
+     (* What do we know about its signature? We know that it's like
+     PLUS_OVER_NUMBER and that its ``number''s are a_N's
+     ``number''s. And what are a_N's ``number''s? Since a_N is
+     IntStruct', we know from its signature that the ``number''s are
+     ``int''s. So, if IntArith''s ``number''s are those of IntStruct',
+     and if IntStruct' ``number''s are ``int''s, what do we know? We
+     know that IntArith''s ``number''s are ``int''s. *)
+
+    (* If we would have written the following instead: *)
+    (* structure IntArith' = PlusOverNumber ( *)
+    (* 	structure a_N = IntStruct') *)
+    (* we get the following compiler type information: *)
+    (* structure IntArith' : *)
+    (*     sig *)
+    (*       type number *)
+    (*       val plus : number -> number -> number *)
+    (*     end *)
+    (* Then the type ``number'' of IntArith' remains ``unrevealed''
+    and we have the same problem of how to build values that ``plus''
+    can consume. *)
+
+    (* Is ``Zero'' the same as ``0''? No, ``0'' is similar to, but not
+    really the same as, ``Zero''. Is ``One_more_than (One_more_than
+    Zero)'' similar to ``2''? Yes, it is similar to ``2'', but not
+    equal to ``2''. Define the function ``similar''. Should it only
+    consume ``num''s and ``int''s? No, it should wokr for any two
+    structures that have the signature ``NUMBERS_BY_PEANO''. That is
+    more interesting. Go read ``similar.sig'' and come back...*)
+
+    (* ...How can we use ``similar''? Since the function can consume
+    ``number''s produced by ``a_N.conceal'' and ``b_N.conceal'',
+    respectively, we just feed `similar numbers' produces with the
+    proper ``conceal'' functions.*)
+
+    (* So let's create a structure that compares ``num''s and
+    ``int''s. *)
+    structure SimIntNum = Same (structure a_N = IntStructWithRevealConceal
+				structure b_N = NumStructWithRevealConceal)
+
+    (* Is there another way to do it? It's just a guess. Good
+    guess. Why? Heere is what Felleisen and Friedman would have said:
+    "Because we supply one structure for each of the functor's
+    dependencies.". Are functors like functions? Yes but they only
+    consume and produce structures, not values (really? take a look at
+    SMLofNJ documentation...maybe we can supply some values....*)
+    structure SimNumInt = Same (structure a_N = NumStructWithRevealConceal
+				structure b_N = IntStructWithRevealConceal)
+
+    (* we can also compare ``num''s to ``num''s: *)
+    structure SimNumNum = Same (structure a_N = NumStructWithRevealConceal
+				structure b_N = NumStructWithRevealConceal)
+
     end

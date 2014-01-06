@@ -69,6 +69,32 @@ testing code of reveal_conseal_of_IntStruct *)
       end
   end
 
+  fun second_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result () =
+      let 
+	  open IntArith'
+	  val computed = plus 1 2
+      in 
+	  Assert.assertEqualInt 3 computed
+      end
+
+  fun similarity_among_0_and_Zero_should_be_satisfied () = 
+      let
+	  open SimIntNum
+	  val computed = similar (IntStructWithRevealConceal.conceal 0)
+				 (NumStructWithRevealConceal.conceal 0)
+      in
+	  Assert.assertEqualBool true computed
+      end
+
+  fun similarity_among_1_and_Zero_should_not_be_satisfied () = 
+      let
+	  open SimIntNum
+	  val computed = similar (IntStructWithRevealConceal.conceal 1)
+				 (NumStructWithRevealConceal.conceal 0)
+      in
+	  Assert.assertEqualBool false computed
+      end
+
   fun suite () =
       Test.labelTests
       [
@@ -85,7 +111,13 @@ testing code of reveal_conseal_of_IntStruct *)
 	("first attempt of plus among ``int''susing functors with where clause in signature result",
 	 first_attempt_of_num_plus_using_functors_with_where_clause_in_signature_result),
 	("first attempt of plus among ``num''s using functors with where clause in signature result",
-	 first_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result)
+	 first_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result),
+	("second attempt of plus among ``num''s using functors with where clause in signature result",
+	 second_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result),
+	("similarity_among_0_and_Zero_should_be_satisfied",
+	similarity_among_0_and_Zero_should_be_satisfied),
+	("similarity_among_1_and_Zero_should_not_be_satisfied",
+	similarity_among_1_and_Zero_should_not_be_satisfied)
       ]
 
 end
