@@ -95,6 +95,24 @@ testing code of reveal_conseal_of_IntStruct *)
 	  Assert.assertEqualBool false computed
       end
 
+  fun plus_using_NewPlusOverJ () = 
+      let
+	  open NewPlusStruct
+	  val computed = plus 3 4
+      in
+	  Assert.assertEqualInt 7 computed
+      end
+
+  fun times_using_TimesOverNumbers () = 
+      let
+	  open TimesStruct
+	  val computed = NumStructWithRevealConceal.reveal 
+			     (times (NumStructWithRevealConceal.conceal 8)
+				    (NumStructWithRevealConceal.conceal 7))
+      in
+	  Assert.assertEqualInt 56 computed
+      end
+
   fun suite () =
       Test.labelTests
       [
@@ -114,10 +132,12 @@ testing code of reveal_conseal_of_IntStruct *)
 	 first_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result),
 	("second attempt of plus among ``num''s using functors with where clause in signature result",
 	 second_attempt_of_int_plus_using_functors_with_where_clause_in_signature_result),
-	("similarity_among_0_and_Zero_should_be_satisfied",
+	("similarity among 0 and Zero should be satisfied",
 	similarity_among_0_and_Zero_should_be_satisfied),
-	("similarity_among_1_and_Zero_should_not_be_satisfied",
-	similarity_among_1_and_Zero_should_not_be_satisfied)
+	("similarity among 1 and Zero should not be satisfied",
+	similarity_among_1_and_Zero_should_not_be_satisfied),
+	("plus using NewPlusOverJ", plus_using_NewPlusOverJ),
+	("times using TimesOverNumbers", times_using_TimesOverNumbers)
       ]
 
 end

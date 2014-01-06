@@ -1,5 +1,12 @@
 2014-01-06  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* little-mler/times-over-numbers.sig: add the signature for doing
+	``times'' arithmetic.
+
+	* little-mler/J-new-plus.sig (NewPlusOverJ): Add a new signature
+	for the new functor in order to abstract deeply for the plus
+	operation.
+
 	* little-mler/similar.sig (similar): add the signature to check
 	similarity among NUMBERS_BY_PEANO values.
 

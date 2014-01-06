@@ -379,4 +379,38 @@ structure IntArith' :
     structure SimNumNum = Same (structure a_N = NumStructWithRevealConceal
 				structure b_N = NumStructWithRevealConceal)
 
+    (* About the use of the new form of ``plus'', have a look at
+    ``J-new-plus.sig''...after we can use NewPlusOverJ directly as: *)
+    structure NewPlusStruct = NewPlusOverJ (
+	structure a_N = NumStructWithRevealConceal
+	structure a_P = PlusOverNumberWithWhereClause (
+	    structure a_N = a_N))
+    (* How do we know from the signatures that the type ``number'' in
+     NumStructWithRevealConceal is the same as the type ``number'' in
+     ``PlusOverNumberWithWhereClause ( structure a_N = a_N)''? The
+     functor that creates ``a_P'' is defined to produce structures
+     that have signature: ``PLUS_OVER_NUMBER where type number =
+     a_N.number''. And what is NumStructWithRevealConceal.number in
+     our case? We know that we create ``a_P'' from
+     ``PlusOverNumberWithWhereClause'' with
+     ``NumStructWithRevealConceal''. And therefore the type ``number''
+     in NumStructWithRevealConceal and the type ``number'' in ``a_P''
+     are equal. Does that mean the sharing constraint is satisfied?
+     Yes. *)
+
+    (* Felleisen and Friedman bet that you never thought there was so
+    much to say about ``plus''. Define the functor ``TimesOverNumber''
+    which defines the function ``times'', using a signature ``T'', go
+    read times-over-numbers.sig and come back... *)
+    structure TimesStruct = TimesOverNumber (
+	structure a_N = NumStructWithRevealConceal
+	structure a_P = PlusOverNumberWithWhereClause (
+	    structure a_N = a_N))
+
+    (* Don't forget to leave a tip. *)
+
+    (* THE TENTH MORAL: Real programs consist of many
+    components. Specify the dependencies among these components using
+    signatures and functors. *)
+
     end
