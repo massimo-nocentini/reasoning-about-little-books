@@ -11,6 +11,7 @@ is
     ../sexp-expressions/sources.cm
 
     table.sig
+    table-tests.sml
 
     scheme-interpreter.sig
     scheme-interpreter.sml

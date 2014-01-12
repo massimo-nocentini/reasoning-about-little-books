@@ -26,14 +26,20 @@ val zero = num_plus Zero Zero;
 functor aFunctor = NumberAsInt;
 
 
-functor MakeTable' = MakeTableWithStringIdentifierAndDoubleListImpl;
-
-structure Table = MakeTableWithStringIdentifierAndDoubleListImpl (
-    structure Identifier = MakeIdentifierAsString ());
-
-val f = Table.new_entry;
+functor MakeTable' = MakeTableDoubleListImpl;
 
 datatype food = Pate | Tomato | Pomodoro
+functor MakeTypeFood () :> TYPE where type aType = food
+   =
+   struct 
+   type aType = food
+   end
+
+structure Table = MakeTableDoubleListImpl (
+    structure IdentifierType = MakeTypeString ()
+    structure StuffType = MakeTypeFood ());
+
+val f = Table.extend_table;
 
 val anEntry = Table.new_entry ["hello", "world"] 
 			      [Pate, Pomodoro];

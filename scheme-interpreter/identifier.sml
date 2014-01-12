@@ -1,13 +1,13 @@
-signature IDENTIFIER = 
+signature TYPE = 
 sig
-    type identifier
+    type aType
 end
 
-functor MakeIdentifierAsString ()
-	:> IDENTIFIER where type identifier = string
+functor MakeTypeString ()
+	:> TYPE where type aType = string
         =
 	struct
 	
-	type identifier = string
+	type aType = string
 
 	end

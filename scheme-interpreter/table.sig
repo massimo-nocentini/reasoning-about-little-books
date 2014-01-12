@@ -2,44 +2,48 @@ signature TABLE =
 sig
 
     type identifier
+    type stuff
+
     type 'a keys
     type 'a values
-    type 'a entry
-    val new_entry: identifier keys -> 'a values -> 'a entry
+    type entry
 
-    datatype 'a lookup_failure = KeyNotFound of identifier -> bool
-			       | ValuesNotEnough of 'a values
+    val new_entry: identifier keys -> stuff values -> entry
 
-    (* val lookup_in_entry: (identifier -> bool)  *)
-    (* 			 -> 'a entry  *)
-    (* 			 -> ('a lookup_failure -> 'a) *)
-    (* 			 -> 'a *)
+    datatype lookup_failure = KeyNotFound of identifier -> bool
+			    | ValuesNotEnough of stuff values
 
-    type 'a table
-    val empty_table: 'a table
-    val extend_table: 'a entry -> 'a table -> 'a table
+    type table = entry list
+    val empty_table: table
+    val extend_table: entry -> table -> table
     val lookup_in_table: (identifier -> bool) 
-			 -> 'a table 
-			 -> ('a lookup_failure -> 'a)
-			 -> 'a
+			 -> table 
+			 -> (lookup_failure -> stuff)
+			 -> stuff
 
 end
 
-functor MakeTableWithStringIdentifierAndDoubleListImpl (
-    structure Identifier: IDENTIFIER)
-	:> TABLE where type identifier = Identifier.identifier
+functor MakeTableDoubleListImpl (
+    structure IdentifierType: TYPE
+    structure StuffType: TYPE)
+	:> TABLE where type identifier = IdentifierType.aType
+                 where type stuff = StuffType.aType
 		 where type 'a values = 'a list
                  where type 'a keys = 'a list
         =
 	struct
 
-	type identifier = Identifier.identifier
+	type identifier = IdentifierType.aType
+        type stuff = StuffType.aType
+
 	type 'a values = 'a list
         type 'a keys = 'a list
-	type 'a entry = (identifier keys) * ('a values)
 
-	datatype 'a lookup_failure = KeyNotFound of identifier -> bool
-				   | ValuesNotEnough of 'a values
+	type entry = (identifier keys) * (stuff values)
+	type table = entry list
+
+	datatype lookup_failure = KeyNotFound of identifier -> bool
+				| ValuesNotEnough of stuff values
 
 	fun new_entry keys values = (keys, values)
 
@@ -57,8 +61,6 @@ functor MakeTableWithStringIdentifierAndDoubleListImpl (
 	    in
 		L anEntry
 	    end
-	    
-	type 'a table = 'a entry list
 			   
 	val empty_table = []
 			      

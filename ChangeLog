@@ -1,5 +1,13 @@
 2014-01-12  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* scheme-interpreter/table.sig: refactored the functor for
+	parameterizing on the type of `stuff' value too (as done for the
+	type of identifier).
+
+	* scheme-interpreter/table-tests.sml (TableTests.suite): add a
+	suite of tests for the table implementation using two `parallel'
+	lists.
+
 	* scheme-interpreter/table.sig (TABLE): introduce a signature for
 	the table concept and a first implementation of a functor to build
 	TABLE structures.

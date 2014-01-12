@@ -13,3 +13,7 @@ val _ = SMLUnit.TextUITestRunner.runTest
 val _ = SMLUnit.TextUITestRunner.runTest
 	    {output = TextIO.stdOut}
 	    (LittleMLerTests.suite ());
+
+val _ = SMLUnit.TextUITestRunner.runTest
+	    {output = TextIO.stdOut}
+	    (TableTests.suite ());
