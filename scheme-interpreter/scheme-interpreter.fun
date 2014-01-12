@@ -56,7 +56,7 @@ structure SchemeInterpreterEnvironment =
 			 | CInteger of int
 			 | CBoolean of bool
 			 | CNonPrimitive of {
-		       	     table: scheme_meaning Table.table,
+		       	     table: computation_meaning Table.table,
 		       	     formals: Sexp.sexp,
 		       	     body: Sexp.sexp
 			 }
@@ -87,7 +87,16 @@ structure SchemeInterpreterEnvironment =
 			(fn (Table.KeyNotFound _) => 
 			    raise IdentifierNotBound key)
 
-		fun lambda_type aSexp aTable = CStub
+		fun lambda_type (Sexp.List
+				     (Sexp.Cons
+					  (Sexp.Atom lambda, 
+					   Sexp.Cons (
+					       formals as Sexp.List _,
+					       Sexp.Cons (
+						   body as Sexp.List _,
+						   Sexp.Null))))) 
+				table = 
+		    CNonPrimitive {table=table, formals=formals, body=body}
 
 		fun cond_type aSexp aTable = CStub
 		fun application_type aSexp aTable = CStub
@@ -135,6 +144,7 @@ structure SchemeInterpreterEnvironment =
 						 
 
 	    end
+		
 
     structure Interpreter = MakeInterpreter (
 	structure Sexp = Sexp
