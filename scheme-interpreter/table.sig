@@ -13,7 +13,7 @@ sig
     datatype lookup_failure = KeyNotFound of identifier -> bool
 			    | ValuesNotEnough of stuff values
 
-    type table = entry list
+    type table
     val empty_table: table
     val extend_table: entry -> table -> table
     val lookup_in_table: (identifier -> bool) 

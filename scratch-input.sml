@@ -45,7 +45,7 @@ val anEntry = Table.new_entry ["hello", "world"]
 			      [Pate, Pomodoro];
 
 (* the following doesn't compile, see the compiler complaint: *)
-(* val anEntry = Table.new_entry [4, 5]  *)
+(* val anEntry = Table.new_entry [4, 5] *)
 (* 			      [Pate, Pomodoro]; *)
  (* operator domain: Table.identifier Table.keys *)
  (*  operand:         int list *)
