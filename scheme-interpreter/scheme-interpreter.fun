@@ -29,10 +29,15 @@ structure SchemeInterpreterEnvironment =
     structure Sexp = MakeSexp (
 	structure ObjectType = MakeTypeSchemeTerm ())
 
-    datatype scheme_meaning = Primitive of scheme_term
+    datatype scheme_meaning = Primitive of Sexp.sexp
 			    | Quotation of Sexp.sexp
 			    | Integer of int
 			    | Boolean of bool
+			    (* | NonPrimitive of { *)
+			    (* 	table: table, *)
+			    (* 	formals: Sexp.sexp, *)
+			    (* 	body: Sexp.sexp *)
+			    (* } *)
 			    | Stub (* to delete when finished! *)
 
     functor MakeTypeSchemeMeaning () 
@@ -42,38 +47,49 @@ structure SchemeInterpreterEnvironment =
 
     functor MakeInterpreter (
 	structure Sexp: SEXP where type object = scheme_term
+	val mk_primitive: Sexp.sexp -> scheme_meaning
 	val mk_quotation: Sexp.sexp -> scheme_meaning
-	structure Table: TABLE) 
+	structure Table: TABLE where type identifier = string
+                               where type stuff = scheme_meaning) 
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
+				where type identifier = Table.identifier
             =
 	    struct
 
-	        type term = scheme_term
-
 		structure Sexp = Sexp
 
+	        type term = scheme_term
+
 		type meaning = scheme_meaning
+
+		type identifier = Table.identifier
 
 		type action = Sexp.sexp 
 			      -> Table.table 
 			      -> meaning
 
 		exception EmptyListNotAllowedForNonPrimitiveExpression
+		exception IdentifierNotBound of identifier
 
 		fun const_type (Sexp.Atom (integer i)) _ = Integer i
 		  | const_type (Sexp.Atom (boolean b)) _ = Boolean b
-		  | const_type (Sexp.Atom anAtom) _ = Primitive anAtom
-
-
-		fun identifier_type aSexp aTable = Stub
+		  | const_type (atom as Sexp.Atom _) _ = mk_primitive atom
 
 		fun quote_type (Sexp.List 
 				    (Sexp.Cons 
-					 (Sexp.Atom quote, conses)))
-			       aTable = mk_quotation (Sexp.List conses)
+					 (Sexp.Atom quote, conses))) _ =
+		    mk_quotation (Sexp.List conses)
+
+		fun identifier_type (Sexp.Atom (identifier key)) aTable = 
+		    Table.lookup_in_table 
+			(fn anotherKey => key = anotherKey)
+			aTable
+			(fn (Table.KeyNotFound _) => 
+			    raise IdentifierNotBound key)
 
 		fun lambda_type aSexp aTable = Stub
+
 		fun cond_type aSexp aTable = Stub
 		fun application_type aSexp aTable = Stub
 
@@ -114,7 +130,9 @@ structure SchemeInterpreterEnvironment =
 
     structure Interpreter = MakeInterpreter (
 	structure Sexp = Sexp
-	val mk_quotation = (fn sexp_obj => Quotation sexp_obj)
+	val mk_primitive = Primitive
+	(* simply, instead of (fn sexp_obj => Quotation sexp_obj) *)
+	val mk_quotation = Quotation 
 	structure Table = MakeTableDoubleListImpl (
 	    structure IdentifierType = MakeTypeString ()
 	    structure StuffType = MakeTypeSchemeMeaning ()))
