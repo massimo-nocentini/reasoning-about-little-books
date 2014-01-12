@@ -1,5 +1,9 @@
 2014-01-12  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
+	* scheme-interpreter/scheme-interpreter.fun
+	(SchemeInterpreterEnvironment): add a first implementation of the
+	environment for interpreting a Scheme expression.
+
 	* scheme-interpreter/table.sig: refactored the functor for
 	parameterizing on the type of `stuff' value too (as done for the
 	type of identifier).

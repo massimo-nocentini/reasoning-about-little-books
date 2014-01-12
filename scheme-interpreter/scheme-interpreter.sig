@@ -3,12 +3,10 @@ sig
 
     type term
 
+    type meaning
+
     structure Sexp: SEXP where type object = term
-			
-    (* type action *)
-
-    (* val sexp_to_action: term Sexp.sexp -> action *)
-
-
+		
+    val value: term Sexp.sexp -> meaning
 
 end
