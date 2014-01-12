@@ -3,6 +3,10 @@
 	* scheme-interpreter/table.sig (TABLE): introduce a signature for
 	the table concept and a first implementation of a functor to build
 	TABLE structures.
+	(MakeTableWithStringIdentifierAndDoubleListImpl): refined the
+	implementation of the functor for the table in order to
+	parameterize the identifier type, instead of setting it to
+	`string'.
 
 2014-01-06  Massimo Nocentini  <massimo.nocentini@gmail.com>
 

@@ -27,8 +27,23 @@ functor aFunctor = NumberAsInt;
 
 
 functor MakeTable' = MakeTableWithStringIdentifierAndDoubleListImpl;
-structure Table = MakeTableWithStringIdentifierAndDoubleListImpl ();
+
+structure Table = MakeTableWithStringIdentifierAndDoubleListImpl (
+    structure Identifier = MakeIdentifierAsString ());
+
+val f = Table.new_entry;
+
 datatype food = Pate | Tomato | Pomodoro
-val anEntry = Table.new_entry ["appetizer", "entree"] 
+
+val anEntry = Table.new_entry ["hello", "world"] 
 			      [Pate, Pomodoro];
+
+(* the following doesn't compile, see the compiler complaint: *)
+(* val anEntry = Table.new_entry [4, 5]  *)
+(* 			      [Pate, Pomodoro]; *)
+ (* operator domain: Table.identifier Table.keys *)
+ (*  operand:         int list *)
+ (*  in expression: *)
+ (*    Table.new_entry (4 :: 5 :: nil) *)
+
 

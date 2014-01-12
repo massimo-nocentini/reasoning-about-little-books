@@ -25,14 +25,15 @@ sig
 
 end
 
-functor MakeTableWithStringIdentifierAndDoubleListImpl ()
-	:> TABLE where type identifier = string
+functor MakeTableWithStringIdentifierAndDoubleListImpl (
+    structure Identifier: IDENTIFIER)
+	:> TABLE where type identifier = Identifier.identifier
 		 where type 'a values = 'a list
                  where type 'a keys = 'a list
         =
 	struct
 
-	type identifier = string
+	type identifier = Identifier.identifier
 	type 'a values = 'a list
         type 'a keys = 'a list
 	type 'a entry = (identifier keys) * ('a values)
