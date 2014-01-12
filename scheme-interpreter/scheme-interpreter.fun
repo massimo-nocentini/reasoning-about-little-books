@@ -4,23 +4,23 @@ structure SchemeInterpreterEnvironment =
 
     type identifier = string
 
-    datatype scheme_term = integer of int
-			 | boolean of bool
-			 | cons
-			 | car 
-			 | cdr
-			 | null_p
-			 | eq_p
-			 | atom_p				     
-			 | zero_p
-			 | succ
-			 | pred
-			 | number_p
-			 | identifier of identifier
-			 | quote
-			 | lambda
-			 | cond
-			 | elseq
+    datatype scheme_term = TmInteger of int
+			 | TmBoolean of bool
+			 | TmCons
+			 | TmCar 
+			 | TmCdr
+			 | TmNull_p
+			 | TmEq_p
+			 | TmAtom_p				     
+			 | TmZero_p
+			 | TmSucc
+			 | TmPred
+			 | TmNumber_p
+			 | TmIdentifier of identifier
+			 | TmQuote
+			 | TmLambda
+			 | TmCond
+			 | TmElse
 
     functor MakeTypeSchemeTerm () 
 	    :> TYPE where type aType = scheme_term
@@ -82,39 +82,39 @@ structure SchemeInterpreterEnvironment =
 		    sexp_to_action aSexp aSexp aTable
 		and sexp_to_action (atom as Sexp.Atom term) = 
 		    (case term of
-			 integer _ => const_type
-		       | boolean _ => const_type
-		       | cons => const_type
-		       | car => const_type
-		       | cdr => const_type
-		       | null_p => const_type
-		       | eq_p => const_type
-		       | atom_p => const_type		     
-		       | zero_p => const_type
-		       | succ => const_type
-		       | pred => const_type
-		       | number_p => const_type
+			 TmInteger _ => const_type
+		       | TmBoolean _ => const_type
+		       | TmCons => const_type
+		       | TmCar => const_type
+		       | TmCdr => const_type
+		       | TmNull_p => const_type
+		       | TmEq_p => const_type
+		       | TmAtom_p => const_type		     
+		       | TmZero_p => const_type
+		       | TmSucc => const_type
+		       | TmPred => const_type
+		       | TmNumber_p => const_type
 		       | _ => identifier_type)
 		  | sexp_to_action (list as Sexp.List conses) =
 		    case conses of
 			Sexp.Cons (Sexp.Atom atom, _) =>
 			let
-			    fun A quote = quote_type
-			      | A lambda = lambda_type
-			      | A cond = cond_type
+			    fun A TmQuote = quote_type
+			      | A TmLambda = lambda_type
+			      | A TmCond = cond_type
 			      | A _ = application_type
 			in A atom end	    
 		      | Sexp.Cons (_, _) => application_type
 		      | Sexp.Null => 
 			raise EmptyListNotAllowedForNonPrimitiveExpression
-		and const_type (Sexp.Atom (integer i)) _ = CInteger i
-		  | const_type (Sexp.Atom (boolean b)) _ = CBoolean b
+		and const_type (Sexp.Atom (TmInteger i)) _ = CInteger i
+		  | const_type (Sexp.Atom (TmBoolean b)) _ = CBoolean b
 		  | const_type (atom as Sexp.Atom _) _ = CPrimitive atom
 		and quote_type (Sexp.List 
 				    (Sexp.Cons 
-					 (Sexp.Atom quote, conses))) _ =
+					 (Sexp.Atom TmQuote, conses))) _ =
 		    CQuotation (Sexp.List conses)
-		and identifier_type (Sexp.Atom (identifier key)) aTable = 
+		and identifier_type (Sexp.Atom (TmIdentifier key)) aTable = 
 		    Table.lookup_in_table 
 			(fn anotherKey => key = anotherKey)
 			aTable
@@ -122,7 +122,7 @@ structure SchemeInterpreterEnvironment =
 			    raise IdentifierNotBound key)
 		and lambda_type (Sexp.List
 				     (Sexp.Cons
-					  (Sexp.Atom lambda, 
+					  (Sexp.Atom TmLambda, 
 					   Sexp.Cons (
 					       formals as Sexp.List _,
 					       Sexp.Cons (
@@ -136,17 +136,17 @@ structure SchemeInterpreterEnvironment =
 		    }
 		and cond_type (Sexp.List
 				   (Sexp.Cons
-					(Sexp.Atom cons,
+					(Sexp.Atom TmCond,
 					 lines as Sexp.Cons
 					       (* just to ensure that
 					       there is at least one
 					       question, namely
-					       `elseq' *)
+					       `TmElse' *)
 					       (Sexp.List _,
 						other_conses))))
 			      aTable = 
 		    let
-			fun is_else_question (Sexp.Atom elseq) = true
+			fun is_else_question (Sexp.Atom TmElse) = true
 			  | is_else_question _ = false
 						     
 			fun evcon (Sexp.Cons (
