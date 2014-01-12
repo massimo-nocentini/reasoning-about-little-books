@@ -2,10 +2,10 @@ signature SEXP =
 sig
     type object
 
-    datatype 'a slist = Null
-		      | Cons of (object sexp) * ('a slist)
-	 and 'b sexp = Atom of 'b
-		     | List of object slist
+    datatype slist = Null
+		   | Cons of sexp * slist
+	 and sexp = Atom of object
+		  | List of slist
 end
 
 functor MakeSexp (structure ObjectType: TYPE)
@@ -15,10 +15,10 @@ functor MakeSexp (structure ObjectType: TYPE)
 
 	type object = ObjectType.aType
 
-	datatype 'a slist = Null
-			  | Cons of (object sexp) * ('a slist)
-	     and 'b sexp = Atom of 'b
-			 | List of object slist
+	datatype slist = Null
+		       | Cons of sexp * slist
+	     and sexp = Atom of object
+		      | List of slist
 	end
 
 

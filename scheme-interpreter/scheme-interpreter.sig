@@ -7,6 +7,8 @@ sig
 
     structure Sexp: SEXP where type object = term
 		
-    val value: term Sexp.sexp -> meaning
+    val value: Sexp.sexp -> meaning
+
+    exception EmptyListNotAllowedForNonPrimitiveExpression
 
 end

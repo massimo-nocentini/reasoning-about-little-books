@@ -48,6 +48,7 @@ structure FoodSexp = MakeSexp (structure ObjectType = MakeTypeFood());
 val FoodSexp.List aList = FoodSexp.List (
 	FoodSexp.Cons (FoodSexp.Atom Tomato, FoodSexp.Null))
 
+open SchemeInterpreterEnvironment.Sexp;
 (* the following doesn't compile, see the compiler complaint: *)
 (* val anEntry = Table.new_entry [4, 5] *)
 (* 			      [Pate, Pomodoro]; *)
