@@ -12,7 +12,7 @@ is
     ../sexp-expressions/sources.cm
 
     scheme-interpreter.sig
-    scheme-interpreter.sml
+    scheme-interpreter.fun
     
     table.sig
     table-tests.sml
