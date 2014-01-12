@@ -9,15 +9,17 @@ is
     
     hop-skip-jump.sml
 
+    types-utilities/sources.cm
+
     sexp-expressions/sources.cm
 
-    little-schemer.sml
+    little-schemer.sml (with: parser.quotations=true)
     little-schemer-tests.sml (with: parser.quotations=true)
 
     chains.sml
 
     little-mler/sources.cm
 
-    fix-point-combinators/sources.cm
+    (* fix-point-combinators/sources.cm *)
 
     scheme-interpreter/sources.cm

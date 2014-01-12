@@ -8,6 +8,9 @@ is
 
     ../SMLUnit/src/main/sources.cm
 
+    ../types-utilities/sources.cm
+
+    sexp-expressions.sig
     sexp-expressions.sml (with: parser.quotations=true)
     sexp-expressions-tests.sml (with: parser.quotations=true)
 
