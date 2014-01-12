@@ -24,3 +24,11 @@ open LittleMLer;
 
 val zero = num_plus Zero Zero;
 functor aFunctor = NumberAsInt;
+
+
+functor MakeTable' = MakeTableWithStringIdentifierAndDoubleListImpl;
+structure Table = MakeTableWithStringIdentifierAndDoubleListImpl ();
+datatype food = Pate | Tomato | Pomodoro
+val anEntry = Table.new_entry ["appetizer", "entree"] 
+			      [Pate, Pomodoro];
+
