@@ -29,57 +29,56 @@ structure SchemeInterpreterEnvironment =
     structure Sexp = MakeSexp (
 	structure ObjectType = MakeTypeSchemeTerm ())
 
-    datatype scheme_meaning = Primitive of Sexp.sexp
+    datatype scheme_meaning = Integer of int
 			    | Quotation of Sexp.sexp
-			    | Integer of int
 			    | Boolean of bool
-			    (* | NonPrimitive of { *)
-			    (* 	table: table, *)
-			    (* 	formals: Sexp.sexp, *)
-			    (* 	body: Sexp.sexp *)
-			    (* } *)
-			    | Stub (* to delete when finished! *)
-
-    functor MakeTypeSchemeMeaning () 
-	    :> TYPE where type aType = scheme_meaning
-            =
-	    struct type aType = scheme_meaning end
 
     functor MakeInterpreter (
 	structure Sexp: SEXP where type object = scheme_term
-	val mk_primitive: Sexp.sexp -> scheme_meaning
-	val mk_quotation: Sexp.sexp -> scheme_meaning
-	structure Table: TABLE where type identifier = string
-                               where type stuff = scheme_meaning) 
+	val mk_quotation: Sexp.sexp -> scheme_meaning) 
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
-				where type identifier = Table.identifier
             =
 	    struct
 
 		structure Sexp = Sexp
+		structure Table = MakeTableDoubleListImpl (
+		    structure IdentifierType = MakeTypeString ())
 
 	        type term = scheme_term
 
+		(* meaning for the end of computation *)
 		type meaning = scheme_meaning
+
+		datatype computation_meaning = 
+			 CPrimitive of Sexp.sexp
+			 | CQuotation of Sexp.sexp
+			 | CInteger of int
+			 | CBoolean of bool
+			 | CNonPrimitive of {
+		       	     table: scheme_meaning Table.table,
+		       	     formals: Sexp.sexp,
+		       	     body: Sexp.sexp
+			 }
+		       | CStub (* to delete when finished! *)
 
 		type identifier = Table.identifier
 
 		type action = Sexp.sexp 
-			      -> Table.table 
-			      -> meaning
+			      -> computation_meaning Table.table 
+			      -> computation_meaning
 
 		exception EmptyListNotAllowedForNonPrimitiveExpression
 		exception IdentifierNotBound of identifier
 
-		fun const_type (Sexp.Atom (integer i)) _ = Integer i
-		  | const_type (Sexp.Atom (boolean b)) _ = Boolean b
-		  | const_type (atom as Sexp.Atom _) _ = mk_primitive atom
+		fun const_type (Sexp.Atom (integer i)) _ = CInteger i
+		  | const_type (Sexp.Atom (boolean b)) _ = CBoolean b
+		  | const_type (atom as Sexp.Atom _) _ = CPrimitive atom
 
 		fun quote_type (Sexp.List 
 				    (Sexp.Cons 
 					 (Sexp.Atom quote, conses))) _ =
-		    mk_quotation (Sexp.List conses)
+		    CQuotation (Sexp.List conses)
 
 		fun identifier_type (Sexp.Atom (identifier key)) aTable = 
 		    Table.lookup_in_table 
@@ -88,10 +87,10 @@ structure SchemeInterpreterEnvironment =
 			(fn (Table.KeyNotFound _) => 
 			    raise IdentifierNotBound key)
 
-		fun lambda_type aSexp aTable = Stub
+		fun lambda_type aSexp aTable = CStub
 
-		fun cond_type aSexp aTable = Stub
-		fun application_type aSexp aTable = Stub
+		fun cond_type aSexp aTable = CStub
+		fun application_type aSexp aTable = CStub
 
 		fun sexp_to_action (atom as Sexp.Atom term) = 
 		    (case term of
@@ -121,20 +120,25 @@ structure SchemeInterpreterEnvironment =
 		      | Sexp.Null => 
 			raise EmptyListNotAllowedForNonPrimitiveExpression
 
-		fun value aSexp = sexp_to_action aSexp 
-						 aSexp 
-						 Table.empty_table
+		fun value aSexp = 
+		    let
+			val computation_meaning = 
+			    sexp_to_action aSexp 
+					   aSexp 
+					   Table.empty_table
+		    in
+			case computation_meaning of
+			    CInteger i => Integer i
+			  | CBoolean b => Boolean b
+			  | CQuotation aSexp => mk_quotation aSexp
+		    end
 						 
 
 	    end
 
     structure Interpreter = MakeInterpreter (
 	structure Sexp = Sexp
-	val mk_primitive = Primitive
 	(* simply, instead of (fn sexp_obj => Quotation sexp_obj) *)
-	val mk_quotation = Quotation 
-	structure Table = MakeTableDoubleListImpl (
-	    structure IdentifierType = MakeTypeString ()
-	    structure StuffType = MakeTypeSchemeMeaning ()))
+	val mk_quotation = Quotation)
 
     end

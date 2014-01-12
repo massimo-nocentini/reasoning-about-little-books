@@ -2,48 +2,44 @@ signature TABLE =
 sig
 
     type identifier
-    type stuff
 
     type 'a keys
     type 'a values
-    type entry
+    type 'a entry
 
-    val new_entry: identifier keys -> stuff values -> entry
+    val new_entry: identifier keys -> 'a values -> 'a entry
 
-    datatype lookup_failure = KeyNotFound of identifier -> bool
-			    | ValuesNotEnough of stuff values
+    datatype 'a lookup_failure = KeyNotFound of identifier -> bool
+			       | ValuesNotEnough of 'a values
 
-    type table
-    val empty_table: table
-    val extend_table: entry -> table -> table
+    type 'a table
+    val empty_table: 'a table
+    val extend_table: 'a entry -> 'a table -> 'a table
     val lookup_in_table: (identifier -> bool) 
-			 -> table 
-			 -> (lookup_failure -> stuff)
-			 -> stuff
+			 -> 'a table 
+			 -> ('a lookup_failure -> 'a)
+			 -> 'a
 
 end
 
 functor MakeTableDoubleListImpl (
-    structure IdentifierType: TYPE
-    structure StuffType: TYPE)
+    structure IdentifierType: TYPE)
 	:> TABLE where type identifier = IdentifierType.aType
-                 where type stuff = StuffType.aType
 		 where type 'a values = 'a list
                  where type 'a keys = 'a list
         =
 	struct
 
 	type identifier = IdentifierType.aType
-        type stuff = StuffType.aType
 
 	type 'a values = 'a list
         type 'a keys = 'a list
 
-	type entry = (identifier keys) * (stuff values)
-	type table = entry list
+	type 'a entry = (identifier keys) * ('a values)
+	type 'a table = 'a entry list
 
-	datatype lookup_failure = KeyNotFound of identifier -> bool
-				| ValuesNotEnough of stuff values
+	datatype 'a lookup_failure = KeyNotFound of identifier -> bool
+				   | ValuesNotEnough of 'a values
 
 	fun new_entry keys values = (keys, values)
 
