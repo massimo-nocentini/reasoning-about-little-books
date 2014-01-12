@@ -1,0 +1,1 @@
+structure Temp = struct end

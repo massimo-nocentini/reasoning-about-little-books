@@ -17,3 +17,7 @@ is
     chains.sml
 
     little-mler/sources.cm
+
+    fix-point-combinators/sources.cm
+
+    scheme-interpreter/sources.cm
