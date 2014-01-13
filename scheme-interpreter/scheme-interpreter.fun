@@ -36,7 +36,8 @@ structure SchemeInterpreterEnvironment =
 
     functor MakeInterpreter (
 	structure Sexp: SEXP where type object = scheme_term
-	val mk_quotation: Sexp.sexp -> scheme_meaning) 
+	val mk_quotation: Sexp.sexp -> scheme_meaning)
+	(* val mk_bool_sexp: bool -> Sexp.sexp)  *)
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
             =
@@ -94,7 +95,10 @@ structure SchemeInterpreterEnvironment =
 		       | TmSucc => const_type
 		       | TmPred => const_type
 		       | TmNumber_p => const_type
-		       | _ => identifier_type)
+		       (* maybe here we can require the TmIdentifier
+		       matching, leaving all the other cases to raise
+		       an exception *)
+		       | _ => identifier_type) 
 		  | sexp_to_action (list as Sexp.List conses) =
 		    case conses of
 			Sexp.Cons (Sexp.Atom atom, _) =>
@@ -102,6 +106,8 @@ structure SchemeInterpreterEnvironment =
 			    fun A TmQuote = quote_type
 			      | A TmLambda = lambda_type
 			      | A TmCond = cond_type
+			      (* maybe the following is too safe,
+			      maybe better raising an exception *)
 			      | A _ = application_type
 			in A atom end	    
 		      | Sexp.Cons (_, _) => application_type
@@ -146,9 +152,6 @@ structure SchemeInterpreterEnvironment =
 						other_conses))))
 			      aTable = 
 		    let
-			fun is_else_question (Sexp.Atom TmElse) = true
-			  | is_else_question _ = false
-						     
 			fun evcon (Sexp.Cons (
 					Sexp.List (
 					    Sexp.Cons(
@@ -156,22 +159,98 @@ structure SchemeInterpreterEnvironment =
 						Sexp.Cons (answer, 
 							   Sexp.Null))),
 					other_questions)) =
-			    if is_else_question question
-			    then meaning_of answer aTable
-			    else case meaning_of question aTable of
-				     CBoolean true => 
-				     meaning_of answer aTable
-				   | CBoolean false => 
-				     evcon other_questions
+			    case question of
+				Sexp.Atom TmElse => meaning_of answer aTable
+			      | _ => (case meaning_of question aTable of
+					  CBoolean true => 
+					  meaning_of answer aTable
+					| CBoolean false => 
+					  evcon other_questions)
 		    in 
 			evcon lines
 		    end
-		and application_type aSexp aTable = CStub
+		and application_type (Sexp.List 
+					  (Sexp.Cons
+					       (function as Sexp.List _,
+						args)))
+				     aTable = 
+		    let 
+			fun evlis Sexp.Null = []: computation_meaning list
+			  | evlis (Sexp.Cons (aSexp, other_args)) = 
+			    (meaning_of aSexp aTable) :: (evlis other_args)
 
-
-
+			fun apply (CPrimitive (Sexp.Atom TmCons)) 
+				  [car, cdr as CQuotation cdrSexp] = 
+			    let
+				val car_sexp = case car of
+						   CInteger i => Sexp.Atom (TmInteger i)
+						 | CBoolean b => Sexp.Atom (TmBoolean b)
+						 | CQuotation aSexp => aSexp
+			    in
+				CQuotation (Sexp.List (
+						 Sexp.Cons (car_sexp,
+							    Sexp.Cons (cdrSexp, Sexp.Null))))
+			    end
+			  | apply (CPrimitive (Sexp.Atom TmCar))
+				  [CQuotation (Sexp.List (
+						    Sexp.Cons (car, _)))] =
+			    CQuotation car
+			  | apply (CPrimitive (Sexp.Atom TmCdr))
+				  [CQuotation (Sexp.List (
+						    (* we require that
+						    the cdr isn't
+						    Sexp.Null, asking
+						    for at least
+						    another Cons, in
+						    order to not
+						    violate `Law of
+						    Cons'. *)
+						    Sexp.Cons (_, cdr as Sexp.Cons (_, _))))] = 
+			    CQuotation (Sexp.List cdr)
+			  | apply (CPrimitive (Sexp.Atom TmNull_p))
+				  [CQuotation (Sexp.List (aList))] = 
+			    (case aList of
+				Sexp.Null => CBoolean true
+			      | Sexp.Cons (_,_) => CBoolean false)
+			  | apply (CPrimitive (Sexp.Atom TmEq_p))
+				  [fst, snd] = 
+			    (case (fst, snd) of
+				 (CInteger n, CInteger m) => CBoolean (n = m)
+			       | (CBoolean true, CBoolean true) => CBoolean true
+			       | (CBoolean false, CBoolean false) => CBoolean true
+			       (* | (CQuotation q, CQuotation r) =>  CBoolean (q = r) *)
+			       | (_, _) => CBoolean false)
+			  | apply (CPrimitive (Sexp.Atom TmAtom_p)) 
+				  [atomic_meaning] =
+			    (case atomic_meaning of
+				 CInteger _ => CBoolean true
+			       | CBoolean _ => CBoolean true
+			       | CQuotation (Sexp.List Sexp.Null) => CBoolean false
+			       | CQuotation (Sexp.Atom _) => CBoolean true
+			       | _ => CBoolean false) 
+			  | apply (CPrimitive (Sexp.Atom TmZero_p)) 
+				  [CInteger n] = 
+			    (case n of 
+				 0 => CBoolean true
+			       | _ => CBoolean false)
+			  | apply (CPrimitive (Sexp.Atom TmSucc)) 
+				  [CInteger n] = CInteger (n + 1)
+			  | apply (CPrimitive (Sexp.Atom TmPred)) 
+				  [CInteger n] = 
+			    (case n of 
+				 0 => CInteger 0 (* here we should raise an exception instead *)
+			       | n => CInteger (n-1))
+			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
+				  [CInteger _] = CBoolean true
+			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
+				  [_] = CBoolean false			    
+				
+		    in 
+			apply (meaning_of function aTable) (evlis args)
+		    end
 	    end
 		
+
 
     structure Interpreter = MakeInterpreter (
 	structure Sexp = Sexp
