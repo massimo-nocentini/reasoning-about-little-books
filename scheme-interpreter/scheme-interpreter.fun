@@ -243,7 +243,24 @@ structure SchemeInterpreterEnvironment =
 			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
 				  [CInteger _] = CBoolean true
 			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
-				  [_] = CBoolean false			    
+				  [_] = CBoolean false
+			  | apply (CNonPrimitive {table, formals, body}) meanings = 
+			    let 
+				fun formals_to_identifiers_list Sexp.Null = []
+				  | formals_to_identifiers_list 
+					(Sexp.Cons (Sexp.Atom (TmIdentifier key), other_formals)) = 
+				    key :: (formals_to_identifiers_list other_formals)
+
+				val (Sexp.List formals_slist) = formals
+
+				val new_entry = Table.new_entry 
+						    (formals_to_identifiers_list formals_slist)
+						    meanings
+
+				val table' = Table.extend_table new_entry table
+			    in
+				meaning_of body table'
+			    end
 				
 		    in 
 			apply (meaning_of function aTable) (evlis args)
