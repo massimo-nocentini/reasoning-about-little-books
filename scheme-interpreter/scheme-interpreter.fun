@@ -27,7 +27,10 @@ structure SchemeInterpreterEnvironment =
             =
 	    struct type aType = scheme_term end
 
+    (* make an attempt to write `mutually recursive structure' *)
     structure Sexp = MakeSexp (
+	structure ObjectType = MakeTypeSchemeTerm ())
+	      and Sexp' = MakeSexp (
 	structure ObjectType = MakeTypeSchemeTerm ())
 
     datatype scheme_meaning = Integer of int
@@ -35,9 +38,14 @@ structure SchemeInterpreterEnvironment =
 			    | Boolean of bool
 
     functor MakeInterpreter (
-	structure Sexp: SEXP where type object = scheme_term
-	val mk_quotation: Sexp.sexp -> scheme_meaning)
-	(* val mk_bool_sexp: bool -> Sexp.sexp)  *)
+	(* structure Sexp: SEXP where type object = scheme_term *)
+	structure Sexp: SEXP where type object = Sexp.object
+                             where type sexp = Sexp.sexp)
+	    (* having asserted that sexp = Sexp.sexp now we can build
+	    `Quotation' values *) (* directly giving the same sexp
+	    values! (without using the quite curious outer-function
+	    mechanism) *)
+	(* val mk_quotation: Sexp.sexp -> scheme_meaning) *)
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
             =
@@ -57,12 +65,12 @@ structure SchemeInterpreterEnvironment =
 			 | CQuotation of Sexp.sexp
 			 | CInteger of int
 			 | CBoolean of bool
-			 | CNonPrimitive of {
-		       	     table: computation_meaning Table.table,
-		       	     formals: Sexp.sexp,
-		       	     body: Sexp.sexp
-			 }
-		       | CStub (* to delete when finished! *)
+			 | CNonPrimitive of closure
+		withtype closure = {
+		       	 table: computation_meaning Table.table,
+		       	 formals: Sexp.sexp,
+		       	 body: Sexp.sexp
+		     }
 
 		type identifier = Table.identifier
 
@@ -78,7 +86,8 @@ structure SchemeInterpreterEnvironment =
 		    case meaning_of aSexp Table.empty_table of
 			CInteger i => Integer i
 		      | CBoolean b => Boolean b
-		      | CQuotation aSexp => mk_quotation aSexp
+		      (* | CQuotation aSexp => mk_quotation aSexp *)
+		      | CQuotation aSexp => Quotation aSexp
 		and meaning_of aSexp aTable = 
 		    sexp_to_action aSexp aSexp aTable
 		and sexp_to_action (atom as Sexp.Atom term) = 
@@ -239,7 +248,7 @@ structure SchemeInterpreterEnvironment =
 				  [CInteger n] = 
 			    (case n of 
 				 0 => CInteger 0 (* here we should raise an exception instead *)
-			       | n => CInteger (n-1))
+			       | m => CInteger (m-1))
 			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
 				  [CInteger _] = CBoolean true
 			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
@@ -270,8 +279,8 @@ structure SchemeInterpreterEnvironment =
 
 
     structure Interpreter = MakeInterpreter (
-	structure Sexp = Sexp
+	structure Sexp = Sexp)
 	(* simply, instead of (fn sexp_obj => Quotation sexp_obj) *)
-	val mk_quotation = Quotation)
+	(* val mk_quotation = Quotation) *)
 
     end
