@@ -27,15 +27,28 @@ structure SchemeInterpreterEnvironment =
             =
 	    struct type aType = scheme_term end
 
-    (* make an attempt to write `mutually recursive structure' *)
+
     structure Sexp = MakeSexp (
 	structure ObjectType = MakeTypeSchemeTerm ())
-	      and Sexp' = MakeSexp (
-	structure ObjectType = MakeTypeSchemeTerm ())
 
-    datatype scheme_meaning = Integer of int
+    (* fun scheme_term_eq (q: Sexp.sexp) (r: Sexp.sexp) = q = r *)
+
+    (* datatype scheme_meaning = Integer of int *)
+    (* 			    | Quotation of Sexp.sexp *)
+    (* 			    | Boolean of bool *)
+
+    structure Table = MakeTableDoubleListImpl (
+	structure IdentifierType = MakeTypeString ())
+
+    datatype scheme_meaning = Primitive of Sexp.sexp
 			    | Quotation of Sexp.sexp
+			    | Integer of int
 			    | Boolean of bool
+			    | NonPrimitive of closure withtype closure = {
+				table: scheme_meaning Table.table,
+				formals: Sexp.sexp,
+				body: Sexp.sexp
+			    }
 
     functor MakeInterpreter (
 	(* structure Sexp: SEXP where type object = scheme_term *)
@@ -52,42 +65,27 @@ structure SchemeInterpreterEnvironment =
 	    struct
 
 		structure Sexp = Sexp
-		structure Table = MakeTableDoubleListImpl (
-		    structure IdentifierType = MakeTypeString ())
 
 	        type term = scheme_term
 
-		(* meaning for the end of computation *)
 		type meaning = scheme_meaning
-
-		datatype computation_meaning = 
-			 CPrimitive of Sexp.sexp
-			 | CQuotation of Sexp.sexp
-			 | CInteger of int
-			 | CBoolean of bool
-			 | CNonPrimitive of closure
-		withtype closure = {
-		       	 table: computation_meaning Table.table,
-		       	 formals: Sexp.sexp,
-		       	 body: Sexp.sexp
-		     }
 
 		type identifier = Table.identifier
 
 		type action = Sexp.sexp 
-			      -> computation_meaning Table.table 
-			      -> computation_meaning
+			      -> scheme_meaning Table.table 
+			      -> scheme_meaning
 
 		exception EmptyListNotAllowedForNonPrimitiveExpression
 		exception IdentifierNotBound of identifier
 
 
-		fun value aSexp = 
-		    case meaning_of aSexp Table.empty_table of
-			CInteger i => Integer i
-		      | CBoolean b => Boolean b
-		      (* | CQuotation aSexp => mk_quotation aSexp *)
-		      | CQuotation aSexp => Quotation aSexp
+		fun value aSexp = meaning_of aSexp Table.empty_table
+		    (* case meaning_of aSexp Table.empty_table of *)
+		    (* 	Integer i => Integer i *)
+		    (*   | Boolean b => Boolean b *)
+		    (*   (* | Quotation aSexp => mk_quotation aSexp *) *)
+		    (*   | Quotation aSexp => Quotation aSexp *)
 		and meaning_of aSexp aTable = 
 		    sexp_to_action aSexp aSexp aTable
 		and sexp_to_action (atom as Sexp.Atom term) = 
@@ -122,13 +120,13 @@ structure SchemeInterpreterEnvironment =
 		      | Sexp.Cons (_, _) => application_type
 		      | Sexp.Null => 
 			raise EmptyListNotAllowedForNonPrimitiveExpression
-		and const_type (Sexp.Atom (TmInteger i)) _ = CInteger i
-		  | const_type (Sexp.Atom (TmBoolean b)) _ = CBoolean b
-		  | const_type (atom as Sexp.Atom _) _ = CPrimitive atom
+		and const_type (Sexp.Atom (TmInteger i)) _ = Integer i
+		  | const_type (Sexp.Atom (TmBoolean b)) _ = Boolean b
+		  | const_type (atom as Sexp.Atom _) _ = Primitive atom
 		and quote_type (Sexp.List 
 				    (Sexp.Cons 
 					 (Sexp.Atom TmQuote, conses))) _ =
-		    CQuotation (Sexp.List conses)
+		    Quotation (Sexp.List conses)
 		and identifier_type (Sexp.Atom (TmIdentifier key)) aTable = 
 		    Table.lookup_in_table 
 			(fn anotherKey => key = anotherKey)
@@ -144,7 +142,7 @@ structure SchemeInterpreterEnvironment =
 						   body as Sexp.List _,
 						   Sexp.Null))))) 
 				aTable = 
-		    CNonPrimitive {
+		    NonPrimitive {
 			table=aTable, 
 			formals=formals, 
 			body=body
@@ -171,9 +169,9 @@ structure SchemeInterpreterEnvironment =
 			    case question of
 				Sexp.Atom TmElse => meaning_of answer aTable
 			      | _ => (case meaning_of question aTable of
-					  CBoolean true => 
+					  Boolean true => 
 					  meaning_of answer aTable
-					| CBoolean false => 
+					| Boolean false => 
 					  evcon other_questions)
 		    in 
 			evcon lines
@@ -184,28 +182,28 @@ structure SchemeInterpreterEnvironment =
 						args)))
 				     aTable = 
 		    let 
-			fun evlis Sexp.Null = []: computation_meaning list
+			fun evlis Sexp.Null = []: scheme_meaning list
 			  | evlis (Sexp.Cons (aSexp, other_args)) = 
 			    (meaning_of aSexp aTable) :: (evlis other_args)
 
-			fun apply (CPrimitive (Sexp.Atom TmCons)) 
-				  [car, cdr as CQuotation cdrSexp] = 
+			fun apply (Primitive (Sexp.Atom TmCons)) 
+				  [car, cdr as Quotation cdrSexp] = 
 			    let
 				val car_sexp = case car of
-						   CInteger i => Sexp.Atom (TmInteger i)
-						 | CBoolean b => Sexp.Atom (TmBoolean b)
-						 | CQuotation aSexp => aSexp
+						   Integer i => Sexp.Atom (TmInteger i)
+						 | Boolean b => Sexp.Atom (TmBoolean b)
+						 | Quotation aSexp => aSexp
 			    in
-				CQuotation (Sexp.List (
+				Quotation (Sexp.List (
 						 Sexp.Cons (car_sexp,
 							    Sexp.Cons (cdrSexp, Sexp.Null))))
 			    end
-			  | apply (CPrimitive (Sexp.Atom TmCar))
-				  [CQuotation (Sexp.List (
+			  | apply (Primitive (Sexp.Atom TmCar))
+				  [Quotation (Sexp.List (
 						    Sexp.Cons (car, _)))] =
-			    CQuotation car
-			  | apply (CPrimitive (Sexp.Atom TmCdr))
-				  [CQuotation (Sexp.List (
+			    Quotation car
+			  | apply (Primitive (Sexp.Atom TmCdr))
+				  [Quotation (Sexp.List (
 						    (* we require that
 						    the cdr isn't
 						    Sexp.Null, asking
@@ -215,45 +213,45 @@ structure SchemeInterpreterEnvironment =
 						    violate `Law of
 						    Cons'. *)
 						    Sexp.Cons (_, cdr as Sexp.Cons (_, _))))] = 
-			    CQuotation (Sexp.List cdr)
-			  | apply (CPrimitive (Sexp.Atom TmNull_p))
-				  [CQuotation (Sexp.List (aList))] = 
+			    Quotation (Sexp.List cdr)
+			  | apply (Primitive (Sexp.Atom TmNull_p))
+				  [Quotation (Sexp.List (aList))] = 
 			    (case aList of
-				Sexp.Null => CBoolean true
-			      | Sexp.Cons (_,_) => CBoolean false)
-			  | apply (CPrimitive (Sexp.Atom TmEq_p))
+				Sexp.Null => Boolean true
+			      | Sexp.Cons (_,_) => Boolean false)
+			  | apply (Primitive (Sexp.Atom TmEq_p))
 				  [fst, snd] = 
 			    (case (fst, snd) of
-				 (CInteger n, CInteger m) => CBoolean (n = m)
-			       | (CBoolean true, CBoolean true) => CBoolean true
-			       | (CBoolean false, CBoolean false) => CBoolean true
-			       (* | (CQuotation q, CQuotation r) =>  CBoolean (q = r) *)
-			       | (_, _) => CBoolean false)
-			  | apply (CPrimitive (Sexp.Atom TmAtom_p)) 
+				 (Integer n, Integer m) => Boolean (n = m)
+			       | (Boolean true, Boolean true) => Boolean true
+			       | (Boolean false, Boolean false) => Boolean true
+			       (* | (Quotation q, Quotation r) =>  Boolean (scheme_term_eq q r) *)
+			       | (_, _) => Boolean false)
+			  | apply (Primitive (Sexp.Atom TmAtom_p)) 
 				  [atomic_meaning] =
 			    (case atomic_meaning of
-				 CInteger _ => CBoolean true
-			       | CBoolean _ => CBoolean true
-			       | CQuotation (Sexp.List Sexp.Null) => CBoolean false
-			       | CQuotation (Sexp.Atom _) => CBoolean true
-			       | _ => CBoolean false) 
-			  | apply (CPrimitive (Sexp.Atom TmZero_p)) 
-				  [CInteger n] = 
+				 Integer _ => Boolean true
+			       | Boolean _ => Boolean true
+			       | Quotation (Sexp.List Sexp.Null) => Boolean false
+			       | Quotation (Sexp.Atom _) => Boolean true
+			       | _ => Boolean false) 
+			  | apply (Primitive (Sexp.Atom TmZero_p)) 
+				  [Integer n] = 
 			    (case n of 
-				 0 => CBoolean true
-			       | _ => CBoolean false)
-			  | apply (CPrimitive (Sexp.Atom TmSucc)) 
-				  [CInteger n] = CInteger (n + 1)
-			  | apply (CPrimitive (Sexp.Atom TmPred)) 
-				  [CInteger n] = 
+				 0 => Boolean true
+			       | _ => Boolean false)
+			  | apply (Primitive (Sexp.Atom TmSucc)) 
+				  [Integer n] = Integer (n + 1)
+			  | apply (Primitive (Sexp.Atom TmPred)) 
+				  [Integer n] = 
 			    (case n of 
-				 0 => CInteger 0 (* here we should raise an exception instead *)
-			       | m => CInteger (m-1))
-			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
-				  [CInteger _] = CBoolean true
-			  | apply (CPrimitive (Sexp.Atom TmNumber_p)) 
-				  [_] = CBoolean false
-			  | apply (CNonPrimitive {table, formals, body}) meanings = 
+				 0 => Integer 0 (* here we should raise an exception instead *)
+			       | m => Integer (m-1))
+			  | apply (Primitive (Sexp.Atom TmNumber_p)) 
+				  [Integer _] = Boolean true
+			  | apply (Primitive (Sexp.Atom TmNumber_p)) 
+				  [_] = Boolean false
+			  | apply (NonPrimitive {table, formals, body}) meanings = 
 			    let 
 				fun formals_to_identifiers_list Sexp.Null = []
 				  | formals_to_identifiers_list 
