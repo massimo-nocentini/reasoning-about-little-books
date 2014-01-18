@@ -1,24 +1,29 @@
 signature SEXP = 
 sig
-    type object
-
-    datatype slist = Null
-		   | Cons of sexp * slist
-	 and sexp = Atom of object
-		  | List of slist
+    datatype 'a slist = Null
+		      | Cons of 'a sexp * 'a slist
+	 and 'b sexp = Atom of 'b
+		     | List of 'b slist
 end
 
-functor MakeSexp (structure ObjectType: TYPE)
-	:> SEXP where type object = ObjectType.aType
-        =
+functor MakeSexp () 
+	:> SEXP
+	=
 	struct
 
-	type object = ObjectType.aType
+	datatype 'a slist = Null
+			  | Cons of 'a sexp * 'a slist
+	     and 'b sexp = Atom of 'b
+			 | List of 'b slist
 
-	datatype slist = Null
-		       | Cons of sexp * slist
-	     and sexp = Atom of object
-		      | List of slist
 	end
 
+signature SEXP_PARSER = 
+sig
+    type 'a fragments
+    structure Sexp: SEXP
+
+    exception Parse_error of string
+    val parse: 'a fragments -> 'a Sexp.sexp
+end
 

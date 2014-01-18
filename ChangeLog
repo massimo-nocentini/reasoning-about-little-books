@@ -1,3 +1,13 @@
+2014-01-18  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* scheme-interpreter/scheme-interpreter.fun
+	(SchemeInterpreterEnvironment): Update the scheme interpreter
+	environment in order to use the new definitions specified in SEXP
+	and SEXP_PARSER signatures.
+
+	* sexp-expressions/sexp-parser-SMLofNJ.sml (SEXP_PARSER_SMLofNJ):
+	Moved the sexp parser in its own source file.
+
 2014-01-12  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
 	* scheme-interpreter/scheme-interpreter.fun

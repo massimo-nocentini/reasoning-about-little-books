@@ -48,7 +48,12 @@ structure FoodSexp = MakeSexp (structure ObjectType = MakeTypeFood());
 val FoodSexp.List aList = FoodSexp.List (
 	FoodSexp.Cons (FoodSexp.Atom Tomato, FoodSexp.Null))
 
-open SchemeInterpreterEnvironment.Sexp;
+structure SexpStr = MakeSexp ()
+structure SexpParser = SExpParserSMLofNJ (structure aSexp = SexpStr)
+structure SIE = SchemeInterpreterEnvironment (structure aParser = SexpParser)
+structure Interpreter = SIE.MakeInterpreter ()
+
+open SIE Interpreter;
 (* the following doesn't compile, see the compiler complaint: *)
 (* val anEntry = Table.new_entry [4, 5] *)
 (* 			      [Pate, Pomodoro]; *)
@@ -56,5 +61,7 @@ open SchemeInterpreterEnvironment.Sexp;
  (*  operand:         int list *)
  (*  in expression: *)
  (*    Table.new_entry (4 :: 5 :: nil) *)
+val sexp = SIE.Parser.parse `(^(TmCar) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
+val valu = Interpreter.value sexp;
 
 

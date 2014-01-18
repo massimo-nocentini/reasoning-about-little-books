@@ -1,8 +1,12 @@
 
-structure SchemeInterpreterEnvironment = 
+functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) = 
     struct
 
-    type identifier = string
+    structure Table = MakeTableDoubleListImpl (
+	structure IdentifierType = MakeTypeString ())
+
+    structure Parser = aParser
+    structure aSexp = Parser.Sexp
 
     datatype scheme_term = TmInteger of int
 			 | TmBoolean of bool
@@ -16,55 +20,30 @@ structure SchemeInterpreterEnvironment =
 			 | TmSucc
 			 | TmPred
 			 | TmNumber_p
-			 | TmIdentifier of identifier
+			 | TmIdentifier of Table.identifier
 			 | TmQuote
 			 | TmLambda
 			 | TmCond
 			 | TmElse
 
-    functor MakeTypeSchemeTerm () 
-	    :> TYPE where type aType = scheme_term
-            =
-	    struct type aType = scheme_term end
-
-
-    structure Sexp = MakeSexp (
-	structure ObjectType = MakeTypeSchemeTerm ())
-
-    (* fun scheme_term_eq (q: Sexp.sexp) (r: Sexp.sexp) = q = r *)
-
-    (* datatype scheme_meaning = Integer of int *)
-    (* 			    | Quotation of Sexp.sexp *)
-    (* 			    | Boolean of bool *)
-
-    structure Table = MakeTableDoubleListImpl (
-	structure IdentifierType = MakeTypeString ())
-
-    datatype scheme_meaning = Primitive of Sexp.sexp
-			    | Quotation of Sexp.sexp
+    datatype scheme_meaning = Primitive of scheme_term aSexp.sexp
+			    | Quotation of scheme_term aSexp.sexp
 			    | Integer of int
 			    | Boolean of bool
 			    | NonPrimitive of closure withtype closure = {
 				table: scheme_meaning Table.table,
-				formals: Sexp.sexp,
-				body: Sexp.sexp
+				formals: scheme_term aSexp.sexp,
+				body: scheme_term aSexp.sexp
 			    }
 
-    functor MakeInterpreter (
-	(* structure Sexp: SEXP where type object = scheme_term *)
-	structure Sexp: SEXP where type object = Sexp.object
-                             where type sexp = Sexp.sexp)
-	    (* having asserted that sexp = Sexp.sexp now we can build
-	    `Quotation' values *) (* directly giving the same sexp
-	    values! (without using the quite curious outer-function
-	    mechanism) *)
-	(* val mk_quotation: Sexp.sexp -> scheme_meaning) *)
+    functor MakeInterpreter ()
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
+				where type 'a Sexp.sexp = 'a aSexp.sexp
             =
 	    struct
 
-		structure Sexp = Sexp
+		structure Sexp = aSexp
 
 	        type term = scheme_term
 
@@ -72,7 +51,7 @@ structure SchemeInterpreterEnvironment =
 
 		type identifier = Table.identifier
 
-		type action = Sexp.sexp 
+		type action = term Sexp.sexp 
 			      -> scheme_meaning Table.table 
 			      -> scheme_meaning
 
@@ -86,8 +65,8 @@ structure SchemeInterpreterEnvironment =
 		    (*   | Boolean b => Boolean b *)
 		    (*   (* | Quotation aSexp => mk_quotation aSexp *) *)
 		    (*   | Quotation aSexp => Quotation aSexp *)
-		and meaning_of aSexp aTable = 
-		    sexp_to_action aSexp aSexp aTable
+		and meaning_of (aSexp as Sexp.List (Sexp.Cons (carSexp, _))) aTable = 
+		    sexp_to_action carSexp carSexp aTable
 		and sexp_to_action (atom as Sexp.Atom term) = 
 		    (case term of
 			 TmInteger _ => const_type
@@ -274,11 +253,5 @@ structure SchemeInterpreterEnvironment =
 		    end
 	    end
 		
-
-
-    structure Interpreter = MakeInterpreter (
-	structure Sexp = Sexp)
-	(* simply, instead of (fn sexp_obj => Quotation sexp_obj) *)
-	(* val mk_quotation = Quotation) *)
 
     end
