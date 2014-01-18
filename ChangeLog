@@ -6,6 +6,9 @@
 	and SEXP_PARSER signatures.
 	(SchemeInterpreterEnvironment.sexp_to_action): the `car' and the
 	`quote' functions work!
+	(SchemeInterpreterEnvironment.application_type.apply): factor the
+	`Integer' and `Boolean' meaning into `Quotation' meaning in order
+	to be more uniform (Lisp should do a similar thing, is it true?)
 
 	* sexp-expressions/sexp-parser-SMLofNJ.sml (SEXP_PARSER_SMLofNJ):
 	Moved the sexp parser in its own source file.

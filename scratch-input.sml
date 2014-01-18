@@ -69,5 +69,11 @@ val sexp = SIE.Parser.parse `(^(TmQuote) ^(TmIdentifier "x"))`;
 val valu = Interpreter.value sexp;
 val sexp = SIE.Parser.parse `(^(TmCar) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
 val valu = Interpreter.value sexp;
+val sexp = SIE.Parser.parse `(^(TmCdr) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
+val valu = Interpreter.value sexp;
+val sexp = SIE.Parser.parse `(^(TmSucc) (^(TmQuote) ^(TmInteger 5)))`;
+val valu = Interpreter.value sexp;
+val sexp = SIE.Parser.parse `(^(TmZero_p) (^(TmQuote) ^(TmInteger 5)))`;
+val valu = Interpreter.value sexp;
 
 

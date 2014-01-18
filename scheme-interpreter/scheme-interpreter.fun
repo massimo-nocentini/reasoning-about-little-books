@@ -28,8 +28,6 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 
     datatype scheme_meaning = Primitive of scheme_term aSexp.sexp
 			    | Quotation of scheme_term aSexp.sexp
-			    | Integer of int
-			    | Boolean of bool
 			    | NonPrimitive of closure withtype closure = {
 				table: scheme_meaning Table.table,
 				formals: scheme_term aSexp.sexp,
@@ -60,11 +58,6 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 
 
 		fun value aSexp = meaning_of aSexp Table.empty_table
-		    (* case meaning_of aSexp Table.empty_table of *)
-		    (* 	Integer i => Integer i *)
-		    (*   | Boolean b => Boolean b *)
-		    (*   (* | Quotation aSexp => mk_quotation aSexp *) *)
-		    (*   | Quotation aSexp => Quotation aSexp *)
 		and meaning_of aSexp aTable = 
 		    sexp_to_action aSexp aSexp aTable
 		and sexp_to_action (atom as Sexp.Atom term) = 
@@ -99,10 +92,9 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 		      | Sexp.Cons (_, _) => application_type
 		      | Sexp.Null => 
 			raise EmptyListNotAllowedForNonPrimitiveExpression
-		and const_type (Sexp.Atom (TmInteger i)) _ = Integer i
-		  | const_type (Sexp.Atom (TmBoolean b)) _ = Boolean b
+		and const_type (Sexp.Atom (TmInteger i)) _ = Quotation (Sexp.Atom (TmInteger i))
+		  | const_type (Sexp.Atom (TmBoolean b)) _ = Quotation (Sexp.Atom (TmBoolean b))
 		  | const_type atom _ = Primitive atom
-		  (* | const_type sexp _ = Quotation sexp *)
 		and quote_type (Sexp.List 
 				    (Sexp.Cons (
 					  Sexp.Atom TmQuote, 
@@ -150,9 +142,9 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			    case question of
 				Sexp.Atom TmElse => meaning_of answer aTable
 			      | _ => (case meaning_of question aTable of
-					  Boolean true => 
+					  Quotation (Sexp.Atom (TmBoolean true)) => 
 					  meaning_of answer aTable
-					| Boolean false => 
+					| Quotation (Sexp.Atom (TmBoolean false)) => 
 					  evcon other_questions)
 		    in 
 			evcon lines
@@ -168,24 +160,15 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			    (meaning_of aSexp aTable) :: (evlis other_args)
 
 			fun apply (Primitive (Sexp.Atom TmCons)) 
-				  [car, cdr as Quotation cdrSexp] = 
-			    let
-				val car_sexp = case car of
-						   Integer i => Sexp.Atom (TmInteger i)
-						 | Boolean b => Sexp.Atom (TmBoolean b)
-						 | Quotation aSexp => aSexp
-			    in
-				Quotation (Sexp.List (
-						 Sexp.Cons (car_sexp,
-							    Sexp.Cons (cdrSexp, Sexp.Null))))
-			    end
+				  [Quotation carSexp, 
+				   Quotation cdrSexp] = 
+			    Quotation (Sexp.List (
+					    Sexp.Cons (carSexp,
+						       Sexp.Cons (cdrSexp, Sexp.Null))))
 			  | apply (Primitive (Sexp.Atom TmCar))
 				  [Quotation (Sexp.List (
 						   Sexp.Cons (car, _)))] =
-			    (case car of
-				 Sexp.Atom (TmInteger i) => Integer i
-			       | Sexp.Atom (TmBoolean b) => Boolean b
-			       | _ => Quotation car)
+			    Quotation car
 			  | apply (Primitive (Sexp.Atom TmCdr))
 				  [Quotation (Sexp.List (
 						    (* we require that
@@ -201,40 +184,45 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			  | apply (Primitive (Sexp.Atom TmNull_p))
 				  [Quotation (Sexp.List (aList))] = 
 			    (case aList of
-				Sexp.Null => Boolean true
-			      | Sexp.Cons (_,_) => Boolean false)
+				Sexp.Null => Quotation (Sexp.Atom (TmBoolean true))
+			      | Sexp.Cons (_,_) => Quotation (Sexp.Atom (TmBoolean false)))
+
 			  | apply (Primitive (Sexp.Atom TmEq_p))
-				  [fst, snd] = 
+				  [Quotation (Sexp.Atom fst), Quotation (Sexp.Atom snd)] = 
 			    (case (fst, snd) of
-				 (Integer n, Integer m) => Boolean (n = m)
-			       | (Boolean true, Boolean true) => Boolean true
-			       | (Boolean false, Boolean false) => Boolean true
+				 (TmInteger n, TmInteger m) => Quotation (Sexp.Atom (TmBoolean (n = m)))
+			       | (TmBoolean true, TmBoolean true) => Quotation (Sexp.Atom (TmBoolean true))
+			       | (TmBoolean false, TmBoolean false) => Quotation (Sexp.Atom (TmBoolean true))
 			       (* | (Quotation q, Quotation r) =>  Boolean (scheme_term_eq q r) *)
-			       | (_, _) => Boolean false)
+			       | (_, _) => Quotation (Sexp.Atom (TmBoolean false)))
+			  | apply (Primitive (Sexp.Atom TmEq_p))
+				  [Quotation _, Quotation _] = Quotation (Sexp.Atom (TmBoolean false))
+
 			  | apply (Primitive (Sexp.Atom TmAtom_p)) 
 				  [atomic_meaning] =
 			    (case atomic_meaning of
-				 Integer _ => Boolean true
-			       | Boolean _ => Boolean true
-			       | Quotation (Sexp.List Sexp.Null) => Boolean false
-			       | Quotation (Sexp.Atom _) => Boolean true
-			       | _ => Boolean false) 
+				 Quotation (Sexp.Atom (TmInteger _)) => Quotation (Sexp.Atom (TmBoolean true))
+			       | Quotation (Sexp.Atom (TmBoolean _)) => Quotation (Sexp.Atom (TmBoolean true))
+			       | Quotation (Sexp.List Sexp.Null) => Quotation (Sexp.Atom (TmBoolean false))
+			       | Quotation (Sexp.Atom _) => Quotation (Sexp.Atom (TmBoolean true))
+			       | _ => Quotation (Sexp.Atom (TmBoolean false)))
 			  | apply (Primitive (Sexp.Atom TmZero_p)) 
-				  [Integer n] = 
+				  [Quotation (Sexp.Atom (TmInteger n))] =
 			    (case n of 
-				 0 => Boolean true
-			       | _ => Boolean false)
+				 0 => Quotation (Sexp.Atom (TmBoolean true))
+			       | _ => Quotation (Sexp.Atom (TmBoolean false)))
 			  | apply (Primitive (Sexp.Atom TmSucc)) 
-				  [Integer n] = Integer (n + 1)
-			  | apply (Primitive (Sexp.Atom TmPred)) 
-				  [Integer n] = 
+				  [Quotation (Sexp.Atom (TmInteger n))] = Quotation (Sexp.Atom (TmInteger (n + 1)))
+			  | apply (Primitive (Sexp.Atom TmPred))
+				  [Quotation (Sexp.Atom (TmInteger n))] = 
 			    (case n of 
-				 0 => Integer 0 (* here we should raise an exception instead *)
-			       | m => Integer (m-1))
+				 (* here we should raise an exception instead *)
+				 0 => Quotation (Sexp.Atom (TmInteger 0)) 
+			       | m => Quotation (Sexp.Atom (TmInteger (m-1))))
+			  | apply (Primitive (Sexp.Atom TmNumber_p))
+				  [Quotation (Sexp.Atom (TmInteger _))] = Quotation (Sexp.Atom (TmBoolean true))
 			  | apply (Primitive (Sexp.Atom TmNumber_p)) 
-				  [Integer _] = Boolean true
-			  | apply (Primitive (Sexp.Atom TmNumber_p)) 
-				  [_] = Boolean false
+				  [ _ ] = Quotation (Sexp.Atom (TmBoolean false))
 			  | apply (NonPrimitive {table, formals, body}) meanings = 
 			    let 
 				fun formals_to_identifiers_list Sexp.Null = []
