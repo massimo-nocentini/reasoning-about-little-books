@@ -4,6 +4,8 @@
 	(SchemeInterpreterEnvironment): Update the scheme interpreter
 	environment in order to use the new definitions specified in SEXP
 	and SEXP_PARSER signatures.
+	(SchemeInterpreterEnvironment.sexp_to_action): the `car' and the
+	`quote' functions work!
 
 	* sexp-expressions/sexp-parser-SMLofNJ.sml (SEXP_PARSER_SMLofNJ):
 	Moved the sexp parser in its own source file.

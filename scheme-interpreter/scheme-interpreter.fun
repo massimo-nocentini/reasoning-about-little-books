@@ -65,8 +65,8 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 		    (*   | Boolean b => Boolean b *)
 		    (*   (* | Quotation aSexp => mk_quotation aSexp *) *)
 		    (*   | Quotation aSexp => Quotation aSexp *)
-		and meaning_of (aSexp as Sexp.List (Sexp.Cons (carSexp, _))) aTable = 
-		    sexp_to_action carSexp carSexp aTable
+		and meaning_of aSexp aTable = 
+		    sexp_to_action aSexp aSexp aTable
 		and sexp_to_action (atom as Sexp.Atom term) = 
 		    (case term of
 			 TmInteger _ => const_type
@@ -76,7 +76,7 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 		       | TmCdr => const_type
 		       | TmNull_p => const_type
 		       | TmEq_p => const_type
-		       | TmAtom_p => const_type		     
+		       | TmAtom_p => const_type
 		       | TmZero_p => const_type
 		       | TmSucc => const_type
 		       | TmPred => const_type
@@ -84,7 +84,7 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 		       (* maybe here we can require the TmIdentifier
 		       matching, leaving all the other cases to raise
 		       an exception *)
-		       | _ => identifier_type) 
+		       | TmIdentifier _ => identifier_type) 
 		  | sexp_to_action (list as Sexp.List conses) =
 		    case conses of
 			Sexp.Cons (Sexp.Atom atom, _) =>
@@ -101,11 +101,13 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			raise EmptyListNotAllowedForNonPrimitiveExpression
 		and const_type (Sexp.Atom (TmInteger i)) _ = Integer i
 		  | const_type (Sexp.Atom (TmBoolean b)) _ = Boolean b
-		  | const_type (atom as Sexp.Atom _) _ = Primitive atom
+		  | const_type atom _ = Primitive atom
+		  (* | const_type sexp _ = Quotation sexp *)
 		and quote_type (Sexp.List 
-				    (Sexp.Cons 
-					 (Sexp.Atom TmQuote, conses))) _ =
-		    Quotation (Sexp.List conses)
+				    (Sexp.Cons (
+					  Sexp.Atom TmQuote, 
+					  Sexp.Cons (aSexp, Sexp.Null)))) _ =
+		    Quotation aSexp
 		and identifier_type (Sexp.Atom (TmIdentifier key)) aTable = 
 		    Table.lookup_in_table 
 			(fn anotherKey => key = anotherKey)
@@ -157,7 +159,7 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 		    end
 		and application_type (Sexp.List 
 					  (Sexp.Cons
-					       (function as Sexp.List _,
+					       (function,
 						args)))
 				     aTable = 
 		    let 
@@ -179,8 +181,11 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			    end
 			  | apply (Primitive (Sexp.Atom TmCar))
 				  [Quotation (Sexp.List (
-						    Sexp.Cons (car, _)))] =
-			    Quotation car
+						   Sexp.Cons (car, _)))] =
+			    (case car of
+				 Sexp.Atom (TmInteger i) => Integer i
+			       | Sexp.Atom (TmBoolean b) => Boolean b
+			       | _ => Quotation car)
 			  | apply (Primitive (Sexp.Atom TmCdr))
 				  [Quotation (Sexp.List (
 						    (* we require that
