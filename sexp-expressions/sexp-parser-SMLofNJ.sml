@@ -2,7 +2,7 @@ signature SEXP_PARSER_SMLofNJ = SEXP_PARSER
     where type 'a fragments = 'a SMLofNJ.frag list
 
 functor SExpParserSMLofNJ (structure aSexp: SEXP)
-	:> SEXP_PARSER_SMLofNJ 
+	:> SEXP_PARSER_SMLofNJ where type 'a Sexp.sexp = 'a aSexp.sexp
 	=
 	struct
 

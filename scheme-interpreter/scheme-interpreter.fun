@@ -1,12 +1,14 @@
 
-functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) = 
+functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER
+				     structure aSexp: SEXP 
+	                             sharing type aSexp.sexp = aParser.Sexp.sexp) = 
     struct
 
     structure Table = MakeTableDoubleListImpl (
 	structure IdentifierType = MakeTypeString ())
 
     structure Parser = aParser
-    structure aSexp = Parser.Sexp
+    structure Sexp = aSexp
 
     datatype scheme_term = TmInteger of int
 			 | TmBoolean of bool
@@ -26,22 +28,22 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			 | TmCond
 			 | TmElse
 
-    datatype scheme_meaning = Primitive of scheme_term aSexp.sexp
-			    | Quotation of scheme_term aSexp.sexp
+    datatype scheme_meaning = Primitive of scheme_term Sexp.sexp
+			    | Quotation of scheme_term Sexp.sexp
 			    | NonPrimitive of closure withtype closure = {
 				table: scheme_meaning Table.table,
-				formals: scheme_term aSexp.sexp,
-				body: scheme_term aSexp.sexp
+				formals: scheme_term Sexp.sexp,
+				body: scheme_term Sexp.sexp
 			    }
 
     functor MakeInterpreter ()
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
-				where type 'a Sexp.sexp = 'a aSexp.sexp
+				where type 'a Sexp.sexp = 'a Sexp.sexp
             =
 	    struct
 
-		structure Sexp = aSexp
+		structure Sexp = Sexp
 
 	        type term = scheme_term
 
@@ -74,9 +76,6 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 		       | TmSucc => const_type
 		       | TmPred => const_type
 		       | TmNumber_p => const_type
-		       (* maybe here we can require the TmIdentifier
-		       matching, leaving all the other cases to raise
-		       an exception *)
 		       | TmIdentifier _ => identifier_type) 
 		  | sexp_to_action (list as Sexp.List conses) =
 		    case conses of
@@ -85,15 +84,13 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER) =
 			    fun A TmQuote = quote_type
 			      | A TmLambda = lambda_type
 			      | A TmCond = cond_type
-			      (* maybe the following is too safe,
-			      maybe better raising an exception *)
 			      | A _ = application_type
 			in A atom end	    
 		      | Sexp.Cons (_, _) => application_type
 		      | Sexp.Null => 
 			raise EmptyListNotAllowedForNonPrimitiveExpression
-		and const_type (Sexp.Atom (TmInteger i)) _ = Quotation (Sexp.Atom (TmInteger i))
-		  | const_type (Sexp.Atom (TmBoolean b)) _ = Quotation (Sexp.Atom (TmBoolean b))
+		and const_type (anInt as Sexp.Atom (TmInteger _)) _ = Quotation anInt
+		  | const_type (aBoolean as Sexp.Atom (TmBoolean _)) _ = Quotation aBoolean
 		  | const_type atom _ = Primitive atom
 		and quote_type (Sexp.List 
 				    (Sexp.Cons (
