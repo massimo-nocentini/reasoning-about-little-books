@@ -50,8 +50,7 @@ val FoodSexp.List aList = FoodSexp.List (
 
 structure SexpStr = MakeSexp ()
 structure SexpParser = SExpParserSMLofNJ (structure aSexp = SexpStr)
-structure SIE = SchemeInterpreterEnvironment (structure aParser = SexpParser
-					      structure aSexp = SexpStr)
+structure SIE = SchemeInterpreterEnvironment (structure Sexp = SexpStr)
 structure Interpreter = SIE.MakeInterpreter ()
 
 open SIE Interpreter;

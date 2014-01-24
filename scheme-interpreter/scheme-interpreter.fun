@@ -1,15 +1,9 @@
 
-(* functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER *)
-(* 				     structure aSexp: SEXP  *)
-(* 	                             sharing type aSexp.sexp = aParser.sexp) =  *)
-functor SchemeInterpreterEnvironment(structure aSexp: SEXP) = 
-
+functor SchemeInterpreterEnvironment(structure Sexp: SEXP) = 
     struct
 
     structure Table = MakeTableDoubleListImpl (
 	structure IdentifierType = MakeTypeString ())
-
-    structure Sexp = aSexp
 
     datatype scheme_term = TmInteger of int
 			 | TmBoolean of bool
@@ -18,7 +12,7 @@ functor SchemeInterpreterEnvironment(structure aSexp: SEXP) =
 			 | TmCdr
 			 | TmNull_p
 			 | TmEq_p
-			 | TmAtom_p				     
+			 | TmAtom_p			     
 			 | TmZero_p
 			 | TmSucc
 			 | TmPred
@@ -62,7 +56,7 @@ functor SchemeInterpreterEnvironment(structure aSexp: SEXP) =
 		fun value aSexp = meaning_of aSexp Table.empty_table
 		and meaning_of aSexp aTable = 
 		    sexp_to_action aSexp aSexp aTable
-		and sexp_to_action (atom as Sexp.Atom term) = 
+		and sexp_to_action (atom as Sexp.Atom term) :action = 
 		    (case term of
 			 TmInteger _ => const_type
 		       | TmBoolean _ => const_type
