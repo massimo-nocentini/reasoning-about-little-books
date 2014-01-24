@@ -62,19 +62,19 @@ open SIE Interpreter;
  (*  operand:         int list *)
  (*  in expression: *)
  (*    Table.new_entry (4 :: 5 :: nil) *)
-val sexp = SIE.Parser.parse `(^(TmQuote) (^(TmBoolean true) ^(TmInteger 5)))`;
+val sexp = SexpParser.parse `(^(TmQuote) (^(TmBoolean true) ^(TmInteger 5)))`;
 val valu = Interpreter.value sexp;
-val sexp = SIE.Parser.parse `(^(TmQuote) ^(TmInteger 5))`;
+val sexp = SexpParser.parse `(^(TmQuote) ^(TmInteger 5))`;
 val valu = Interpreter.value sexp;
-val sexp = SIE.Parser.parse `(^(TmQuote) ^(TmIdentifier "x"))`;
+val sexp = SexpParser.parse `(^(TmQuote) ^(TmIdentifier "x"))`;
 val valu = Interpreter.value sexp;
-val sexp = SIE.Parser.parse `(^(TmCar) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
+val sexp = SexpParser.parse `(^(TmCar) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
 val valu = Interpreter.value sexp;
-val sexp = SIE.Parser.parse `(^(TmCdr) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
+val sexp = SexpParser.parse `(^(TmCdr) (^(TmQuote) (^(TmBoolean true) ^(TmInteger 5))))`;
 val valu = Interpreter.value sexp;
-val sexp = SIE.Parser.parse `(^(TmSucc) (^(TmQuote) ^(TmInteger 5)))`;
+val sexp = SexpParser.parse `(^(TmSucc) (^(TmQuote) ^(TmInteger 5)))`;
 val valu = Interpreter.value sexp;
-val sexp = SIE.Parser.parse `(^(TmZero_p) (^(TmQuote) ^(TmInteger 5)))`;
+val sexp = SexpParser.parse `(^(TmZero_p) (^(TmQuote) ^(TmInteger 5)))`;
 val valu = Interpreter.value sexp;
 
 (* the following example shows that  *)
