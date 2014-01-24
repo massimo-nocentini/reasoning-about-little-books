@@ -39,11 +39,11 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER
     functor MakeInterpreter ()
 	    :> SEXP_INTERPRETER where type term = scheme_term
 	                        where type meaning = scheme_meaning
-				where type 'a Sexp.sexp = 'a Sexp.sexp
+				where type 'a sexp = 'a Sexp.sexp
             =
 	    struct
 
-		structure Sexp = Sexp
+	        type 'a sexp = 'a Sexp.sexp
 
 	        type term = scheme_term
 
@@ -57,7 +57,6 @@ functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER
 
 		exception EmptyListNotAllowedForNonPrimitiveExpression
 		exception IdentifierNotBound of identifier
-
 
 		fun value aSexp = meaning_of aSexp Table.empty_table
 		and meaning_of aSexp aTable = 

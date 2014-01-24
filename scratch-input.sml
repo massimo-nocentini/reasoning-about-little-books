@@ -77,4 +77,47 @@ val valu = Interpreter.value sexp;
 val sexp = SIE.Parser.parse `(^(TmZero_p) (^(TmQuote) ^(TmInteger 5)))`;
 val valu = Interpreter.value sexp;
 
+(* the following example shows that  *)
+signature SIMPLE_SEXP = 
+sig
+    type 'a ssexp
+    type 'b sslist
+end
+
+functor MakeSSexp () 
+	=
+	struct
+
+	datatype 'a sslist = Null
+			   | Cons of 'a ssexp * 'a sslist
+	     and 'b ssexp = Atom of 'b
+			  | List of 'b sslist
+
+	end
+
+structure SimpleSSexp: SIMPLE_SEXP = MakeSSexp () 
+(* We cannot write the following, since Null value isn't exposed in
+the signature. Abscribing a signature only has to do with types, not
+with exposed values! *)
+(* val _ = SimpleSSexp.Null; *)
+
+
+structure SimpleSSexp = MakeSSexp () 
+(* here instead we can use the values introduced by the datatype
+definition. *)
+val _ = SimpleSSexp.Null;
+
+(* signature EXTENDED_SIMPLE_SEXP =  *)
+(* sig *)
+(*     include SIMPLE_SEXP *)
+(* 	datatype 'a ssslist = Null *)
+(* 			   | Cons of 'a sssexp * 'a ssslist *)
+(* 	     and 'b sssexp = Atom of 'b *)
+(* 			  | List of 'b ssslist *)
+
+(* end *)
+
+(* structure ExtendedSimpleSexp: EXTENDED_SIMPLE_SEXP = MakeSSexp () ; *)
+(* val _ = fn a => (case a of ExtendedSimpleSexp.Null => 4); *)
+
 

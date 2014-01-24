@@ -9,9 +9,10 @@ sig
 
     (* this structure is necessary only to define the type for sexp
     and allow us to build values that belong to that type *)
-    structure Sexp: SEXP
+    (* structure Sexp: SEXP *)
+    type 'a sexp
 		
-    val value: term Sexp.sexp -> meaning
+    val value: term sexp -> meaning
 
     exception EmptyListNotAllowedForNonPrimitiveExpression
 
