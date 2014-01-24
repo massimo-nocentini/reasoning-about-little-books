@@ -1,7 +1,7 @@
 
 functor SchemeInterpreterEnvironment(structure aParser: SEXP_PARSER
 				     structure aSexp: SEXP 
-	                             sharing type aSexp.sexp = aParser.Sexp.sexp) = 
+	                             sharing type aSexp.sexp = aParser.sexp) = 
     struct
 
     structure Table = MakeTableDoubleListImpl (

@@ -21,9 +21,10 @@ functor MakeSexp ()
 signature SEXP_PARSER = 
 sig
     type 'a fragments
-    structure Sexp: SEXP
+    type 'a sexp
 
     exception Parse_error of string
-    val parse: 'a fragments -> 'a Sexp.sexp
+
+    val parse: 'a fragments -> 'a sexp
 end
 

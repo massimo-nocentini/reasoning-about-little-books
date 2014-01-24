@@ -2,19 +2,18 @@ signature SEXP_PARSER_SMLofNJ = SEXP_PARSER
     where type 'a fragments = 'a SMLofNJ.frag list
 
 functor SExpParserSMLofNJ (structure aSexp: SEXP)
-	:> SEXP_PARSER_SMLofNJ where type 'a Sexp.sexp = 'a aSexp.sexp
+	:> SEXP_PARSER_SMLofNJ where type 'a sexp = 'a aSexp.sexp
 	=
 	struct
 
-    (* maybe this type can be parameterized introducing a functor *)
+	(* maybe this type can be parameterized introducing a functor *)
 	type 'a fragments = 'a SMLofNJ.frag list
+	type 'a sexp = 'a aSexp.sexp
 
 	exception Parse_error of string
 
-	structure Sexp = aSexp
-
 	local
-	    open Sexp
+	    open aSexp
 	in
 	fun parse (aFragList: 'a fragments): 'a sexp = 
 	    let
