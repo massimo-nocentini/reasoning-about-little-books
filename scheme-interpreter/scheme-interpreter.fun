@@ -75,7 +75,8 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
       | term_to_string TmElse = "else"
 
     fun meaning_to_string (Quotation aSexp) = 
-	"'" ^ (SexpFunctions.to_string term_to_string aSexp)
+	(* "'" ^  *)    
+	(SexpFunctions.to_string term_to_string aSexp)
       | meaning_to_string (Primitive aSexp) = 
 	"Primitive function: " ^ 
 	(SexpFunctions.to_string term_to_string aSexp)
@@ -203,10 +204,10 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 
 			fun apply (Primitive (Sexp.Atom TmCons)) 
 				  [Quotation carSexp, 
-				   Quotation cdrSexp] = 
+				   Quotation (Sexp.List cdr_slist)] = 
 			    Quotation (Sexp.List (
 					    Sexp.Cons (carSexp,
-						       Sexp.Cons (cdrSexp, Sexp.Null))))
+						       cdr_slist)))
 			  | apply (Primitive (Sexp.Atom TmCar))
 				  [Quotation (Sexp.List (
 						   Sexp.Cons (car, _)))] =

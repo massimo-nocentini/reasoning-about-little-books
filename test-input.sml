@@ -17,3 +17,7 @@ val _ = SMLUnit.TextUITestRunner.runTest
 val _ = SMLUnit.TextUITestRunner.runTest
 	    {output = TextIO.stdOut}
 	    (TableTests.suite ());
+
+val _ = SMLUnit.TextUITestRunner.runTest
+	    {output = TextIO.stdOut}
+	    (SchemeInterpreterTests.suite ());
