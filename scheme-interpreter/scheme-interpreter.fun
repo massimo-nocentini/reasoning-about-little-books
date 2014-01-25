@@ -5,6 +5,9 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
     structure Table = MakeTableDoubleListImpl (
 	structure IdentifierType = MakeTypeString ())
 
+    structure SexpFunctions = SexpFunctionsStandardImpl(
+	structure Sexp = Sexp)
+
     datatype scheme_term = TmInteger of int
 			 | TmBoolean of bool
 			 | TmCons
@@ -30,6 +33,54 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 				formals: scheme_term Sexp.sexp,
 				body: scheme_term Sexp.sexp
 			    }
+
+    fun scheme_term_equal (TmInteger fst_int) (TmInteger snd_int) = 
+	fst_int = snd_int
+      | scheme_term_equal (TmBoolean fst_bool) (TmBoolean snd_bool) =
+	fst_bool = snd_bool
+      | scheme_term_equal TmCons TmCons = true
+      | scheme_term_equal TmCar TmCar = true
+      | scheme_term_equal TmCdr TmCdr = true
+      | scheme_term_equal TmNull_p TmNull_p = true
+      | scheme_term_equal TmEq_p TmEq_p = true
+      | scheme_term_equal TmAtom_p TmAtom_p = true
+      | scheme_term_equal TmZero_p TmZero_p = true
+      | scheme_term_equal TmSucc TmSucc = true
+      | scheme_term_equal TmPred TmPred = true
+      | scheme_term_equal TmNumber_p TmNumber_p = true
+      | scheme_term_equal (TmIdentifier fst_id) (TmIdentifier snd_id) = 
+	fst_id = snd_id
+      | scheme_term_equal TmQuote TmQuote = true
+      | scheme_term_equal TmLambda TmLambda = true
+      | scheme_term_equal TmCond TmCond = true
+      | scheme_term_equal TmElse TmElse = true
+      | scheme_term_equal _ _ = false
+
+    fun term_to_string (TmInteger anInt) = Int.toString anInt
+      | term_to_string (TmBoolean aBool) = Bool.toString aBool
+      | term_to_string TmCons = "cons"
+      | term_to_string TmCar = "car"
+      | term_to_string TmCdr = "cdr"
+      | term_to_string TmNull_p = "null?"
+      | term_to_string TmEq_p = "eq?"
+      | term_to_string TmAtom_p	= "atom?"		     
+      | term_to_string TmZero_p = "zero?"
+      | term_to_string TmSucc = "succ"
+      | term_to_string TmPred = "pred"
+      | term_to_string TmNumber_p = "number?"
+      | term_to_string (TmIdentifier anIdentifier) = anIdentifier
+      | term_to_string TmQuote = "quote"
+      | term_to_string TmLambda = "λ"
+      | term_to_string TmCond = "cond"
+      | term_to_string TmElse = "else"
+
+    fun meaning_to_string (Quotation aSexp) = 
+	"'" ^ (SexpFunctions.to_string term_to_string aSexp)
+      | meaning_to_string (Primitive aSexp) = 
+	"Primitive function: " ^ 
+	(SexpFunctions.to_string term_to_string aSexp)
+      | meaning_to_string (NonPrimitive _) = 
+	"Non primitive function"
 
     functor MakeInterpreter ()
 	    :> SEXP_INTERPRETER where type term = scheme_term

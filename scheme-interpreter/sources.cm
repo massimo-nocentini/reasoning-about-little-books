@@ -13,6 +13,8 @@ is
 
     scheme-interpreter.sig
     scheme-interpreter.fun
+
+    scheme-interpreter-tests.sml (with: parser.quotations=true)
     
     table.sig
     table-tests.sml

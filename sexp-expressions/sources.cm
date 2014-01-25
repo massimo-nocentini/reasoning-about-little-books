@@ -13,5 +13,9 @@ is
     sexp-expressions.sig
     sexp-expressions.sml (with: parser.quotations=true)
     sexp-expressions-tests.sml (with: parser.quotations=true)
+
     sexp-parser-SMLofNJ.sml
+
+    sexp-functions.sig
+    sexp-functions.sml
 

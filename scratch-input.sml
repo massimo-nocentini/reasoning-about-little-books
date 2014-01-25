@@ -119,4 +119,23 @@ val _ = SimpleSSexp.Null;
 (* structure ExtendedSimpleSexp: EXTENDED_SIMPLE_SEXP = MakeSSexp () ; *)
 (* val _ = fn a => (case a of ExtendedSimpleSexp.Null => 4); *)
 
+signature DIFF_INST_TYPE = 
+sig
+    type 'a sexp
 
+    val zip: 'a sexp -> 'b sexp -> ('a * 'b) sexp
+end
+
+signature GENERIC_TYPE = 
+sig
+    type 'a aType
+end
+
+(* functor ZipFunction (structure Sexp: SIMPLE_SEXP *)
+(* 		     val firstSexp: 'a Sexp.ssexp *)
+(* 		     val secondSexp: 'b Sexp.ssexp) :> GENERIC_TYPE where type 'c aType = ('a * 'b) Sexp.ssexp = *)
+(* 	struct *)
+	
+(* 	type 'c aType = ('a * 'b) Sexp.ssexp *)
+
+(* 	end *)
