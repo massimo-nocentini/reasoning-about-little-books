@@ -828,6 +828,29 @@ struct
 	  assertEqualMeaning expected meaning
       end
 
+  fun high_order_function_namely_apply () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `((^(TmLambda) (^(TmIdentifier "fn") ^(TmIdentifier "arg"))
+					(^(TmIdentifier "fn") ^(TmIdentifier "arg")))
+			       (^(TmLambda) (^(TmIdentifier "x"))
+					    (^(TmSucc) ^(TmIdentifier "x")))
+			   ^(TmInteger 10))` 
+	  val expected = Quotation (Atom (TmInteger 11))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "((lambda (fn arg) (fn arg)) (lambda (x) (succ x)) 10)" 
+	      input_as_string;
+	  Assert.assertEqualString "11" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+
   fun suite () =
       Test.labelTests
       [
@@ -958,7 +981,10 @@ struct
 	("printing_quine", printing_quine),
 
 	("evaluating_THE_quine_should_return_THAT_quine",
-	 evaluating_THE_quine_should_return_THAT_quine)
+	 evaluating_THE_quine_should_return_THAT_quine),
+
+	("high_order_function_namely_apply",
+	 high_order_function_namely_apply)
 
 
 

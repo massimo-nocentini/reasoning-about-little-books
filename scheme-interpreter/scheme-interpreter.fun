@@ -71,8 +71,11 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
       | term_to_string TmNumber_p = "number?"
       | term_to_string (TmIdentifier anIdentifier) = anIdentifier
       | term_to_string TmQuote = "quote"
+      (* in this way we can use the output directly for evalution in
+      Emacs, instead of the following commented code (which can be
+      evaluated with Racket instead. *)
       (* | term_to_string TmLambda = "λ" *)
-      | term_to_string TmLambda = "lambda"
+      | term_to_string TmLambda = "lambda" 
       | term_to_string TmCond = "cond"
       | term_to_string TmElse = "else"
 
