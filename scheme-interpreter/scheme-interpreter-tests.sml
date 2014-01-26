@@ -182,6 +182,92 @@ struct
 	  Assert.assertEqualString "(a 4 ((5) hello))" output_as_string
       end
 
+  fun consing_an_identifier_onto_a_non_list_should_raise_the_law_of_cons () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmCons)  (^(TmQuote) ^(TmIdentifier "a"))
+				      (^(TmQuote) ^(TmIdentifier "b")))`;
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+      in
+	  Assert.assertEqualString "(cons (quote a) (quote b))" 
+				   input_as_string;
+	  (Interpreter.value sexp; 
+	   Assert.fail "Consing an atom onto another atom should raise the Law of Cons")
+	   handle Law_of_Cons => ()
+      end
+
+  fun the_car_of_non_empty_list_with_an_int_at_heah_should_return_that_int () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmCar) (^(TmQuote) 
+					  (^(TmInteger 4) 
+						((^(TmInteger 5)) 
+						 ^(TmIdentifier "hello")))))`	  
+	  val expected = Quotation (Atom (TmInteger 4))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(car (quote (4 ((5) hello))))" 
+	      input_as_string;
+	  Assert.assertEqualString "4" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun car_of_empty_list_should_raise_the_law_of_car () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmCar)  (^(TmQuote) ()))`;
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+      in
+	  Assert.assertEqualString "(car (quote ()))" 
+				   input_as_string;
+	  (Interpreter.value sexp; 
+	   Assert.fail "Car of empty list should raise the Law of Car")
+	   handle Law_of_Car => ()
+      end
+
+  fun cdr_of_non_empty_list_should_return_the_rest_of_that_list () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmCdr) (^(TmQuote) 
+					  (^(TmInteger 4) 
+						((^(TmInteger 5)) 
+						 ^(TmIdentifier "hello")))))`	  
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(cdr (quote (4 ((5) hello))))" 
+	      input_as_string;
+	  Assert.assertEqualString "(((5) hello))" output_as_string
+      end
+
+  fun cdr_of_empty_list_should_raise_the_law_of_cdr () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmCdr)  (^(TmQuote) ()))`;
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+      in
+	  Assert.assertEqualString "(cdr (quote ()))" 
+				   input_as_string;
+	  (Interpreter.value sexp; 
+	   Assert.fail "Cdr of empty list should raise the Law of Cdr")
+	   handle Law_of_Cdr => ()
+      end
+
 
   fun suite () =
       Test.labelTests
@@ -205,7 +291,22 @@ struct
 	 consing_an_identifier_onto_an_empty_list_should_return_a_list_containing_only_that_identifier),
 
 	("consing_an_identifier_onto_a_tree_should_return_a_new_tree_with_that_identifier_in_very_left_child",
-	 consing_an_identifier_onto_a_tree_should_return_a_new_tree_with_that_identifier_in_very_left_child)
+	 consing_an_identifier_onto_a_tree_should_return_a_new_tree_with_that_identifier_in_very_left_child),
+
+	("consing_an_identifier_onto_a_non_list_should_raise_the_law_of_cons", 
+	 consing_an_identifier_onto_a_non_list_should_raise_the_law_of_cons),
+
+	("the_car_of_non_empty_list_with_an_int_at_heah_should_return_that_int", 
+	the_car_of_non_empty_list_with_an_int_at_heah_should_return_that_int),
+
+	("car_of_empty_list_should_raise_the_law_of_car",
+	 car_of_empty_list_should_raise_the_law_of_car),
+
+	("cdr_of_non_empty_list_should_return_the_rest_of_that_list",
+	 cdr_of_non_empty_list_should_return_the_rest_of_that_list),
+
+	("cdr_of_empty_list_should_raise_the_law_of_cdr",
+	 cdr_of_empty_list_should_raise_the_law_of_cdr)
       ]
 
 end

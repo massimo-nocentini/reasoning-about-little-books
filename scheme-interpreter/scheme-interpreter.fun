@@ -104,6 +104,9 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 
 		exception EmptyListNotAllowedForNonPrimitiveExpression
 		exception IdentifierNotBound of identifier
+		exception Law_of_Cons
+		exception Law_of_Car
+		exception Law_of_Cdr
 
 		fun value aSexp = meaning_of aSexp Table.empty_table
 		and meaning_of aSexp aTable = 
@@ -208,10 +211,17 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 			    Quotation (Sexp.List (
 					    Sexp.Cons (carSexp,
 						       cdr_slist)))
+			  | apply (Primitive (Sexp.Atom TmCons)) 
+				  [Quotation carSexp, 
+				   Quotation _] = 
+			    raise Law_of_Cons
 			  | apply (Primitive (Sexp.Atom TmCar))
 				  [Quotation (Sexp.List (
 						   Sexp.Cons (car, _)))] =
 			    Quotation car
+			  | apply (Primitive (Sexp.Atom TmCar))
+				  [Quotation _] = 
+			    raise Law_of_Car
 			  | apply (Primitive (Sexp.Atom TmCdr))
 				  [Quotation (Sexp.List (
 						    (* we require that
@@ -224,6 +234,9 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 						    Cons'. *)
 						    Sexp.Cons (_, cdr as Sexp.Cons (_, _))))] = 
 			    Quotation (Sexp.List cdr)
+			  | apply (Primitive (Sexp.Atom TmCdr))
+				  [Quotation _] = 
+			    raise Law_of_Cdr
 			  | apply (Primitive (Sexp.Atom TmNull_p))
 				  [Quotation (Sexp.List (aList))] = 
 			    (case aList of
