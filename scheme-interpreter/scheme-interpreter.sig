@@ -21,9 +21,9 @@ sig
     (* The primitive Cons takes two arguments. The second argument to
     `cons' must be a list. The result is a list. *)
     exception Law_of_Cons
-
     exception Law_of_Car
     exception Law_of_Cdr
     exception Law_of_Null
+    exception Law_of_Pred
 
 end

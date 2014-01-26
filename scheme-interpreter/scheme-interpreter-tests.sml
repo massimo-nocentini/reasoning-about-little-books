@@ -531,6 +531,259 @@ struct
 	  assertEqualMeaning expected meaning
       end
 
+  fun zero_of_0_should_return_true () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmZero_p) (^(TmQuote) ^(TmInteger 0)))` 
+	  val expected = Quotation (Atom (TmBoolean true))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(zero? (quote 0))" 
+	      input_as_string;
+	  Assert.assertEqualString "#t" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun zero_of_non_zero_integer_should_return_false () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmZero_p) (^(TmQuote) ^(TmInteger 8)))` 
+	  val expected = Quotation (Atom (TmBoolean false))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(zero? (quote 8))" 
+	      input_as_string;
+	  Assert.assertEqualString "#f" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun succ_of_0_should_return_1 () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmSucc) (^(TmQuote) ^(TmInteger 0)))` 
+	  val expected = Quotation (Atom (TmInteger 1))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(succ (quote 0))" 
+	      input_as_string;
+	  Assert.assertEqualString "1" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun pred_of_1_should_return_0 () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmPred) (^(TmQuote) ^(TmInteger 1)))` 
+	  val expected = Quotation (Atom (TmInteger 0))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(pred (quote 1))" 
+	      input_as_string;
+	  Assert.assertEqualString "0" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun pred_of_0_should_raise_law_of_pred () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmPred) (^(TmQuote) ^(TmInteger 0)))` 
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+      in
+	  Assert.assertEqualString "(pred (quote 0))" 
+				   input_as_string;
+	  (Interpreter.value sexp; 
+	   Assert.fail "Pred of 0 should raise the Law of Pred")
+	   handle Law_of_Pred => ()
+      end
+
+  fun numberp_of_an_integer_should_return_true () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmNumber_p) (^(TmQuote) ^(TmInteger 101)))` 
+	  val expected = Quotation (Atom (TmBoolean true))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(number? (quote 101))" 
+	      input_as_string;
+	  Assert.assertEqualString "#t" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun numberp_of_a_boolean_should_return_false () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmNumber_p) (^(TmQuote) ^(TmBoolean true)))` 
+	  val expected = Quotation (Atom (TmBoolean false))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(number? (quote #t))" 
+	      input_as_string;
+	  Assert.assertEqualString "#f" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun numberp_of_an_identifier_should_return_false () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmNumber_p) (^(TmQuote) ^(TmIdentifier "quote")))` 
+	  val expected = Quotation (Atom (TmBoolean false))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(number? (quote quote))"
+	      input_as_string;
+	  Assert.assertEqualString "#f" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+
+  fun numberp_of_a_list_should_return_false () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmNumber_p) (^(TmQuote) (^(TmInteger 101) ^(TmIdentifier "quote"))))` 
+	  val expected = Quotation (Atom (TmBoolean false))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(number? (quote (101 quote)))" 
+	      input_as_string;
+	  Assert.assertEqualString "#f" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun atomp_of_an_integer_should_return_true () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmAtom_p) (^(TmQuote) ^(TmInteger 101)))` 
+	  val expected = Quotation (Atom (TmBoolean true))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(atom? (quote 101))" 
+	      input_as_string;
+	  Assert.assertEqualString "#t" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun atomp_of_a_boolean_should_return_true () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmAtom_p) (^(TmQuote) ^(TmBoolean true)))` 
+	  val expected = Quotation (Atom (TmBoolean true))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(atom? (quote #t))" 
+	      input_as_string;
+	  Assert.assertEqualString "#t" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun atomp_of_an_identifier_should_return_true () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmAtom_p) (^(TmQuote) ^(TmIdentifier "quote")))` 
+	  val expected = Quotation (Atom (TmBoolean true))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(atom? (quote quote))"
+	      input_as_string;
+	  Assert.assertEqualString "#t" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+
+  fun atomp_of_empty_list_should_return_false () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmAtom_p) (^(TmQuote) ()))` 
+	  val expected = Quotation (Atom (TmBoolean false))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(atom? (quote ()))" 
+	      input_as_string;
+	  Assert.assertEqualString "#f" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun atomp_of_non_empty_list_should_return_false () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmAtom_p) (^(TmQuote) (^(TmInteger 101) ^(TmIdentifier "quote"))))` 
+	  val expected = Quotation (Atom (TmBoolean false))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(atom? (quote (101 quote)))" 
+	      input_as_string;
+	  Assert.assertEqualString "#f" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+
+
   fun suite () =
       Test.labelTests
       [
@@ -610,11 +863,54 @@ struct
 	 eq_of_two_equal_lists_should_return_true),
 
 	("eq_of_two_different_lists_should_return_true",
-	 eq_of_two_different_lists_should_return_true)
+	 eq_of_two_different_lists_should_return_true),
 
       (* we do not check an atom (an int or a bool or an identifier)
       against a list since this follow from the correctness of the
       SexFuncions.equal function *)
+
+	("zero_of_0_should_return_true", 
+	 zero_of_0_should_return_true),
+
+	("zero_of_non_zero_integer_should_return_false", 
+	 zero_of_non_zero_integer_should_return_false),
+
+	("succ_of_0_should_return_1",
+	 succ_of_0_should_return_1),
+
+	("pred_of_1_should_return_0",
+	 pred_of_1_should_return_0),
+
+	("pred_of_0_should_raise_law_of_pred",
+	 pred_of_0_should_raise_law_of_pred),
+
+	("numberp_of_an_integer_should_return_true",
+	 numberp_of_an_integer_should_return_true),
+
+	("numberp_of_a_boolean_should_return_false",
+	 numberp_of_a_boolean_should_return_false),
+
+	("numberp_of_an_identifier_should_return_false",
+	 numberp_of_an_identifier_should_return_false),
+
+	("numberp_of_a_list_should_return_false",
+	 numberp_of_a_list_should_return_false),
+
+	("atomp_of_an_integer_should_return_true",
+	 atomp_of_an_integer_should_return_true),
+
+	("atomp_of_a_boolean_should_return_true",
+	 atomp_of_a_boolean_should_return_true),
+
+	("atomp_of_an_identifier_should_return_true",
+	 atomp_of_an_identifier_should_return_true),
+
+	("atomp_of_empty_list_should_return_false",
+	 atomp_of_an_integer_should_return_true),
+
+	("atomp_of_non_empty_list_should_return_false",
+	 atomp_of_non_empty_list_should_return_false)
+
 
 
 
