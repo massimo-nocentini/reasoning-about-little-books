@@ -51,7 +51,8 @@ val FoodSexp.List aList = FoodSexp.List (
 structure SexpStr = MakeSexp ()
 structure SexpParser = SExpParserSMLofNJ (structure aSexp = SexpStr)
 structure SIE = SchemeInterpreterEnvironment (structure Sexp = SexpStr)
-structure Interpreter = SIE.MakeInterpreter ()
+structure Interpreter = SIE.MakeInterpreter ();
+structure SexpFunctions = SexpFunctionsStandardImpl (structure Sexp = SexpStr)
 
 open SIE Interpreter;
 (* the following doesn't compile, see the compiler complaint: *)
@@ -75,6 +76,13 @@ val sexp = SexpParser.parse `(^(TmSucc) (^(TmQuote) ^(TmInteger 5)))`;
 val valu = Interpreter.value sexp;
 val sexp = SexpParser.parse `(^(TmZero_p) (^(TmQuote) ^(TmInteger 5)))`;
 val valu = Interpreter.value sexp;
+
+val Y = SexpParser.parse `(^(TmLambda) (^(TmIdentifier "le"))
+			  	       ((^(TmLambda) (^(TmIdentifier "f")) (^(TmIdentifier "f") ^(TmIdentifier "f")))
+					    (^(TmLambda) (^(TmIdentifier "f"))
+						(^(TmIdentifier "le") (^(TmLambda) (^(TmIdentifier "x")) 
+							((^(TmIdentifier "f") ^(TmIdentifier "f")) ^(TmIdentifier "x")))))))`;
+val Y_as_string = SexpFunctions.to_string SIE.term_to_string Y 
 
 (* the following example shows that  *)
 signature SIMPLE_SEXP = 

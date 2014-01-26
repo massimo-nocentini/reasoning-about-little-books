@@ -25,6 +25,7 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 			 | TmLambda
 			 | TmCond
 			 | TmElse
+			 | TmY
 
     datatype scheme_meaning = Primitive of scheme_term Sexp.sexp
 			    | Quotation of scheme_term Sexp.sexp
@@ -54,6 +55,7 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
       | scheme_term_equal TmLambda TmLambda = true
       | scheme_term_equal TmCond TmCond = true
       | scheme_term_equal TmElse TmElse = true
+      | scheme_term_equal TmY TmY = true
       | scheme_term_equal _ _ = false
 
     fun term_to_string (TmInteger anInt) = Int.toString anInt
@@ -78,6 +80,7 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
       | term_to_string TmLambda = "lambda" 
       | term_to_string TmCond = "cond"
       | term_to_string TmElse = "else"
+      | term_to_string TmY = "Y"
 
     fun meaning_to_string (Quotation aSexp) = 
 	(* "'" ^  *)    
@@ -114,6 +117,70 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 		exception Law_of_Cdr
 		exception Law_of_Null
 		exception Law_of_Pred
+
+		(* see the scratch-input file in order to produce the
+		following sexp! *)
+		val Y_sexp = 
+  Sexp.List
+    (Sexp.Cons
+       (Sexp.Atom TmLambda,
+        Sexp.Cons
+          (Sexp.List (Sexp.Cons (Sexp.Atom (TmIdentifier "le"),Sexp.Null)),
+           Sexp.Cons
+             (Sexp.List
+                (Sexp.Cons
+                   (Sexp.List
+                      (Sexp.Cons
+                         (Sexp.Atom TmLambda,
+                          Sexp.Cons
+                            (Sexp.List (Sexp.Cons (Sexp.Atom (TmIdentifier "f"),Sexp.Null)),
+                             Sexp.Cons
+                               (Sexp.List
+                                  (Sexp.Cons
+                                     (Sexp.Atom (TmIdentifier "f"),
+                                      Sexp.Cons (Sexp.Atom (TmIdentifier "f"),Sexp.Null))),
+                                Sexp.Null)))),
+                    Sexp.Cons
+                      (Sexp.List
+                         (Sexp.Cons
+                            (Sexp.Atom TmLambda,
+                             Sexp.Cons
+                               (Sexp.List (Sexp.Cons (Sexp.Atom (TmIdentifier "f"),Sexp.Null)),
+                                Sexp.Cons
+                                  (Sexp.List
+                                     (Sexp.Cons
+                                        (Sexp.Atom (TmIdentifier "le"),
+                                         Sexp.Cons
+                                           (Sexp.List
+                                              (Sexp.Cons
+                                                 (Sexp.Atom TmLambda,
+                                                  Sexp.Cons
+                                                    (Sexp.List
+                                                       (Sexp.Cons
+                                                          (Sexp.Atom
+                                                             (TmIdentifier "x"),
+                                                           Sexp.Null)),
+                                                     Sexp.Cons
+                                                       (Sexp.List
+                                                          (Sexp.Cons
+                                                             (Sexp.List
+                                                                (Sexp.Cons
+                                                                   (Sexp.Atom
+                                                                      (TmIdentifier
+                                                                         "f"),
+                                                                    Sexp.Cons
+                                                                      (Sexp.Atom
+                                                                         (TmIdentifier
+                                                                            "f"),
+                                                                       Sexp.Null))),
+                                                              Sexp.Cons
+                                                                (Sexp.Atom
+                                                                   (TmIdentifier
+                                                                      "x"),
+                                                                 Sexp.Null))),Sexp.Null)))),
+                                            Sexp.Null))),Sexp.Null)))),Sexp.Null))),Sexp.Null))))
+
+		val fix_point_operator = Y_sexp
 
 		fun value aSexp = meaning_of aSexp Table.empty_table
 		and meaning_of aSexp aTable = 
@@ -202,7 +269,15 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 		    in 
 			evcon lines
 		    end
-		and application_type (Sexp.List 
+		and application_type (Sexp.List
+					  (Sexp.Cons
+					       (Sexp.Atom TmY,
+						rec_fn as Sexp.Cons (
+						    Sexp.List _, 
+						    Sexp.Null))))
+				     aTable = 
+		    meaning_of (Sexp.List (Sexp.Cons (fix_point_operator, rec_fn))) aTable
+		  | application_type (Sexp.List 
 					  (Sexp.Cons
 					       (function,
 						args)))
@@ -244,7 +319,8 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 						    order to not
 						    violate `Law of
 						    Cons'. *)
-						    Sexp.Cons (_, cdr as Sexp.Cons (_, _))))] = 
+						    (* Sexp.Cons (_, cdr as Sexp.Cons (_, _))))] =  *)
+						    Sexp.Cons (_, cdr)))] = 
 			    Quotation (Sexp.List cdr)
 			  | apply (Primitive (Sexp.Atom TmCdr))
 				  [Quotation _] = 

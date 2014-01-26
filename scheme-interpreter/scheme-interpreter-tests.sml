@@ -940,6 +940,39 @@ struct
 	  Assert.assertEqualString "10" output_as_string
       end
 
+ fun printing_fix_point_operator () =
+     let
+  	 val sexp = Interpreter.fix_point_operator
+
+	 val input_as_string = SexpFunctions.to_string 
+				   SIE.term_to_string sexp
+     in
+	  Assert.assertEqualString "(lambda (le) ((lambda (f) (f f)) (lambda (f) (le (lambda (x) ((f f) x))))))" input_as_string
+     end
+
+  fun recursive_length () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `((^(TmY) (^(TmLambda) (^(TmIdentifier "length"))
+					       (^(TmLambda) (^(TmIdentifier "lat"))
+							    (^(TmCond) 
+								  (
+								    ((^(TmNull_p) ^(TmIdentifier "lat")) ^(TmInteger 0))
+								    (^(TmElse) (^(TmSucc) (
+										     ^(TmIdentifier "length") (
+											  ^(TmCdr) ^(TmIdentifier "lat"))))))))))
+			       (^(TmQuote) (^(TmInteger 0) ^(TmInteger 0) ^(TmInteger 0) ^(TmInteger 0))))` 
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "((Y (lambda (length) (lambda (lat) (cond (((null? lat) 0) (else (succ (length (cdr lat))))))))) (quote (0 0 0 0)))" 
+	      input_as_string;
+	  Assert.assertEqualString "4" output_as_string
+      end
 
   fun suite () =
       Test.labelTests
@@ -1086,7 +1119,11 @@ struct
 	 cond_with_one_true_clause_true_other_than_two_clauses_should_return_that_answer),
 
 	("cond_with_false_clauses_other_than_else_clause_should_return_the_elses_answer",
-	 cond_with_false_clauses_other_than_else_clause_should_return_the_elses_answer)
+	 cond_with_false_clauses_other_than_else_clause_should_return_the_elses_answer),
+
+	("printing_fix_point_operator", printing_fix_point_operator),
+
+	("recursive_length", recursive_length)
 
 
 

@@ -14,6 +14,8 @@ sig
 		
     val value: term sexp -> meaning
 
+    val fix_point_operator: term sexp
+
     exception EmptyListNotAllowedForNonPrimitiveExpression
 
     exception IdentifierNotBound of identifier

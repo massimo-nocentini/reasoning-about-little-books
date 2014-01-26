@@ -1,3 +1,9 @@
+2014-01-26  Massimo Nocentini  <massimo.nocentini@gmail.com>
+
+	* scheme-interpreter/scheme-interpreter-tests.sml
+	(SchemeInterpreterTests.recursive_length): Finally the Y is still
+	magnificent with Cons and their friends!
+
 2014-01-18  Massimo Nocentini  <massimo.nocentini@gmail.com>
 
 	* scheme-interpreter/scheme-interpreter.fun
