@@ -176,13 +176,13 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 		and cond_type (Sexp.List
 				   (Sexp.Cons
 					(Sexp.Atom TmCond,
-					 lines as Sexp.Cons
-					       (* just to ensure that
+					 (* just to ensure that
 					       there is at least one
 					       question, namely
 					       `TmElse' *)
-					       (Sexp.List _,
-						other_conses))))
+					 Sexp.Cons (
+					     Sexp.List lines, 
+					     Sexp.Null))))
 			      aTable = 
 		    let
 			fun evcon (Sexp.Cons (

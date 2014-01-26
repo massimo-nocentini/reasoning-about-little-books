@@ -850,6 +850,96 @@ struct
 	  assertEqualMeaning expected meaning
       end
 
+  fun cond_with_only_else_clause_should_return_that_answer () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `(^(TmCond) 
+				((^(TmElse) ^(TmInteger 10))))` 
+	  val expected = Quotation (Atom (TmInteger 10))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "(cond ((else 10)))" 
+	      input_as_string;
+	  Assert.assertEqualString "10" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun cond_with_one_true_clause_true_other_than_else_clause_should_return_that_answer () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `((^(TmLambda) (^(TmIdentifier "x"))
+					(^(TmCond) 
+					      (
+						((^(TmEq_p) ^(TmIdentifier "x") ^(TmInteger 98)) (^(TmQuote) ^(TmIdentifier "yep")))
+						(^(TmElse) ^(TmInteger 10)))))
+			       ^(TmInteger 98))` 
+	  val expected = Quotation (Atom (TmIdentifier "yep"))
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "((lambda (x) (cond (((eq? x 98) (quote yep)) (else 10)))) 98)" 
+	      input_as_string;
+	  Assert.assertEqualString "yep" output_as_string;
+	  assertEqualMeaning expected meaning
+      end
+
+  fun cond_with_one_true_clause_true_other_than_two_clauses_should_return_that_answer () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `((^(TmLambda) (^(TmIdentifier "x"))
+					(^(TmCond) 
+					      (
+						((^(TmEq_p) ^(TmIdentifier "x") ^(TmInteger 98)) (^(TmQuote) ^(TmIdentifier "yep")))
+						((^(TmZero_p) ^(TmIdentifier "x")) (^(TmQuote) (^(TmIdentifier "x") 
+												^(TmIdentifier "is") 
+												^(TmIdentifier "zero"))))
+						(^(TmElse) ^(TmInteger 10)))))
+			       ^(TmInteger 0))` 
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "((lambda (x) (cond (((eq? x 98) (quote yep)) ((zero? x) (quote (x is zero))) (else 10)))) 0)" 
+	      input_as_string;
+	  Assert.assertEqualString "(x is zero)" output_as_string
+      end
+
+  fun cond_with_false_clauses_other_than_else_clause_should_return_the_elses_answer () =
+      let
+  	  val sexp = SexpParser.parse 
+			 `((^(TmLambda) (^(TmIdentifier "x"))
+					(^(TmCond) 
+					      (
+						((^(TmEq_p) ^(TmIdentifier "x") ^(TmInteger 98)) (^(TmQuote) ^(TmIdentifier "yep")))
+						((^(TmZero_p) ^(TmIdentifier "x")) (^(TmQuote) (^(TmIdentifier "x") 
+												^(TmIdentifier "is") 
+												^(TmIdentifier "zero"))))
+						(^(TmElse) ^(TmInteger 10)))))
+			       ^(TmInteger 43))` 
+  	  val meaning = Interpreter.value sexp
+
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+      in
+	  Assert.assertEqualString 
+	      "((lambda (x) (cond (((eq? x 98) (quote yep)) ((zero? x) (quote (x is zero))) (else 10)))) 43)" 
+	      input_as_string;
+	  Assert.assertEqualString "10" output_as_string
+      end
+
 
   fun suite () =
       Test.labelTests
@@ -984,7 +1074,19 @@ struct
 	 evaluating_THE_quine_should_return_THAT_quine),
 
 	("high_order_function_namely_apply",
-	 high_order_function_namely_apply)
+	 high_order_function_namely_apply),
+
+	("cond_with_only_else_clause_should_return_that_answer",
+	 cond_with_only_else_clause_should_return_that_answer),
+
+	("cond_with_one_true_clause_true_other_than_else_clause_should_return_that_answer",
+	 cond_with_one_true_clause_true_other_than_else_clause_should_return_that_answer),
+
+	("cond_with_one_true_clause_true_other_than_two_clauses_should_return_that_answer",
+	 cond_with_one_true_clause_true_other_than_two_clauses_should_return_that_answer),
+
+	("cond_with_false_clauses_other_than_else_clause_should_return_the_elses_answer",
+	 cond_with_false_clauses_other_than_else_clause_should_return_the_elses_answer)
 
 
 
