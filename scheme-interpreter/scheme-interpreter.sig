@@ -24,5 +24,6 @@ sig
 
     exception Law_of_Car
     exception Law_of_Cdr
+    exception Law_of_Null
 
 end
