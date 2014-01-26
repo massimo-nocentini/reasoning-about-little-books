@@ -71,7 +71,8 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
       | term_to_string TmNumber_p = "number?"
       | term_to_string (TmIdentifier anIdentifier) = anIdentifier
       | term_to_string TmQuote = "quote"
-      | term_to_string TmLambda = "λ"
+      (* | term_to_string TmLambda = "λ" *)
+      | term_to_string TmLambda = "lambda"
       | term_to_string TmCond = "cond"
       | term_to_string TmElse = "else"
 

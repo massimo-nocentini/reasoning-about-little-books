@@ -29,6 +29,36 @@ struct
 			     SIE.meaning_to_string
       end
 
+(* the original quine for a lisp implementation *)
+(*
+((lambda (x)
+       (list x (list (quote quote) x)))
+      (quote
+         (lambda (x)
+           (list x (list (quote quote) x)))))
+*)
+ val quine_sexp = SexpParser.parse 
+		      `((^(TmLambda) (^(TmIdentifier "x"))
+				     (^(TmCons) ^(TmIdentifier "x") 
+					             (^(TmCons) (^(TmCons) (^(TmQuote) ^(TmQuote)) 
+									   (^(TmCons) ^(TmIdentifier "x") (^(TmQuote) ()))) 
+								(^(TmQuote) ()))))
+			    (^(TmQuote) (^(TmLambda) (^(TmIdentifier "x"))
+						     (^(TmCons) ^(TmIdentifier "x") 
+								     (^(TmCons) (^(TmCons) (^(TmQuote) ^(TmQuote)) 
+											   (^(TmCons) ^(TmIdentifier "x") (^(TmQuote) ()))) 
+										(^(TmQuote) ()))))))`
+
+ fun printing_quine () =
+     let
+  	 val sexp = quine_sexp
+
+	 val input_as_string = SexpFunctions.to_string 
+				   SIE.term_to_string sexp
+     in
+	  Assert.assertEqualString "((lambda (x) (cons x (cons (cons (quote quote) (cons x (quote ()))) (quote ())))) (quote (lambda (x) (cons x (cons (cons (quote quote) (cons x (quote ()))) (quote ()))))))" input_as_string
+      end
+
   fun quoting_the_empty_list_should_return_the_empty_list () =
       let
   	  val sexp = SexpParser.parse `(^(TmQuote) ())`;
@@ -107,10 +137,9 @@ struct
 					      List (
 						  Cons (
 						      Atom (TmIdentifier "x"),
-							   Cons (
-							   Atom (TmBoolean true), 
-							   Null)
-						      )),
+						      Cons (
+							  Atom (TmBoolean true), 
+							  Null))),
 					      Null)),
 				      Null)),
 			      Cons (
@@ -782,7 +811,22 @@ struct
 	  assertEqualMeaning expected meaning
       end
 
+  fun evaluating_THE_quine_should_return_THAT_quine () =
+      let
+  	  val sexp = quine_sexp
+	  val expected = Quotation quine_sexp
+  	  val meaning = Interpreter.value sexp
 
+	  val input_as_string = SexpFunctions.to_string 
+				    SIE.term_to_string sexp
+	  val output_as_string = SIE.meaning_to_string meaning
+
+	  val quine_as_string = "((lambda (x) (cons x (cons (cons (quote quote) (cons x (quote ()))) (quote ())))) (quote (lambda (x) (cons x (cons (cons (quote quote) (cons x (quote ()))) (quote ()))))))"
+      in
+	  Assert.assertEqualString quine_as_string input_as_string;
+	  Assert.assertEqualString quine_as_string output_as_string;
+	  assertEqualMeaning expected meaning
+      end
 
   fun suite () =
       Test.labelTests
@@ -909,7 +953,12 @@ struct
 	 atomp_of_an_integer_should_return_true),
 
 	("atomp_of_non_empty_list_should_return_false",
-	 atomp_of_non_empty_list_should_return_false)
+	 atomp_of_non_empty_list_should_return_false),
+
+	("printing_quine", printing_quine),
+
+	("evaluating_THE_quine_should_return_THAT_quine",
+	 evaluating_THE_quine_should_return_THAT_quine)
 
 
 
