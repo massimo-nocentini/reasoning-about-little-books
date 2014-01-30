@@ -1,12 +1,21 @@
 structure SExpressionsTests =
 struct
 
-  open SExpressions
   structure Assert = SMLUnit.Assert
   structure Test = SMLUnit.Test
 
-  fun assertPred pred item_to_string_fun = Assert.assertEqual 
-					       pred (SExpressions.to_string item_to_string_fun)
+  structure SexpStr = MakeSexp ()
+
+  structure SexpParser = SExpParserSMLofNJ (
+      structure aSexp = SexpStr)
+
+  structure SexpFunctions = SexpFunctionsStandardImpl (
+      structure Sexp = SexpStr)
+
+  open SexpStr SexpParser SexpFunctions
+
+  fun assertPred pred item_to_string_fun = 
+      Assert.assertEqual pred (SexpFunctions.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 
@@ -74,7 +83,7 @@ struct
 
   (* to_string tests **************************************************************)
 
-  val parse_and_to_string = (SExpressions.to_string Int.toString) o parse
+  val parse_and_to_string = (SexpFunctions.to_string Int.toString) o parse
 
   fun to_string_empty_quotation_should_preduce_null_list_sexp () =
       let 
@@ -141,14 +150,14 @@ struct
 
   fun combining_two_empty_lists_should_return_an_empty_list combine_slist () =
       let
-	  val computed = combine_sexp combine_slist null_list_sexp null_list_sexp
+	  val computed = combine combine_slist null_list_sexp null_list_sexp
       in
 	  assert_pred_on_integers (op =) null_list_sexp computed	  
       end
 
   fun combining_an_empty_list_with_an_atom_should_put_that_atom_in_a_list combine_slist () = 
       let	  
-	  val computed = combine_sexp combine_slist null_list_sexp (Atom 5)
+	  val computed = combine combine_slist null_list_sexp (Atom 5)
 
 	  (* here we use ``parse'' assuming, by induction on this test
 	  suite, that ``parse'' behaves correctly *)
@@ -159,7 +168,7 @@ struct
 
   fun combining_two_atoms_should_build_a_flat_list_containing_them combine_slist () = 
       let 
-	  val computed = combine_sexp combine_slist (Atom 4) (Atom 2)
+	  val computed = combine combine_slist (Atom 4) (Atom 2)
 	  val expected = parse `(^(4) ^(2))`
       in
 	  assert_pred_on_integers (op =) expected computed
@@ -167,7 +176,7 @@ struct
 
   fun combining_a_list_with_an_atom_should_build_a_list_with_the_former_list_in_car_and_a_list_for_the_cdr combine_slist () = 
       let 
-	  val computed = combine_sexp combine_slist (parse `(((^(2))) ^(4) (^(9)))`) (Atom 3)
+	  val computed = combine combine_slist (parse `(((^(2))) ^(4) (^(9)))`) (Atom 3)
 	  val expected = parse `(((^(2))) ^(4) (^(9)) ^(3))`
       in
 	  assert_pred_on_integers (op =) expected computed
@@ -176,7 +185,7 @@ struct
   fun combining_a_non_empty_list_with_an_empty_list_should_put_the_former_non_empty_list_in_a_list combine_slist () = 
       let 
 	  val non_empty_list = parse `(((^(2))) ^(4) (^(9)))`
-	  val computed = combine_sexp combine_slist non_empty_list null_list_sexp
+	  val computed = combine combine_slist non_empty_list null_list_sexp
 	  val expected = non_empty_list
       in
 	  assert_pred_on_integers (op =) expected computed
@@ -185,7 +194,7 @@ struct
   fun combining_an_empty_list_with_a_non_empty_list_should_return_the_latter_non_empty_list combine_slist () = 
       let 
 	  val non_empty_list = parse `(((^(2))) ^(4) (^(9)))`
-	  val computed = combine_sexp combine_slist null_list_sexp non_empty_list
+	  val computed = combine combine_slist null_list_sexp non_empty_list
 	  val expected = non_empty_list
       in
 	  assert_pred_on_integers (op =) expected computed
@@ -193,7 +202,7 @@ struct
 
   fun combining_an_atom_with_an_empty_list_should_build_one_element_list_with_that_atom combine_slist () = 
       let 
-	  val computed = combine_sexp combine_slist (Atom 4) null_list_sexp
+	  val computed = combine combine_slist (Atom 4) null_list_sexp
 	  val expected = parse `(^(4))`
       in
 	  assert_pred_on_integers (op =) expected computed
@@ -201,7 +210,7 @@ struct
 
   fun combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slist () = 
       let 
-	  val computed = combine_sexp combine_slist 
+	  val computed = combine combine_slist 
 				      (parse `((((^(3)) ^(8) ^(1)) ^(9)) ^(0))`) 
 				      (parse `(^(2) ((^(8)) ((((^(1))) ^(3))) ^(2)))`)
 	  val expected = parse `((((^(3)) ^(8) ^(1)) ^(9)) ^(0) ^(2) ((^(8)) ((((^(1))) ^(3))) ^(2)))`
@@ -229,38 +238,38 @@ struct
 	    ("atomp of an atom should return true", atomp_of_atom_should_return_true),
 	    ("atomp of null list should return false", atomp_of_empty_list_should_return_false),
 	    ("combining two empty lists should return an empty list using curried slist combination strategy", 
-	     combining_two_empty_lists_should_return_an_empty_list combine_slist_curried),
+	     combining_two_empty_lists_should_return_an_empty_list combine_slists_curried),
 	    ("combining an empty list with an atom should build a one-element list containing that atom using curried slist combination strategy",
-	     combining_an_empty_list_with_an_atom_should_put_that_atom_in_a_list combine_slist_curried),
+	     combining_an_empty_list_with_an_atom_should_put_that_atom_in_a_list combine_slists_curried),
 	    ("combining two atoms should build a flat list containing them using curried slist combination strategy",
-	     combining_two_atoms_should_build_a_flat_list_containing_them combine_slist_curried),
+	     combining_two_atoms_should_build_a_flat_list_containing_them combine_slists_curried),
 	    ("combining a list with an atom should build a list with the former list in car and a list for the cdr using curried slist combination strategy",
-	     combining_a_list_with_an_atom_should_build_a_list_with_the_former_list_in_car_and_a_list_for_the_cdr combine_slist_curried),
+	     combining_a_list_with_an_atom_should_build_a_list_with_the_former_list_in_car_and_a_list_for_the_cdr combine_slists_curried),
 	    ("combining a non empty list with an empty list should put the former non empty list in a list using curried slist combination strategy",
-	     combining_a_non_empty_list_with_an_empty_list_should_put_the_former_non_empty_list_in_a_list combine_slist_curried),
+	     combining_a_non_empty_list_with_an_empty_list_should_put_the_former_non_empty_list_in_a_list combine_slists_curried),
 	    ("combining an empty list with a non empty list should return the latter non empty list using curried slist combination strategy",
-	     combining_an_empty_list_with_a_non_empty_list_should_return_the_latter_non_empty_list combine_slist_curried),
+	     combining_an_empty_list_with_a_non_empty_list_should_return_the_latter_non_empty_list combine_slists_curried),
 	    ("combining an atom with an empty list should build one element list with that atom using curried slist combination strategy",
-	     combining_an_atom_with_an_empty_list_should_build_one_element_list_with_that_atom combine_slist_curried),
+	     combining_an_atom_with_an_empty_list_should_build_one_element_list_with_that_atom combine_slists_curried),
 	    ("combining two non empty lists should build a new list containing their elements using curried slist combination strategy",
-	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slist_curried),
+	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slists_curried),
 
 	    ("combining two empty lists should return an empty list using staged slist combination strategy", 
-	     combining_two_empty_lists_should_return_an_empty_list combine_slist_staged),
+	     combining_two_empty_lists_should_return_an_empty_list combine_slists_staged),
 	    ("combining an empty list with an atom should build a one-element list containing that atom using staged slist combination strategy",
-	     combining_an_empty_list_with_an_atom_should_put_that_atom_in_a_list combine_slist_staged),
+	     combining_an_empty_list_with_an_atom_should_put_that_atom_in_a_list combine_slists_staged),
 	    ("combining two atoms should build a flat list containing them using staged slist combination strategy",
-	     combining_two_atoms_should_build_a_flat_list_containing_them combine_slist_staged),
+	     combining_two_atoms_should_build_a_flat_list_containing_them combine_slists_staged),
 	    ("combining a list with an atom should build a list with the former list in car and a list for the cdr using staged slist combination strategy",
-	     combining_a_list_with_an_atom_should_build_a_list_with_the_former_list_in_car_and_a_list_for_the_cdr combine_slist_staged),
+	     combining_a_list_with_an_atom_should_build_a_list_with_the_former_list_in_car_and_a_list_for_the_cdr combine_slists_staged),
 	    ("combining a non empty list with an empty list should put the former non empty list in a list using staged slist combination strategy",
-	     combining_a_non_empty_list_with_an_empty_list_should_put_the_former_non_empty_list_in_a_list combine_slist_staged),
+	     combining_a_non_empty_list_with_an_empty_list_should_put_the_former_non_empty_list_in_a_list combine_slists_staged),
 	    ("combining an empty list with a non empty list should return the latter non empty list using staged slist combination strategy",
-	     combining_an_empty_list_with_a_non_empty_list_should_return_the_latter_non_empty_list combine_slist_staged),
+	     combining_an_empty_list_with_a_non_empty_list_should_return_the_latter_non_empty_list combine_slists_staged),
 	    ("combining an atom with an empty list should build one element list with that atom using staged slist combination strategy",
-	     combining_an_atom_with_an_empty_list_should_build_one_element_list_with_that_atom combine_slist_staged),
+	     combining_an_atom_with_an_empty_list_should_build_one_element_list_with_that_atom combine_slists_staged),
 	    ("combining two non empty lists should build a new list containing their elements using staged slist combination strategy",
-	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slist_staged)
+	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slists_staged)
 
 
 	  ]

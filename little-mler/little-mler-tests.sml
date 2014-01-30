@@ -1,12 +1,20 @@
 structure LittleMLerTests =
 struct
 
-  open LittleMLer
+  
   structure Assert = SMLUnit.Assert
   structure Test = SMLUnit.Test
 
+  structure SexpStr = MakeSexp ()
+  structure LittleMLerStr = LittleMLer (structure SexpStr = SexpStr)
+
+  structure SexpFunctions = SexpFunctionsStandardImpl (
+      structure Sexp = SexpStr)
+
+  open SexpStr LittleMLerStr 
+
   fun assertPred pred item_to_string_fun = 
-      Assert.assertEqual pred (SExpressions.to_string item_to_string_fun)
+      Assert.assertEqual pred (SexpFunctions.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 

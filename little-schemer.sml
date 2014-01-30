@@ -1,7 +1,13 @@
-structure LittleSchemer = 
+functor LittleSchemer (structure SexpStr : SEXP) = 
     struct
 
-    open SExpressions
+    structure SexpParser = SExpParserSMLofNJ (
+	structure aSexp = SexpStr)
+
+    structure SexpFunctions = SexpFunctionsStandardImpl (
+	structure Sexp = SexpStr)
+
+    open SexpStr SexpParser SexpFunctions
 
     fun occurs_in_slist x Null = 0
       | occurs_in_slist x (Cons (sexp, aList)) = 

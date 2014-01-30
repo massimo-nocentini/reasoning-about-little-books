@@ -1,12 +1,20 @@
 structure LittleSchemerTests =
 struct
 
-  open LittleSchemer
   structure Assert = SMLUnit.Assert
   structure Test = SMLUnit.Test
 
+  structure SexpStr = MakeSexp ()
+  structure LittleSchemerStr = LittleSchemer (structure SexpStr = SexpStr)
+
+  structure SexpFunctions = SexpFunctionsStandardImpl (
+      structure Sexp = SexpStr)
+
+  open SexpStr LittleSchemerStr
+
+
   fun assertPred pred item_to_string_fun = Assert.assertEqual 
-					       pred (SExpressions.to_string item_to_string_fun)
+					       pred (SexpFunctions.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 
@@ -157,25 +165,25 @@ struct
 	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_8),
 
         ("length of atom eight using length defined with Y combinator",
-	 length_of_atom_eight LittleSchemer.length),
+	 length_of_atom_eight LittleSchemerStr.length),
         ("length of atom eight using length defined with Y combinator using accumulator technique",
-	 length_of_atom_eight LittleSchemer.length_with_accumulator),
+	 length_of_atom_eight LittleSchemerStr.length_with_accumulator),
         ("length of atom eight using length defined with Y combinator using collector technique",
-	 length_of_atom_eight (LittleSchemer.length_with_collector (fn length => length))),
+	 length_of_atom_eight (LittleSchemerStr.length_with_collector (fn length => length))),
 
         ("length of flat list of ints using length defined with Y combinator",
-	 length_of_flat_integer_list LittleSchemer.length),
+	 length_of_flat_integer_list LittleSchemerStr.length),
         ("length of flat list of ints using length defined with Y combinator using accumulator technique",
-	 length_of_flat_integer_list LittleSchemer.length_with_accumulator),
+	 length_of_flat_integer_list LittleSchemerStr.length_with_accumulator),
         ("length of flat list of ints using length defined with Y combinator using collector technique",
-	 length_of_flat_integer_list (LittleSchemer.length_with_collector (fn length => length))),
+	 length_of_flat_integer_list (LittleSchemerStr.length_with_collector (fn length => length))),
 
         ("length of complex shuffled tree using length defined with Y combinator",
-	 length_of_complex_shuffled_tree LittleSchemer.length),
+	 length_of_complex_shuffled_tree LittleSchemerStr.length),
         ("length of complex shuffled tree using length defined with Y combinator using accumulator technique",
-	 length_of_complex_shuffled_tree LittleSchemer.length_with_accumulator),
+	 length_of_complex_shuffled_tree LittleSchemerStr.length_with_accumulator),
         ("length of complex shuffled tree using length defined with Y combinator using collector technique",
-	 length_of_complex_shuffled_tree (LittleSchemer.length_with_collector (fn length => length)))
+	 length_of_complex_shuffled_tree (LittleSchemerStr.length_with_collector (fn length => length)))
 
 
       ]
