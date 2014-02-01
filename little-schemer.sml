@@ -509,5 +509,48 @@ cannot be generalized at its binding declaration: 'e *)
 	end
       | length_with_collector collector (Atom _) = collector 1
 
+
+    local
+	structure Self = SelfApplication ()
+	structure Ariety = ArietyOne (
+	    structure SelfApplication = Self)
+	structure Fix = Y_DerivedFrom_LittleLisper (
+	    structure SelfApplication = Self
+	    structure Ariety = Ariety)
+
+	(* open Self Ariety Fix *)
+    in
+    
+    fun length_with_collector_functorized collector (List aList) =
+	let
+	    fun L length Null col = col 0
+	      | L length (Cons (Atom _, cdr)) col =
+	      	length cdr (fn future_value => col (1 + future_value))
+	      | L length (Cons (List innerList, cdr)) col = 
+		length innerList (
+		    fn future_length_of_car_list => 
+		       length cdr (fn future_length_of_cdr_list => 
+				      col (future_length_of_car_list + 
+					   future_length_of_cdr_list)))
+	in
+	    Fix.fix Ariety.G L aList collector
+	end
+      | length_with_collector_functorized collector (Atom _) = collector 1
+    
+
+    fun length_functorized (List aList) =
+	let
+	    fun L length Null = 0
+	      | L length (Cons (Atom _, cdr)) =
+	      	1 + length cdr
+	      | L length (Cons (List innerList, cdr)) = 
+		(length innerList) + (length cdr)
+	in
+	    Fix.fix Ariety.G L aList
+	end
+      | length_functorized (Atom _) = 1
+			      
+
+    end
  
     end

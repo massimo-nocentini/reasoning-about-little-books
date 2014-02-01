@@ -176,7 +176,7 @@ struct
         ("length of flat list of ints using length defined with Y combinator using accumulator technique",
 	 length_of_flat_integer_list LittleSchemerStr.length_with_accumulator),
         ("length of flat list of ints using length defined with Y combinator using collector technique",
-	 length_of_flat_integer_list (LittleSchemerStr.length_with_collector (fn length => length))),
+	 length_of_flat_integer_list (LittleSchemerStr.length_with_collector_functorized (fn length => length))),
 
         ("length of complex shuffled tree using length defined with Y combinator",
 	 length_of_complex_shuffled_tree LittleSchemerStr.length),

@@ -6,32 +6,122 @@ sig
     datatype 'a T = Into of 'a T -> 'a
 end
 
-signature ATTEMPT =
+signature APPLICATION_ARIETY =
+sig
+    type 'a T
+    type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	  'k) ariety
+
+    val G: ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	  'k) ariety T ->
+	   ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	  'k) ariety
+end
+
+signature FIX_POINT_COMBINATOR = 
 sig
 
     type 'a T
-    type ('a,'b,'c) two_argument
+    type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	  'k) ariety
 
-    val application: ('a,'b,'c) two_argument T -> ('a,'b,'c) two_argument
+    val fix: (('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	       'k) ariety T -> 'l) ->
+	     ('l -> ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+		     'k) ariety) ->
+	     ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	      'k) ariety
 
 end
 
-functor TwoArgumentSelfApplication (
+functor Y_DerivedFrom_LittleLisper (
+    structure SelfApplication : SELF_APPLICATION
+    structure Ariety: APPLICATION_ARIETY
+			  sharing type SelfApplication.T = 
+				       Ariety.T) 
+	: FIX_POINT_COMBINATOR = 
+	struct
+	
+	type 'a T = 'a SelfApplication.T
+	type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+ 	      'k) ariety = 
+	     ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+ 	      'k) Ariety.ariety
+
+	val fix = 
+	 fn G => 
+	    fn M => 
+	       (fn (future as (SelfApplication.Into _)) => M (G future)) 
+		   (SelfApplication.Into (
+			 fn (future as (SelfApplication.Into _)) =>
+			    M (G future)))	
+	end
+
+functor ArietyZero (
     structure SelfApplication : SELF_APPLICATION)
-	: ATTEMPT where type 'a T = 'a SelfApplication.T
-        =
+	: APPLICATION_ARIETY = 
 	struct
 
 	type 'a T = 'a SelfApplication.T
-	type ('a,'b,'c) two_argument = 'a -> 'b -> 'c
+	type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	      'k) ariety = unit -> 'a
 
-	(* type 'a T = 'a SelfApplication.T *)
-	open SelfApplication
+	fun G (into as SelfApplication.Into aFn) () =
+	    aFn into ()
 
-	fun application (into as SelfApplication.Into aFn) x1 x2 =
+	end
+
+functor ArietyOne (
+    structure SelfApplication : SELF_APPLICATION)
+	: APPLICATION_ARIETY = 
+	struct
+
+	type 'a T = 'a SelfApplication.T
+	type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	      'k) ariety = 'a -> 'b
+
+	fun G (into as SelfApplication.Into aFn) x1 =
+	    aFn into x1
+
+	end
+
+functor ArietyTwo (
+    structure SelfApplication : SELF_APPLICATION)
+	: APPLICATION_ARIETY = 
+	struct
+
+	type 'a T = 'a SelfApplication.T
+	type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	      'k) ariety = 'a -> 'b -> 'c
+
+	fun G (into as SelfApplication.Into aFn) x1 x2 =
 	    aFn into x1 x2
 
 	end
+
+(* signature TWO_ARGUMENTS = *)
+(* sig *)
+(*     type 'a T *)
+(*     type ('a,'b,'c) two_arguments *)
+
+(*     val G: ('a,'b,'c) two_arguments T -> ('a,'b,'c) two_arguments *)
+(* end *)
+
+(* functor TwoArgumentSelfApplication ( *)
+(*     structure SelfApplication : SELF_APPLICATION) *)
+(* 	: TWO_ARGUMENTS  *)
+(* 	       (* where type 'a T = 'a SelfApplication.T *) *)
+(* 	       (* where type ('a,'b,'c) two_argument = 'a -> 'b -> 'c *) *)
+(*         = *)
+(* 	struct *)
+
+(* 	type 'a T = 'a SelfApplication.T *)
+(* 	type ('a,'b,'c) two_arguments = 'a -> 'b -> 'c *)
+
+(* 	fun G (into as SelfApplication.Into aFn) x1 x2 = *)
+(* 	    aFn into x1 x2 *)
+
+(* 	end *)
 
 signature SELF_APPLICATION_OPERATORS = 
 sig
