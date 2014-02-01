@@ -13,6 +13,8 @@ is
 
     sexp-expressions/sources.cm
 
+    fix-point-combinators/sources.cm
+
     little-schemer.sml (with: parser.quotations=true)
     little-schemer-tests.sml (with: parser.quotations=true)
 

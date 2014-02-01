@@ -1,7 +1,11 @@
 
-open LittleSchemer;
-val into = Into G;
+structure SexpStr = MakeSexp ()
+structure LittleSchemerStr = LittleSchemer(
+	structure SexpStr = SexpStr)
 
+open LittleSchemerStr;
+
+val into = Into G;
 
 open ChainLittleSchemer;
 
@@ -19,8 +23,10 @@ val ninetyth_integer_using_ints = chain_item 90 (ints 0)
 val sixth_fib_number = chain_item 6 (fibs 0 1)
 val sixth_fib_number_using_nth = get_nth 6 (fn (n,m) => (m, n+m)) (0,1)
 val sixth_fib_number_using_nth_projecting = ((fn (n,m) => m) o (get_nth 6 (fn (n,m) => (m, n+m))))  (0,1)
-												    
-open LittleMLer;
+
+structure LittleMLerStr = LittleMLer (
+	structure SexpStr = SexpStr)												    
+open LittleMLerStr;
 
 val zero = num_plus Zero Zero;
 functor aFunctor = NumberAsInt;
