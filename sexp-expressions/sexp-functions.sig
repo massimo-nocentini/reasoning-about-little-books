@@ -11,5 +11,7 @@ sig
 
     val combine_slists_staged: 'a slist -> 'a slist -> 'a slist
     val combine_slists_curried: 'a slist -> 'a slist -> 'a slist
+
+    val two_in_a_row: ('a -> 'a -> bool) -> 'a sexp -> bool
 end
 

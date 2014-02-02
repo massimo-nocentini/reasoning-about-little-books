@@ -1,0 +1,48 @@
+structure SeasonedSchemerTests =
+struct
+
+  structure Assert = SMLUnit.Assert
+  structure Test = SMLUnit.Test
+
+  structure SexpStr = MakeSexp ()
+
+  structure SexpFunctions = SexpFunctionsStandardImpl (
+      structure Sexp = SexpStr)
+
+  open SexpStr SexpFunctions
+
+
+  fun assertPred pred item_to_string_fun = Assert.assertEqual 
+					       pred (to_string item_to_string_fun)
+
+  fun assert_pred_on_integers pred = assertPred pred Int.toString
+
+  val atom_eight = Atom 8
+  val sexp_without_two_in_a_row = parse `(^(1) ^(2) ^(3) ^(4) ^(5) ^(6) ^(7) ^(8))`
+  val sexp_with_an_atom_in_two_in_a_row = parse `(^(1) ^(2) ^(3) ^(4) ^(5) ^(5) ^(7) ^(8))`
+  val sexp_with_a_sexp_in_two_in_a_row = parse `((^(4)) (^(3) (^(2))) (^(3) (^(2))) ^(9))`
+
+  fun eight_filter 8 = true
+    | eight_filter _ = false
+
+  fun test_two_in_a_row two_in_a_row_fn () =
+      let 
+	  val sut = two_in_a_row_fn (fn fst => fn => snd => fst = snd)	  
+      in
+	  Assert.assertFalse (sut atom_eight);
+	  Assert.assertFalse (sut sexp_without_two_in_a_row);
+	  Assert.assertTrue (sut sexp_with_an_atom_in_two_in_a_row);
+	  Assert.assertTrue (sut sexp_with_a_sexp_in_two_in_a_row)
+      end
+
+  fun suite () =
+      Test.labelTests
+      [
+        ("test_two_in_a_row",
+	 test_two_in_a_row two_in_a_row_using_normal_patterns)
+
+
+      ]
+
+end
+    

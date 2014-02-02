@@ -25,12 +25,23 @@ sig
     type ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
 	  'k) ariety
 
+    (* val fix: (('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j ,  *)
+    (* 	       'k) ariety T -> 'l) -> *)
+    (* 	     ('l -> ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j ,  *)
+    (* 		     'k) ariety) -> *)
+    (* 	     ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j ,  *)
+    (* 	      'k) ariety *)
+
     val fix: (('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
-	       'k) ariety T -> 'l) ->
-	     ('l -> ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	       'k) ariety T -> 
+	      ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	       'k) ariety) ->
+	     (('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
+	       'k) ariety -> ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
 		     'k) ariety) ->
 	     ('a , 'b , 'c , 'd , 'e , 'f , 'g , 'h , 'i , 'j , 
 	      'k) ariety
+
 
 end
 
@@ -85,6 +96,7 @@ functor ArietyOne (
 
 	end
 
+(* the following seems superflous but I do not understand upto now... *)
 functor ArietyTwo (
     structure SelfApplication : SELF_APPLICATION)
 	: APPLICATION_ARIETY = 
