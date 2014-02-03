@@ -5,11 +5,13 @@ struct
   structure Test = SMLUnit.Test
 
   structure SexpStr = MakeSexp ()
+  structure SeasonedSchemerStr = SeasonedSchemer (
+      structure SexpStr = SexpStr)
 
   structure SexpFunctions = SexpFunctionsStandardImpl (
       structure Sexp = SexpStr)
 
-  open SexpStr SexpFunctions
+  open SexpStr SeasonedSchemerStr
 
 
   fun assertPred pred item_to_string_fun = Assert.assertEqual 
@@ -27,7 +29,7 @@ struct
 
   fun test_two_in_a_row two_in_a_row_fn () =
       let 
-	  val sut = two_in_a_row_fn (fn fst => fn => snd => fst = snd)	  
+	  val sut = two_in_a_row_fn (fn fst => fn snd => fst = snd)	  
       in
 	  Assert.assertFalse (sut atom_eight);
 	  Assert.assertFalse (sut sexp_without_two_in_a_row);
@@ -38,10 +40,8 @@ struct
   fun suite () =
       Test.labelTests
       [
-        ("test_two_in_a_row",
-	 test_two_in_a_row two_in_a_row_using_normal_patterns)
-
-
+        ("test_two_in_a_row of first version: use `is_first_in' helper",
+	 test_two_in_a_row two_in_a_row_using_helper_function)
       ]
 
 end
