@@ -41,7 +41,15 @@ struct
       Test.labelTests
       [
         ("test_two_in_a_row of first version: use `is_first_in' helper",
-	 test_two_in_a_row two_in_a_row_using_helper_function)
+	 test_two_in_a_row two_in_a_row_using_helper_function),
+
+        ("test_two_in_a_row of second version: leaving decision to recur to `is_first_in' helper",
+	 test_two_in_a_row two_in_a_row_leaving_recursion_to_helper),
+
+        ("test_two_in_a_row of second version: two_in_a_row_recursion_only_through_helper",
+	 test_two_in_a_row two_in_a_row_recursion_only_through_helper)
+
+
       ]
 
 end
