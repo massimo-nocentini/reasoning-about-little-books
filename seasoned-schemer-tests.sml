@@ -37,6 +37,18 @@ struct
 	  Assert.assertTrue (sut sexp_with_a_sexp_in_two_in_a_row)
       end
 
+  fun test_sum_of_prefixes () = 
+      let
+	  val computed_mixture = sum_of_prefixes_unprotected (parse `(^(2) ^(1) ^(9) ^(17) ^(0))`)
+	  val expected_mixture = parse `(^(2) ^(3) ^(12) ^(29) ^(29))`
+
+	  val computed_ones = sum_of_prefixes_unprotected (parse `(^(1) ^(1) ^(1) ^(1) ^(1))`)
+	  val expected_ones = parse `(^(1) ^(2) ^(3) ^(4) ^(5))`
+      in
+	  assertPred (op =) Int.toString computed_mixture expected_mixture;
+	  assertPred (op =) Int.toString computed_ones expected_ones
+      end
+
   fun suite () =
       Test.labelTests
       [
@@ -47,7 +59,9 @@ struct
 	 test_two_in_a_row two_in_a_row_leaving_recursion_to_helper),
 
         ("test_two_in_a_row of second version: two_in_a_row_recursion_only_through_helper",
-	 test_two_in_a_row two_in_a_row_recursion_only_through_helper)
+	 test_two_in_a_row two_in_a_row_recursion_only_through_helper),
+
+	("test_sum_of_prefixes", test_sum_of_prefixes)
 
 
       ]
