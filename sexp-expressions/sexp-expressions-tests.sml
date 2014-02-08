@@ -220,8 +220,8 @@ struct
 
   fun test_pick () = 
       let
-	  val should_be_one = pick 4 (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)
-	  val should_be_three = pick 2 (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)
+	  val Atom should_be_one = pick 4 (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)
+	  val Atom should_be_three = pick 2 (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)
       in
 	  Assert.assertEqualInt 1 should_be_one;
 	  Assert.assertEqualInt 3 should_be_three

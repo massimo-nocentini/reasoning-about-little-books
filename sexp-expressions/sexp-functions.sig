@@ -12,6 +12,6 @@ sig
     val combine_slists_staged: 'a slist -> 'a slist -> 'a slist
     val combine_slists_curried: 'a slist -> 'a slist -> 'a slist
 
-    val pick: int -> int sexp -> int
+    val pick: int -> 'a sexp -> 'a sexp
 end
 

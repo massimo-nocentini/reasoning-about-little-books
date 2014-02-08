@@ -49,6 +49,14 @@ struct
 	  assertPred (op =) Int.toString computed_ones expected_ones
       end
 
+  fun test_scramble () = 
+      let
+	  val first_computed = scramble_unprotected 
+				   (parse `(^(1) ^(1) ^(1) ^(3) ^(4) ^(2) ^(1) ^(1) ^(9) ^(2))`)
+	  val first_expected = parse `(^(1) ^(1) ^(1) ^(1) ^(1) ^(4) ^(1) ^(1) ^(1) ^(9))`
+      in
+	  assertPred (op =) Int.toString  first_expected first_computed
+      end
 
   fun suite () =
       Test.labelTests
@@ -62,7 +70,9 @@ struct
         ("test_two_in_a_row of second version: two_in_a_row_recursion_only_through_helper",
 	 test_two_in_a_row two_in_a_row_recursion_only_through_helper),
 
-	("test_sum_of_prefixes", test_sum_of_prefixes)
+	("test_sum_of_prefixes", test_sum_of_prefixes),
+
+	("test_scramble", test_scramble)
 
 	
 
