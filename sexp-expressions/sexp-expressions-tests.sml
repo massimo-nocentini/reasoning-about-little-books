@@ -218,6 +218,15 @@ struct
 	  assert_pred_on_integers (op =) expected computed
       end      
 
+  fun test_pick () = 
+      let
+	  val should_be_one = pick 4 (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)
+	  val should_be_three = pick 2 (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)
+      in
+	  Assert.assertEqualInt 1 should_be_one;
+	  Assert.assertEqualInt 3 should_be_three
+      end
+
   fun suite () =
       Test.labelTests
 	  [
@@ -269,7 +278,9 @@ struct
 	    ("combining an atom with an empty list should build one element list with that atom using staged slist combination strategy",
 	     combining_an_atom_with_an_empty_list_should_build_one_element_list_with_that_atom combine_slists_staged),
 	    ("combining two non empty lists should build a new list containing their elements using staged slist combination strategy",
-	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slists_staged)
+	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements combine_slists_staged),
+
+	    ("test_pick", test_pick)
 
 
 	  ]

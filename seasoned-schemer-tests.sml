@@ -49,6 +49,7 @@ struct
 	  assertPred (op =) Int.toString computed_ones expected_ones
       end
 
+
   fun suite () =
       Test.labelTests
       [
@@ -62,6 +63,8 @@ struct
 	 test_two_in_a_row two_in_a_row_recursion_only_through_helper),
 
 	("test_sum_of_prefixes", test_sum_of_prefixes)
+
+	
 
 
       ]

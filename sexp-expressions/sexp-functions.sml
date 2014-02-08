@@ -96,7 +96,10 @@ functor SexpFunctionsStandardImpl (structure Sexp: SEXP)
 	    (fn anotherList => Cons (aSexp, stage anotherList))
 		
 
-
+	fun pick_slist 1 (Cons (Atom anInt, _)) = anInt
+	  | pick_slist n (Cons (Atom _, cdr_slist)) =
+	    pick_slist (n-1) cdr_slist
+	and pick n (List conses) = pick_slist n conses
 
 
 
