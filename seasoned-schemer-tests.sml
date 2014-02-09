@@ -58,6 +58,15 @@ struct
 	  assertPred (op =) Int.toString  first_expected first_computed
       end
 
+  fun test_multirember () =
+      let
+	  val element_not_present = multirember (Atom 8)
+					(parse `(^(1) ^(1) ^(1) ^(3) ^(4) ^(2) ^(1) ^(1) ^(9) ^(2))`)
+	  val same_list_expected = parse `(b^(1) ^(1) ^(1) ^(3) ^(4) ^(2) ^(1) ^(1) ^(9) ^(2))`
+      in 
+	  assertPred (op =) Int.toString same_list_expected element_not_present
+      end
+
   fun suite () =
       Test.labelTests
       [
@@ -72,7 +81,9 @@ struct
 
 	("test_sum_of_prefixes", test_sum_of_prefixes),
 
-	("test_scramble", test_scramble)
+	("test_scramble", test_scramble),
+
+	("test_multirember", test_multirember)
 
 	
 
