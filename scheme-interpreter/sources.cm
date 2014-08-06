@@ -10,6 +10,7 @@ is
     ../types-utilities/sources.cm
 
     ../sexp-expressions/sources.cm
+	../sexp-functions/sources.cm
 
     scheme-interpreter.sig
     scheme-interpreter.sml

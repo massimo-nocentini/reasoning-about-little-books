@@ -7,22 +7,27 @@ struct
   structure SexpStr = MakeSexp ()
 
   structure SexpParser = SExpParserSMLofNJ (
-      structure aSexp = SexpStr)
+		  structure Sexp = SexpStr)
 
   structure SIE = SchemeInterpreterEnvironment (
-      structure Sexp = SexpStr)
+		  structure Sexp = SexpStr)
 
   structure Interpreter = SIE.MakeInterpreter ()
 
-  structure SexpFunctions = SexpFunctionsStandardImpl (
-      structure Sexp = SexpStr)
+  structure SexpEqualFunction = SexpEqual (
+		  structure Sexp = SexpStr)
 
-  open SIE Interpreter SexpStr;
+  structure SexpToStringFunction = SexpToString(
+		  structure Sexp = SexpStr)
+
+  open SIE 
+  open Interpreter 
+  open SexpStr;
 
   val assertEqualMeaning  = 
       let
 	  fun equal_meaning (Quotation a, Quotation b) = 
-	      SexpFunctions.equal SIE.scheme_term_equal a b
+	      SexpEqualFunction.equal SIE.scheme_term_equal a b
 	    | equal_meaning (_, _) = false				  
       in
 	  Assert.assertEqual equal_meaning
@@ -53,7 +58,7 @@ struct
      let
   	 val sexp = quine_sexp
 
-	 val input_as_string = SexpFunctions.to_string 
+	 val input_as_string = SexpToStringFunction.to_string 
 				   SIE.term_to_string sexp
      in
 	  Assert.assertEqualString "((lambda (x) (cons x (cons (cons (quote quote) (cons x (quote ()))) (quote ())))) (quote (lambda (x) (cons x (cons (cons (quote quote) (cons x (quote ()))) (quote ()))))))" input_as_string
@@ -65,7 +70,7 @@ struct
   	  val meaning = Interpreter.value sexp;
 	  val expected = Quotation (List Null)
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -80,7 +85,7 @@ struct
   	  val meaning = Interpreter.value sexp;
 	  val expected = Quotation (Atom (TmInteger 5))
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
 
@@ -105,7 +110,7 @@ struct
 		 				 Atom (TmInteger 10),
 						 Null)))))
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
 
@@ -146,7 +151,7 @@ struct
 				  Atom (TmInteger 10),
 				  Null)))))
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
 
@@ -163,7 +168,7 @@ struct
   	  val meaning = Interpreter.value sexp;
 	  val expected = Quotation (Atom (TmIdentifier "a"))
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -182,7 +187,7 @@ struct
 					      Atom (TmIdentifier "a"),
 					      Null)))
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -201,7 +206,7 @@ struct
 							^(TmIdentifier "hello")))))`
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -217,7 +222,7 @@ struct
 			 `(^(TmCons)  (^(TmQuote) ^(TmIdentifier "a"))
 				      (^(TmQuote) ^(TmIdentifier "b")))`;
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
       in
 	  Assert.assertEqualString "(cons (quote a) (quote b))" 
@@ -237,7 +242,7 @@ struct
 	  val expected = Quotation (Atom (TmInteger 4))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -253,7 +258,7 @@ struct
   	  val sexp = SexpParser.parse 
 			 `(^(TmCar)  (^(TmQuote) ()))`;
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
       in
 	  Assert.assertEqualString "(car (quote ()))" 
@@ -272,7 +277,7 @@ struct
 						 ^(TmIdentifier "hello")))))`	  
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -287,7 +292,7 @@ struct
   	  val sexp = SexpParser.parse 
 			 `(^(TmCdr)  (^(TmQuote) ()))`;
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
       in
 	  Assert.assertEqualString "(cdr (quote ()))" 
@@ -307,7 +312,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -325,7 +330,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -341,7 +346,7 @@ struct
   	  val sexp = SexpParser.parse 
 			 `(^(TmNull_p)  (^(TmQuote) ^(TmBoolean true)))`;
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
       in
 	  Assert.assertEqualString "(null? (quote #t))" 
@@ -359,7 +364,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -378,7 +383,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -397,7 +402,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -416,7 +421,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -435,7 +440,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -454,7 +459,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -473,7 +478,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -492,7 +497,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -511,7 +516,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -530,7 +535,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -549,7 +554,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -567,7 +572,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -585,7 +590,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -603,7 +608,7 @@ struct
 	  val expected = Quotation (Atom (TmInteger 1))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -621,7 +626,7 @@ struct
 	  val expected = Quotation (Atom (TmInteger 0))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -637,7 +642,7 @@ struct
   	  val sexp = SexpParser.parse 
 			 `(^(TmPred) (^(TmQuote) ^(TmInteger 0)))` 
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
       in
 	  Assert.assertEqualString "(pred (quote 0))" 
@@ -654,7 +659,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -672,7 +677,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -690,7 +695,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -709,7 +714,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -727,7 +732,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -745,7 +750,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -763,7 +768,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean true))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -782,7 +787,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -800,7 +805,7 @@ struct
 	  val expected = Quotation (Atom (TmBoolean false))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -817,7 +822,7 @@ struct
 	  val expected = Quotation quine_sexp
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
 
@@ -839,7 +844,7 @@ struct
 	  val expected = Quotation (Atom (TmInteger 11))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -858,7 +863,7 @@ struct
 	  val expected = Quotation (Atom (TmInteger 10))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -881,7 +886,7 @@ struct
 	  val expected = Quotation (Atom (TmIdentifier "yep"))
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -906,7 +911,7 @@ struct
 			       ^(TmInteger 0))` 
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -930,7 +935,7 @@ struct
 			       ^(TmInteger 43))` 
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in
@@ -944,7 +949,7 @@ struct
      let
   	 val sexp = Interpreter.fix_point_operator
 
-	 val input_as_string = SexpFunctions.to_string 
+	 val input_as_string = SexpToStringFunction.to_string 
 				   SIE.term_to_string sexp
      in
 	  Assert.assertEqualString "(lambda (le) ((lambda (f) (f f)) (lambda (f) (le (lambda (x) ((f f) x))))))" input_as_string
@@ -964,7 +969,7 @@ struct
 			       (^(TmQuote) (^(TmInteger 0) ^(TmInteger 0) ^(TmInteger 0) ^(TmInteger 0))))` 
   	  val meaning = Interpreter.value sexp
 
-	  val input_as_string = SexpFunctions.to_string 
+	  val input_as_string = SexpToStringFunction.to_string 
 				    SIE.term_to_string sexp
 	  val output_as_string = SIE.meaning_to_string meaning
       in

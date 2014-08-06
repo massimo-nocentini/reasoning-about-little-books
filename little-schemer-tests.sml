@@ -7,14 +7,13 @@ struct
   structure SexpStr = MakeSexp ()
   structure LittleSchemerStr = LittleSchemer (structure SexpStr = SexpStr)
 
-  structure SexpFunctions = SexpFunctionsStandardImpl (
-      structure Sexp = SexpStr)
+  structure SexpToStringFunction = SexpToString (structure Sexp = SexpStr)
 
-  open SexpStr LittleSchemerStr
-
+  open SexpStr 
+  open LittleSchemerStr
 
   fun assertPred pred item_to_string_fun = Assert.assertEqual 
-					       pred (SexpFunctions.to_string item_to_string_fun)
+					       pred (SexpToStringFunction.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 
@@ -28,7 +27,7 @@ struct
 
   fun remove_from_atom_eight remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn eight_filter)	  
+	  val sut = (SexpToStringFunction.to_string Int.toString) o (remove_fn eight_filter)	  
       in
 	  (sut atom_eight;
 	   Assert.fail "It shouldn't be allowed to removed from an atomic sexp") 
@@ -37,7 +36,7 @@ struct
 
   fun remove_from_flat_integer_list remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn eight_filter)
+	  val sut = (SexpToStringFunction.to_string Int.toString) o (remove_fn eight_filter)
 	  val computed = sut flat_integer_list
       in
 	  Assert.assertEqualString "(1 2 3 4 5 6 7)" computed
@@ -45,7 +44,7 @@ struct
 
   fun remove_from_complex_tree_of_eights remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn eight_filter)
+	  val sut = (SexpToStringFunction.to_string Int.toString) o (remove_fn eight_filter)
 	  val computed = sut complex_tree_of_eights
       in
 	  Assert.assertEqualString "(((((()) ((()))) ((())))))" computed
@@ -53,7 +52,7 @@ struct
 
   fun remove_from_complex_shuffled_tree remove_fn () =
       let 
-	  val sut = (to_string Int.toString) o (remove_fn eight_filter)
+	  val sut = (SexpToStringFunction.to_string Int.toString) o (remove_fn eight_filter)
 	  val computed = sut complex_tree_shuffled
       in
 	  Assert.assertEqualString "((((((1)) 3 (4 (()))) 6 (7 (() 9)))))" computed

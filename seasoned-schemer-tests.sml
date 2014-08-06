@@ -5,17 +5,22 @@ struct
   structure Test = SMLUnit.Test
 
   structure SexpStr = MakeSexp ()
+
+  structure SexpParser = SExpParserSMLofNJ (
+			structure Sexp = SexpStr) 
+
   structure SeasonedSchemerStr = SeasonedSchemer (
-      structure SexpStr = SexpStr)
+		  structure SexpStr = SexpStr)
 
-  structure SexpFunctions = SexpFunctionsStandardImpl (
-      structure Sexp = SexpStr)
+  structure SexpToStringFunction = SexpToString (
+		  structure Sexp = SexpStr)
 
-  open SexpStr SeasonedSchemerStr
-
+  open SexpStr 
+  open SexpParser
+  open SeasonedSchemerStr
 
   fun assertPred pred item_to_string_fun = Assert.assertEqual 
-					       pred (to_string item_to_string_fun)
+					       pred (SexpToStringFunction.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 

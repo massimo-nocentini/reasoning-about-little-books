@@ -2,14 +2,16 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
     struct
 
     structure SexpParser = SExpParserSMLofNJ (
-	structure aSexp = SexpStr) 
+			structure Sexp = SexpStr) 
 
-    structure SexpFunctions = SexpFunctionsStandardImpl (
-	structure Sexp = SexpStr)
+	structure SexpEqualFunction = SexpEqual (
+			structure Sexp = SexpStr)
+
+	structure SexpPickFunction = SexpPick (
+			structure Sexp = SexpStr)
 
     open SexpStr 
     open SexpParser 
-    open SexpFunctions
 
     fun two_in_a_row_using_helper_function eq_fn = 
 	let
@@ -18,7 +20,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 		 is empty or when the first element in the list is
 		 different from sexp*)
 	    fun is_first_in sexp (Cons (another_sexp, _)) = 
-		equal eq_fn sexp another_sexp
+		SexpEqualFunction.equal eq_fn sexp another_sexp
 	      | is_first_in _ Null = false
 
 	    (* If `is_first_in' responds `false' it makes sense
@@ -50,7 +52,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 		 atom is not the same as `a', we must search for two
 		 atoms in a row in `list'. And that's the job of
 		 `L'.*)
-		equal eq_fn sexp another_sexp orelse L list
+		SexpEqualFunction.equal eq_fn sexp another_sexp orelse L list
 	      | is_first_in _ Null = false
 
 	in
@@ -73,7 +75,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
             Here the `preceding' argument always occurs just before 
             the second argument, `list', in the original list.*)
 	    fun is_first_in preceding (list as Cons (car_sexp, cdr_slist)) = 
-		equal eq_fn preceding car_sexp orelse 
+		SexpEqualFunction.equal eq_fn preceding car_sexp orelse 
 		is_first_in car_sexp cdr_slist
 	      | is_first_in _ Null = false
 
@@ -123,7 +125,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 			(Cons (car_sexp as Atom anIndex, cdr_slist)) = 
 	let
 	    val reversed_prefix' = Cons (car_sexp, reversed_prefix)
-	    val picked = pick anIndex (List reversed_prefix')
+	    val picked = SexpPickFunction.pick (List reversed_prefix') anIndex 
 	    val rest = scramble_helper reversed_prefix' cdr_slist
 	in Cons (picked, rest) end
       | scramble_helper _ Null = Null
@@ -142,7 +144,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 		List (multirember_slist conses)
 	    and multirember_slist Null = Null
 	      | multirember_slist (Cons (car_sexp, cdr_slist)) = 
-		if equal curried_equal anElement car_sexp 
+		if SexpEqualFunction.equal curried_equal anElement car_sexp 
 		then multirember_slist cdr_slist
 		else Cons (car_sexp, multirember_slist cdr_slist)
 	in multirember_sexp aSexp end
@@ -187,7 +189,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 		m_r_slist anElement conses
 	    and m_r_slist anElement Null = Null
 	      | m_r_slist anElement (Cons (car_sexp, cdr_slist)) = 
-		if equal curried_equal anElement car_sexp 
+		if SexpEqualFunction.equal curried_equal anElement car_sexp 
 		then m_r_slist anElement cdr_slist
 		else Cons (car_sexp, m_r_slist anElement cdr_slist)
 	in m_r end
@@ -206,7 +208,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 	    and multirember_with_test_slist_abridged_2_slist anElement Null = Null
 	      | multirember_with_test_slist_abridged_2_slist 
 		    anElement (Cons (car_sexp, cdr_slist)) = 
-		if equal curried_equal anElement car_sexp 
+		if SexpEqualFunction.equal curried_equal anElement car_sexp 
 		then multirember_with_test_slist_abridged_2_slist anElement cdr_slist
 		else Cons (car_sexp, 
 			   multirember_with_test_slist_abridged_2_slist anElement cdr_slist)
@@ -224,7 +226,7 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 		multirember_slist conses
 	    and multirember_slist Null = Null
 	      | multirember_slist (Cons (car_sexp, cdr_slist)) = 
-		if equal curried_equal anElement car_sexp 
+		if SexpEqualFunction.equal curried_equal anElement car_sexp 
 		then multirember_slist cdr_slist
 		else Cons (car_sexp, multirember_slist cdr_slist)
 	in multirember_sexp aSexp end

@@ -1,6 +1,6 @@
 
 
-signature COMBINE_SEXP = 
+signature SEXP_COMBINE = 
 sig
 
     type 'a sexp
@@ -9,7 +9,7 @@ sig
 end
 
 functor CombineSexpCurried(structure Sexp: SEXP)
-	:> COMBINE_SEXP where type 'a sexp = 'a Sexp.sexp 
+	:> SEXP_COMBINE where type 'a sexp = 'a Sexp.sexp 
     = 
 	struct
 
@@ -48,7 +48,7 @@ functor CombineSexpCurried(structure Sexp: SEXP)
 	end
 
 functor CombineSexpStaged (structure Sexp: SEXP)
-	:> COMBINE_SEXP where type 'a sexp = 'a Sexp.sexp 
+	:> SEXP_COMBINE where type 'a sexp = 'a Sexp.sexp 
     = 
 	struct
 

@@ -7,14 +7,13 @@ struct
 
   structure SexpStr = MakeSexp ()
   structure LittleMLerStr = LittleMLer (structure SexpStr = SexpStr)
+  structure SexpToStringFunction = SexpToString (structure Sexp = SexpStr)
 
-  structure SexpFunctions = SexpFunctionsStandardImpl (
-      structure Sexp = SexpStr)
-
-  open SexpStr LittleMLerStr 
+  open SexpStr 
+  open LittleMLerStr 
 
   fun assertPred pred item_to_string_fun = 
-      Assert.assertEqual pred (SexpFunctions.to_string item_to_string_fun)
+      Assert.assertEqual pred (SexpToStringFunction.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 

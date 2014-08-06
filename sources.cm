@@ -12,6 +12,7 @@ is
     types-utilities/sources.cm
 
     sexp-expressions/sources.cm
+	sexp-functions/sources.cm
 
     fix-point-combinators/sources.cm
 

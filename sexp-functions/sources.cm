@@ -16,4 +16,3 @@ is
     equal.sml
     pick.sml
     sexp-functions.sml
-    to_string.sml

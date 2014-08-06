@@ -3,10 +3,12 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
     struct
 
     structure Table = MakeTableDoubleListImpl (
-	structure IdentifierType = MakeTypeString ())
+			structure IdentifierType = MakeTypeString ())
 
-    structure SexpFunctions = SexpFunctionsStandardImpl(
-	structure Sexp = Sexp)
+	structure SexpToStringFunction = SexpToString (
+			structure Sexp = Sexp)
+
+	structure SexpEqualFunction = SexpEqual (structure Sexp = Sexp)
 
     datatype scheme_term = TmInteger of int
 			 | TmBoolean of bool
@@ -84,10 +86,10 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 
     fun meaning_to_string (Quotation aSexp) = 
 	(* "'" ^  *)    
-	(SexpFunctions.to_string term_to_string aSexp)
+	(SexpToStringFunction.to_string term_to_string aSexp)
       | meaning_to_string (Primitive aSexp) = 
 	"Primitive function: " ^ 
-	(SexpFunctions.to_string term_to_string aSexp)
+	(SexpToStringFunction.to_string term_to_string aSexp)
       | meaning_to_string (NonPrimitive _) = 
 	"Non primitive function"
 
@@ -369,9 +371,7 @@ functor SchemeInterpreterEnvironment(structure Sexp: SEXP) =
 				   (* 			   Sexp.Null))))] =  *)
 				  [Quotation fst_sexp, Quotation snd_sexp] = 
 			    Quotation (Sexp.Atom (TmBoolean (
-						       SexpFunctions.equal scheme_term_equal 
-									   fst_sexp 
-									   snd_sexp)))
+						       SexpEqualFunction.equal scheme_term_equal fst_sexp snd_sexp)))
 
 			  (* atom? **************************************************************** *)
 			  | apply (Primitive (Sexp.Atom TmAtom_p)) 

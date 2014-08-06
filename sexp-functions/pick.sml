@@ -5,7 +5,7 @@ signature SEXP_PICK =
 
 		exception IndexOutOfBound
 
-		val pick : 'a sexp -> int -> 'a
+		val pick : 'a sexp -> int -> 'a sexp
 
 	end
 
@@ -13,6 +13,11 @@ functor SexpPick (structure Sexp : SEXP)
 	:> SEXP_PICK where type 'a sexp = 'a Sexp.sexp
 	=
 	struct
+
+		exception IndexOutOfBound
+
+		open Sexp
+
 		fun pick (List conses) n = 
 			let 
 				fun	pick_slist _ Null = raise IndexOutOfBound 
