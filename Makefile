@@ -10,3 +10,7 @@ interactive:
 compile:
 	rm -r .cm/
 	sml -m sources.cm < /dev/null
+
+tags:
+	rm -f tags
+	ctags-exuberant -R --languages=sml
