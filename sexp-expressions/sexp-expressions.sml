@@ -1,5 +1,7 @@
 signature SEXP = 
 sig
+    (* essentially here we're providing pattern matching capabilities
+     as basic building blocks for these types.*)
     datatype 'a slist = Null
 		      | Cons of 'a sexp * 'a slist
 	 and 'b sexp = Atom of 'b
@@ -17,14 +19,3 @@ functor MakeSexp ()
 			 | List of 'b slist
 
 	end
-
-signature SEXP_PARSER = 
-sig
-    type 'a fragments
-    type 'a sexp
-
-    exception Parse_error of string
-
-    val parse: 'a fragments -> 'a sexp
-end
-

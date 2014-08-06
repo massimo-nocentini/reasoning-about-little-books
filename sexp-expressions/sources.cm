@@ -10,10 +10,11 @@ is
 
     ../types-utilities/sources.cm
 
-    sexp-expressions.sig
+    sexp-expressions.sml
     
     sexp-expressions-tests.sml (with: parser.quotations=true)
 
+    sexp-parser-sig.sml
     sexp-parser-SMLofNJ.sml
 
     sexp-functions.sig

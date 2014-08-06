@@ -2,12 +2,14 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
     struct
 
     structure SexpParser = SExpParserSMLofNJ (
-	structure aSexp = SexpStr)
+	structure aSexp = SexpStr) 
 
     structure SexpFunctions = SexpFunctionsStandardImpl (
 	structure Sexp = SexpStr)
 
-    open SexpStr SexpParser SexpFunctions
+    open SexpStr 
+    open SexpParser 
+    open SexpFunctions
 
     fun two_in_a_row_using_helper_function eq_fn = 
 	let
