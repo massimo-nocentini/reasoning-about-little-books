@@ -40,7 +40,7 @@ functor CombineSexpCurried(structure Sexp: SEXP)
 		 (C null). However, the previous one shows deeper the currying
 		 mechanism since it accepts two arguments.
 		 *)
-		fun C' Null = sndslist
+		fun C' Null = snd_slist
 		  | C' (Cons (aSexp, slist)) = Cons (aSexp, C' slist)
 
 	    in List(C fst_slist snd_slist) end
@@ -78,7 +78,7 @@ functor CombineSexpStaged (structure Sexp: SEXP)
 			and make_cons aSexp stage = 
 				(fn anotherList => Cons (aSexp, stage anotherList))
 		in 
-			List (combine_slist_staged fst_slist snd_slist)	
+			List (combine_slists_staged fst_slist snd_slist)	
 		end
 
 	end

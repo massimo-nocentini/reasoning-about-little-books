@@ -1,19 +1,19 @@
 signature SEXP_PARSER_SMLofNJ = SEXP_PARSER 
     where type 'a fragments = 'a SMLofNJ.frag list
 
-functor SExpParserSMLofNJ (structure aSexp: SEXP)
-	:> SEXP_PARSER_SMLofNJ where type 'a sexp = 'a aSexp.sexp
+functor SExpParserSMLofNJ (structure Sexp: SEXP)
+	:> SEXP_PARSER_SMLofNJ where type 'a sexp = 'a Sexp.sexp
 	=
 	struct
 
 	(* maybe this type can be parameterized introducing a functor *)
 	type 'a fragments = 'a SMLofNJ.frag list
-	type 'a sexp = 'a aSexp.sexp
+	type 'a sexp = 'a Sexp.sexp
 
 	exception Parse_error of string
 
 	local
-	    open aSexp
+	    open Sexp
 	in
 	fun parse (aFragList: 'a fragments): 'a sexp = 
 	    let
@@ -72,9 +72,8 @@ functor SExpParserSMLofNJ (structure aSexp: SEXP)
 		  | minify_fraglist (aFragment::rest) = 
 		    (explode_fragment aFragment) @ (minify_fraglist rest)
 
-	    in
-		% (minify_fraglist aFragList) []
-	    end
+	    in % (minify_fraglist aFragList) [] end
 	end	
-end
+
+	end
 

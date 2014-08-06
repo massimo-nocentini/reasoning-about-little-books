@@ -16,5 +16,4 @@ is
     equal.sml
     pick.sml
     sexp-functions.sml
-    sources.cm
     to_string.sml

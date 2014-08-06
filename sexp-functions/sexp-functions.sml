@@ -2,20 +2,25 @@
 signature SEXP_FUNCTIONS_COLLECTION = 
 	sig
 		structure Sexp : SEXP
-		structure Equal: SEXP_EQUAL sharing type 'a Equal.sexp = 'a Sexp.sexp
-		structure ToString: SEXP_TO_STRING sharing type 'a Equal.sexp = 'a ToString.sexp
-		structure CombineStaged: SEXP_COMBINE sharing type 'a ToString.sexp = 'a CombineStaged.sexp
-		structure CombineCurried: SEXP_COMBINE sharing type 'a CombineStaged.sexp = 'a CombineCurried.sexp
-		structure Pick : SEXP_PICK sharing type 'a CombineCurried.sexp = 'a Pick.sexp
+		(*
+		 The following declaration remembers us that using `sharing type'
+		 doesn't require to explicitly say type variables ('a, 'b, ...), 
+		 only the type constructor is required.
+		 *)
+		structure Equal: SEXP_EQUAL sharing type Equal.sexp = Sexp.sexp
+		structure ToString: SEXP_TO_STRING sharing type  Equal.sexp =  ToString.sexp
+		structure CombineStaged: SEXP_COMBINE sharing type  ToString.sexp =  CombineStaged.sexp
+		structure CombineCurried: SEXP_COMBINE sharing type  CombineStaged.sexp =  CombineCurried.sexp
+		structure Pick : SEXP_PICK sharing type  CombineCurried.sexp =  Pick.sexp
 	end
 
 functor SexpFunctionsCollection 
 	(structure Sexp : SEXP
-	 structure Equal: SEXP_EQUAL sharing type 'a Equal.sexp = 'a Sexp.sexp
-	 structure ToString: SEXP_TO_STRING sharing type 'a Equal.sexp = 'a ToString.sexp
-	 structure CombineStaged: SEXP_COMBINE sharing type 'a ToString.sexp = 'a CombineStaged.sexp
-	 structure CombineCurried: SEXP_COMBINE sharing type 'a CombineStaged.sexp = 'a CombineCurried.sexp
-	 structure Pick : SEXP_PICK sharing type 'a CombineCurried.sexp = 'a Pick.sexp)
+	 structure Equal: SEXP_EQUAL sharing type  Equal.sexp =  Sexp.sexp
+	 structure ToString: SEXP_TO_STRING sharing type  Equal.sexp =  ToString.sexp
+	 structure CombineStaged: SEXP_COMBINE sharing type  ToString.sexp =  CombineStaged.sexp
+	 structure CombineCurried: SEXP_COMBINE sharing type  CombineStaged.sexp =  CombineCurried.sexp
+	 structure Pick : SEXP_PICK sharing type  CombineCurried.sexp =  Pick.sexp)
 	:> SEXP_FUNCTIONS_COLLECTION where type 'a Sexp.sexp = 'a Sexp.sexp (* we hope that this will be sufficient *)
 	=
 	struct

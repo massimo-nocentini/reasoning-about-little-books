@@ -1,19 +1,16 @@
 functor LittleMLer (structure SexpStr : SEXP) = 
     struct
 
-    structure SexpParser = SExpParserSMLofNJ (
-	structure aSexp = SexpStr)
+    structure SexpParser = SExpParserSMLofNJ (structure Sexp = SexpStr)
+	structure CombineStaged = CombineSexpStaged (structure Sexp = SexpStr)
+	structure CombineCurried = CombineSexpCurried (structure Sexp = SexpStr)
 
-    structure SexpFunctions = SexpFunctionsStandardImpl (
-	structure Sexp = SexpStr)
-
-    open SexpStr SexpParser SexpFunctions
-
+    open SexpStr 
+	open SexpParser 
 
     (* What is the value of ``prefixer_curried''? It is a function
     that consumes a list and prefixes that list with 1, 2 and 3. *)
-    val curried_prefixer = combine combine_slists_curried 
-				   (parse `(^(1) ^(2) ^(3))`)
+    val curried_prefixer = CombineCurried.combine (parse `(^(1) ^(2) ^(3))`)
 
     (* Define a function that is like the value of
     ``prefixer_curried'' *)
@@ -44,23 +41,20 @@ functor LittleMLer (structure SexpStr : SEXP) =
      \emph{extensionllay} equal because they produce the same values
      when they consume (extensionally) equal values.*)
     fun waiting_prefixer aSexp = 
-	let 
-	    val rest_of_prefix = parse `(^(2) ^(3))`
-	    (* here we have to take apart the result otherwise we've
-	     to introduce an additional Cons in order to putting (List
-	     combined) onto the result.*)
-	    val List combined = combine combine_slists_curried 
-					rest_of_prefix 
-					aSexp
-	in List (Cons (Atom 1, combined)) end
+		let 
+			val rest_of_prefix = parse `(^(2) ^(3))`
+			(* here we have to take apart the result otherwise we've
+			 to introduce an additional Cons in order to putting (List
+			 combined) onto the result.*)
+			val List combined = CombineCurried.combine rest_of_prefix aSexp
+		in List (Cons (Atom 1, combined)) end
 
     (* Does \emph{intensionally} mean they differ in how they produce
     the values? Exactly and we can define a function like
     ``combine'' that produces ``prefixer'' when used with ``parse
     `(^(1) ^(2) ^(3))`'' *)
-    val staged_prefixer = 
-	let val prefix = parse `(^(1) ^(2) ^(3))`
-	in  combine combine_slists_staged prefix end
+    val staged_prefixer = let val prefix = parse `(^(1) ^(2) ^(3))` 
+							in CombineStaged.combine prefix end
 
 
     (* ******************10. Building on blocks****************** *)
