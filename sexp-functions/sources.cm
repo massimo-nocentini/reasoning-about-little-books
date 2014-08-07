@@ -15,4 +15,7 @@ is
     combine.sml
     equal.sml
     pick.sml
+    occurs.sml
+    subst.sml
+
     sexp-functions.sml

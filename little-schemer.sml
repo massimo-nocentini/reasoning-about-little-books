@@ -6,23 +6,6 @@ functor LittleSchemer (structure SexpStr : SEXP) =
     open SexpStr 
 	open SexpParser 
 
-    fun occurs_in_slist x Null = 0
-      | occurs_in_slist x (Cons (sexp, aList)) = 
-	(occurs_in_sexp x sexp) + (occurs_in_slist x aList)
-    and occurs_in_sexp x (Atom y) = 
-	if x = y then 1 else 0
-      | occurs_in_sexp x (List aList) =
-	occurs_in_slist x aList
-
-    fun subst_in_slist new old Null = Null
-      | subst_in_slist new old (Cons (sexp, slist)) = 
-	Cons ((subst_in_sexp new old sexp), 
-	      (subst_in_slist new old slist))
-    and subst_in_sexp new old (original as (Atom atom)) =
-	if atom = old then Atom new else original
-      | subst_in_sexp new old (List aList) =
-	List (subst_in_slist new old aList) 
-
     fun remove_from_sexp pred = 
 	let 
 	    fun R_from_slist Null = Null
@@ -78,7 +61,7 @@ functor LittleSchemer (structure SexpStr : SEXP) =
 		       Cons (List (curry_maker hukairs fsList), 
 			     (curry_maker hukairs snList))
 
-	    (* The argument for the parameter ``hukairs'' is just
+	(* The argument for the parameter ``hukairs'' is just
     passed around: when ``curry_maker'' reaches the leafs of the sexp,
     ``hukairs'' is not used. *)
 	    val Mrember_curry = curry_maker 0
