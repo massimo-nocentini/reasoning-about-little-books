@@ -18,6 +18,13 @@ sig
 
 end
 
+signature SEXP_TYPED =
+	sig
+		include SEXP	
+		type elem
+		type sexp_typed = elem sexp
+	end
+
 functor MakeSexp () 
 	:> SEXP
 	=
@@ -29,3 +36,29 @@ functor MakeSexp ()
 			 | List of 'b slist
 
 	end
+
+functor MakeSexpTyped(type t) 
+	=
+	struct 
+
+
+	datatype  slist = Null
+			  | Cons of  sexp *  slist
+	     and  sexp = Atom of t 
+			 | List of  slist
+
+
+	end
+(*
+functor MakeSexpTypeCompatible(
+	type t
+	structure Sexp : SEXP)
+	:> SEXP where type 'a sexp = t Sexp.sexp
+	=
+	struct
+
+		open Sexp
+		type 'a sexp = t Sexp.sexp
+
+	end
+*)
