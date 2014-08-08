@@ -6,6 +6,16 @@ sig
 		      | Cons of 'a sexp * 'a slist
 	 and 'b sexp = Atom of 'b
 		     | List of 'b slist
+
+	(* 
+	 Just a remainder to consider later, we choose to not
+	 put here function `to_string' in order to have it as the same
+	 level of other functions, it is by no means more special than 
+	 others in this way. The only drawback is that we have to put its 
+	 definition in file in this current subtree and not in the 
+	 functions' subtree.
+	*)	
+
 end
 
 functor MakeSexp () 

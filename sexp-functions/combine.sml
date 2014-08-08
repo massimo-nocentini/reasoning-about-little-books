@@ -15,7 +15,11 @@ functor CombineSexpCurried(structure Sexp: SEXP)
 
 	open Sexp
 	
-	fun combine (List fst_slist) (List snd_slist) =
+	fun combine (atom as Atom _) another_sexp = 
+		combine (List (Cons (atom, Null))) another_sexp
+	|	combine another_sexp (atom as Atom _) = 
+		combine another_sexp (List (Cons (atom, Null))) 
+	|	combine (List fst_slist) (List snd_slist) =
 	    let 
 
 		(* 
@@ -69,7 +73,11 @@ functor CombineSexpStaged (structure Sexp: SEXP)
     in case of null returns the identity function, otherwise in case
     of a Cons (_, _) it use an helper function which ``simulate'' the
     consing as done in the curried version.*)
-	fun combine (List fst_slist) (List snd_slist) =
+	fun combine (atom as Atom _) another_sexp = 
+		combine (List (Cons (atom, Null))) another_sexp
+	|	combine another_sexp (atom as Atom _) = 
+		combine another_sexp (List (Cons (atom, Null))) 
+	|	combine (List fst_slist) (List snd_slist) =
 		let
 			fun combine_slists_staged Null = 
 				(fn anotherList => anotherList)

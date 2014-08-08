@@ -12,6 +12,8 @@ is
 
     ../sexp-expressions/sources.cm
 
+    sexp-functions-tests.sml (with: parser.quotations=true)
+
     combine.sml
     equal.sml
     pick.sml

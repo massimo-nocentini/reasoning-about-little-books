@@ -2,11 +2,11 @@ functor LittleMLer (structure SexpStr : SEXP) =
     struct
 
     structure SexpParser = SExpParserSMLofNJ (structure Sexp = SexpStr)
-	structure CombineStaged = CombineSexpStaged (structure Sexp = SexpStr)
-	structure CombineCurried = CombineSexpCurried (structure Sexp = SexpStr)
+    structure CombineStaged = CombineSexpStaged (structure Sexp = SexpStr)
+    structure CombineCurried = CombineSexpCurried (structure Sexp = SexpStr)
 
     open SexpStr 
-	open SexpParser 
+    open SexpParser 
 
     (* What is the value of ``prefixer_curried''? It is a function
     that consumes a list and prefixes that list with 1, 2 and 3. *)
