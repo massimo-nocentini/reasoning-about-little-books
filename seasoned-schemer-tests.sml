@@ -38,12 +38,22 @@ struct
                         structure Sexp = SexpStr
                         structure SexpEqualFunction = SexpEqualFunction)
 
+        structure SexpTwoInARowLeavingRecursionToHelperFunction =
+                SexpTwoInARowLeavingRecursionToHelper(
+                        structure Sexp = SexpStr
+                        structure SexpEqualFunction = SexpEqualFunction)
+
+        structure SexpTwoInARowRecursionOnlyThroughHelperFunction =
+                SexpTwoInARowRecursionOnlyThroughHelper(
+                        structure Sexp = SexpStr
+                        structure SexpEqualFunction = SexpEqualFunction)
+
   open SexpStr 
   open SexpParser
   open SeasonedSchemerStr
 
   fun assertPred pred item_to_string_fun = Assert.assertEqual 
-					       pred (SexpToStringFunction.to_string item_to_string_fun)
+        pred (SexpToStringFunction.to_string item_to_string_fun)
 
   fun assert_pred_on_integers pred = assertPred pred Int.toString
 
@@ -55,16 +65,23 @@ struct
   fun eight_filter 8 = true
     | eight_filter _ = false
 
-  fun test_two_in_a_row two_in_a_row_fn () =
-      let 
-	  val sut = two_in_a_row_fn (fn fst => fn snd => fst = snd)	  
-      in
-	  Assert.assertFalse (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row atom_eight curried_equal);
-	  Assert.assertFalse (sut atom_eight);
-	  Assert.assertFalse (sut sexp_without_two_in_a_row);
-	  Assert.assertTrue (sut sexp_with_an_atom_in_two_in_a_row);
-	  Assert.assertTrue (sut sexp_with_a_sexp_in_two_in_a_row)
-      end
+  fun test_two_in_a_row  () =
+        (
+         Assert.assertFalse (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row   atom_eight curried_equal);
+         Assert.assertFalse (SexpTwoInARowLeavingRecursionToHelperFunction.two_in_a_row        atom_eight curried_equal);
+         Assert.assertFalse (SexpTwoInARowRecursionOnlyThroughHelperFunction.two_in_a_row      atom_eight curried_equal);
+
+         Assert.assertFalse (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row   sexp_without_two_in_a_row curried_equal);
+         Assert.assertFalse (SexpTwoInARowLeavingRecursionToHelperFunction.two_in_a_row        sexp_without_two_in_a_row curried_equal);
+         Assert.assertFalse (SexpTwoInARowRecursionOnlyThroughHelperFunction.two_in_a_row      sexp_without_two_in_a_row curried_equal);
+
+         Assert.assertTrue (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row   sexp_with_an_atom_in_two_in_a_row curried_equal);
+         Assert.assertTrue (SexpTwoInARowLeavingRecursionToHelperFunction.two_in_a_row        sexp_with_an_atom_in_two_in_a_row curried_equal);
+         Assert.assertTrue (SexpTwoInARowRecursionOnlyThroughHelperFunction.two_in_a_row      sexp_with_an_atom_in_two_in_a_row curried_equal);
+
+         Assert.assertTrue (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row   sexp_with_a_sexp_in_two_in_a_row curried_equal);
+         Assert.assertTrue (SexpTwoInARowLeavingRecursionToHelperFunction.two_in_a_row        sexp_with_a_sexp_in_two_in_a_row curried_equal);
+         Assert.assertTrue (SexpTwoInARowRecursionOnlyThroughHelperFunction.two_in_a_row      sexp_with_a_sexp_in_two_in_a_row curried_equal))
 
   fun test_sum_of_prefixes () = 
       let
@@ -99,14 +116,7 @@ struct
   fun suite () =
       Test.labelTests
       [
-        ("test_two_in_a_row of first version: use `is_first_in' helper",
-	 test_two_in_a_row two_in_a_row_using_helper_function),
-
-        ("test_two_in_a_row of second version: leaving decision to recur to `is_first_in' helper",
-	 test_two_in_a_row two_in_a_row_leaving_recursion_to_helper),
-
-        ("test_two_in_a_row of second version: two_in_a_row_recursion_only_through_helper",
-	 test_two_in_a_row two_in_a_row_recursion_only_through_helper),
+        ("test_two_in_a_row of first version: use `is_first_in' helper", test_two_in_a_row ),
 
 	("test_sum_of_prefixes", test_sum_of_prefixes),
 

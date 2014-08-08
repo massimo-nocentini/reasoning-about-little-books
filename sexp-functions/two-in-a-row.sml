@@ -57,3 +57,79 @@ functor SexpTwoInARowWithIndependentHelper(
 			in two_in_a_row_sexp sexp end
 
 	end
+
+functor SexpTwoInARowLeavingRecursionToHelper(
+	structure Sexp : SEXP 
+	structure SexpEqualFunction : SEXP_EQUAL 
+	sharing type Sexp.sexp = SexpEqualFunction.sexp )
+	:> SEXP_TWO_IN_A_ROW where type 'a sexp = 'a Sexp.sexp
+	=
+	struct
+		
+		open Sexp
+
+		(* Write a new version where `two_in_a_row' leaves the decision of
+		 whether continuing the search is useful to the revised version of
+		 `is_first_in'.*)
+		fun two_in_a_row sexp comparer = 
+		let
+
+			fun S (Atom _) = false
+			|	S (List slist) = L slist
+			and L Null = false
+			|	L (Cons (car_sexp, cdr_slist)) = 
+			  	is_first_in car_sexp cdr_slist 
+			and is_first_in _ Null = false
+			|	is_first_in sexp (list as Cons (another_sexp, _)) = 
+				(* if `list' contains at least one atom and if the
+				 atom is not the same as `a', we must search for two
+				 atoms in a row in `list'. And that's the job of
+				 `L'.*)
+				SexpEqualFunction.equal comparer sexp another_sexp orelse L list
+
+		in
+			S sexp
+		end
+
+	end
+
+functor SexpTwoInARowRecursionOnlyThroughHelper(
+	structure Sexp : SEXP 
+	structure SexpEqualFunction : SEXP_EQUAL 
+	sharing type Sexp.sexp = SexpEqualFunction.sexp )
+	:> SEXP_TWO_IN_A_ROW where type 'a sexp = 'a Sexp.sexp
+	=
+	struct
+		
+		open Sexp
+
+		(* When `is_first_in' determines the value of `L list',
+		`two_in_a_row' will request the value of `is_first_in car_sexp
+		cdr_slist' since `list' isn't empty. This does mean that we could
+		write a function like `is_first_in' that doesn't use `L' at all*)
+		fun two_in_a_row sexp comparer = 
+			let
+				(* the natural recursion is `is_first_in car_sexp
+				cdr_slist', but is quite unusual since both arguments
+				change even though the function asks questions about its
+				second argument only. The first argument `preceding'
+				changes all the time because, as the name of the argument
+				says, the first argument is always the atom that precedes
+				the current `list' in the list of sexp that `L' received.
+					Here the `preceding' argument always occurs just before 
+					the second argument, `list', in the original list.*)
+				fun is_first_in _ 			Null = false
+				|	is_first_in preceding 	(list as Cons (car_sexp, cdr_slist)) = 
+					SexpEqualFunction.equal comparer preceding car_sexp orelse 
+						is_first_in car_sexp cdr_slist
+
+				fun S (Atom _) = false
+				  | S (List slist) = L slist
+				and L Null = false
+				  | L (Cons (car_sexp, cdr_slist)) = is_first_in car_sexp cdr_slist 
+				
+			in
+				S sexp
+			end
+
+	end
