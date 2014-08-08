@@ -3,9 +3,19 @@ signature SEXP_TWO_IN_A_ROW =
     sig
         type 'a sexp
 
+		(* 
+		 it should be interesting to remove the comparer function
+		 in order to have a more clear type for two_in_a_row
+		*)
         val two_in_a_row : 'a sexp -> ('a -> 'a -> bool) -> bool
     end
-
+(*
+ The following is an attempt to remove the comparer function
+ from the signature: it does compile but with the current 
+ structure we cannot supply a structure that type checks
+ the proposed requirements.
+*)
+(*
 functor SexpTwoInARowWithIndependentHelper(
 	type elem
 	type 'a t
@@ -13,6 +23,12 @@ functor SexpTwoInARowWithIndependentHelper(
 	structure SexpEqualFunction : SEXP_EQUAL 
 		where type 'a sexp = 'a Sexp.sexp
 	val comparer : elem -> elem -> bool) 
+	:> SEXP_TWO_IN_A_ROW where type 'a sexp = 'a Sexp.sexp
+*)
+functor SexpTwoInARowWithIndependentHelper(
+	structure Sexp : SEXP 
+	structure SexpEqualFunction : SEXP_EQUAL 
+	sharing type Sexp.sexp = SexpEqualFunction.sexp )
 	:> SEXP_TWO_IN_A_ROW where type 'a sexp = 'a Sexp.sexp
 	=
 	struct

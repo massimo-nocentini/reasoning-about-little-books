@@ -17,8 +17,13 @@ struct
 
         val curried_equal = fn (fst: int ) => fn snd => fst = snd
 
-        structure SexpEqualFunction = SexpEqual (structure Sexp = SexpStr)
-
+        structure SexpEqualFunction = SexpEqual (
+                        structure Sexp = SexpStr)
+        (* 
+         The following version is much more interesting 
+         than the following one, but we cannot make it type checks. 
+         *)
+        (* 
         structure SexpTwoInARowWithIndependentHelperFunction =
                 SexpTwoInARowWithIndependentHelper(
                         type elem = int
@@ -26,6 +31,12 @@ struct
                         structure Sexp = SexpStr
                         structure SexpEqualFunction = SexpEqualFunction
                         val comparer = curried_equal)
+        *)
+
+        structure SexpTwoInARowWithIndependentHelperFunction =
+                SexpTwoInARowWithIndependentHelper(
+                        structure Sexp = SexpStr
+                        structure SexpEqualFunction = SexpEqualFunction)
 
   open SexpStr 
   open SexpParser
