@@ -19,5 +19,6 @@ is
     pick.sml
     occurs.sml
     subst.sml
+	two-in-a-row.sml
 
     sexp-functions.sml

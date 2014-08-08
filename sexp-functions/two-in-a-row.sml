@@ -1,0 +1,43 @@
+
+signature SEXP_TWO_IN_A_ROW = 
+    sig
+        type 'a sexp
+
+        val two_in_a_row : 'a sexp -> ('a -> 'a -> bool) -> bool
+    end
+
+functor SexpTwoInARowWithIndependentHelper(
+	type elem
+	type 'a t
+	structure Sexp : SEXP where type 'a sexp =elem t 
+	structure SexpEqualFunction : SEXP_EQUAL 
+		where type 'a sexp = 'a Sexp.sexp
+	val comparer : elem -> elem -> bool) 
+	:> SEXP_TWO_IN_A_ROW where type 'a sexp = 'a Sexp.sexp
+	=
+	struct
+		
+		open Sexp
+
+		fun two_in_a_row sexp comparer = 
+			let
+				(* ``is_first_in'' may respond with `false' for two
+				 different situation: it returns `false' when the list
+				 is empty or when the first element in the list is
+				 different from sexp*)
+				fun is_first_in _ Null = false
+				|	is_first_in sexp (Cons (another_sexp, _)) = 
+					SexpEqualFunction.equal comparer sexp another_sexp
+
+				(* If `is_first_in' responds `false' it makes sense
+				for `two_in_a_row_slist' to continue the search only if `cdr_list'
+				isn't empty*)
+				fun two_in_a_row_sexp (Atom _) = false
+				  | two_in_a_row_sexp (List slist) = two_in_a_row_slist slist
+				and two_in_a_row_slist Null = false
+				  | two_in_a_row_slist (Cons (car_sexp, cdr_slist)) = 
+					is_first_in car_sexp cdr_slist orelse two_in_a_row_slist cdr_slist
+
+			in two_in_a_row_sexp sexp end
+
+	end

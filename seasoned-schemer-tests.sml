@@ -7,13 +7,25 @@ struct
   structure SexpStr = MakeSexp ()
 
   structure SexpParser = SExpParserSMLofNJ (
-			structure Sexp = SexpStr) 
+                  structure Sexp = SexpStr) 
 
   structure SeasonedSchemerStr = SeasonedSchemer (
 		  structure SexpStr = SexpStr)
 
   structure SexpToStringFunction = SexpToString (
 		  structure Sexp = SexpStr)
+
+        val curried_equal = fn (fst: int ) => fn snd => fst = snd
+
+        structure SexpEqualFunction = SexpEqual (structure Sexp = SexpStr)
+
+        structure SexpTwoInARowWithIndependentHelperFunction =
+                SexpTwoInARowWithIndependentHelper(
+                        type elem = int
+                        type 'a t = int SexpStr.sexp
+                        structure Sexp = SexpStr
+                        structure SexpEqualFunction = SexpEqualFunction
+                        val comparer = curried_equal)
 
   open SexpStr 
   open SexpParser
@@ -36,6 +48,7 @@ struct
       let 
 	  val sut = two_in_a_row_fn (fn fst => fn snd => fst = snd)	  
       in
+	  Assert.assertFalse (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row atom_eight curried_equal);
 	  Assert.assertFalse (sut atom_eight);
 	  Assert.assertFalse (sut sexp_without_two_in_a_row);
 	  Assert.assertTrue (sut sexp_with_an_atom_in_two_in_a_row);
