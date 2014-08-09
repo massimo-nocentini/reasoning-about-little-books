@@ -7,8 +7,6 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
 	structure SexpEqualFunction = SexpEqual (
 			structure Sexp = SexpStr)
 
-	structure SexpPickFunction = SexpPick (
-			structure Sexp = SexpStr)
 
     open SexpStr 
     open SexpParser 
@@ -20,23 +18,6 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
      so far. *)
     (* **************************************************************** *)
 
-    (* the function `scramble_unprotected' takes a non-empty flat sexp
-     (tup for short) of integers in which no number is greater than
-     its own index, and returns a tup of the same length. Each number
-     in the argument is treated as a backward index from its own
-     position to a point earlier in the tup. The result at each
-     position is found by counting backward from the current position
-     according to this index.*)
-    fun scramble_unprotected (List conses) = 
-	List (scramble_helper Null conses)
-    and scramble_helper reversed_prefix 
-			(Cons (car_sexp as Atom anIndex, cdr_slist)) = 
-	let
-	    val reversed_prefix' = Cons (car_sexp, reversed_prefix)
-	    val picked = SexpPickFunction.pick (List reversed_prefix') anIndex 
-	    val rest = scramble_helper reversed_prefix' cdr_slist
-	in Cons (picked, rest) end
-      | scramble_helper _ Null = Null
  
     fun multirember anElement aSexp = 
 	let 

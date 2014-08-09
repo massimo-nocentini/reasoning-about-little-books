@@ -21,5 +21,6 @@ is
     subst.sml
 	two-in-a-row.sml
 	sum-of-prefixes.sml
+	scramble.sml
 
     sexp-functions.sml

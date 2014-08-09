@@ -51,6 +51,14 @@ struct
 	structure SexpSumOfPrefixesFunction = 
 		SexpSumOfPrefixes (structure Sexp = SexpStr)
 
+	structure SexpPickFunction = SexpPick (
+			structure Sexp = SexpStr)
+
+	structure SexpScrambleUnprotectedFunction = SexpScrambleUnprotected (
+		structure Sexp = SexpStr
+		structure SexpPickFunction = SexpPickFunction)
+
+
 	open SexpStr 
 	open SexpParser
 	open SeasonedSchemerStr
@@ -98,7 +106,7 @@ struct
 
 	fun test_scramble () = 
 		let	
-			val first_computed = scramble_unprotected (parse `(^(1) ^(1) ^(1) ^(3) ^(4) ^(2) ^(1) ^(1) ^(9) ^(2))`)
+			val first_computed = SexpScrambleUnprotectedFunction.scramble (parse `(^(1) ^(1) ^(1) ^(3) ^(4) ^(2) ^(1) ^(1) ^(9) ^(2))`)
 			val first_expected = parse `(^(1) ^(1) ^(1) ^(1) ^(1) ^(4) ^(1) ^(1) ^(1) ^(9))`
 		in assertPred (op =) Int.toString  first_expected first_computed end
 
