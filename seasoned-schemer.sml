@@ -14,24 +14,6 @@ functor SeasonedSchemer (structure SexpStr : SEXP) =
     open SexpParser 
 
 
-
-
-    fun sum_of_prefixes_helper sonssf Null = Null
-      | sum_of_prefixes_helper sonssf (Cons (Atom anInt, cdr)) = 
-	(* the answer should be the sum of all the numbers that we
-	have seen so far consed onto the natural recursion. So we've
-	applied the trick just saw, helping a lot: that trick consists
-	of receiving two arguments and one tells it something about
-	the other. The argument `SumOfNumberSeenSoFar' is what it
-	namely say@! *)
-	Cons (Atom (sonssf + anInt), 
-	      sum_of_prefixes_helper (sonssf + anInt) cdr)
-
-    fun sum_of_prefixes_unprotected (List aList) = 
-	List (sum_of_prefixes_helper 0 aList)
-      | sum_of_prefixes_unprotected (atom as Atom _) = 
-	List (Cons (atom, Null))
-
     (* **************************************************************** *)
     (* ELEVENTH COMMANDMENT: Use additional arguments when a function
      needs to know what other arguments to the function have been like

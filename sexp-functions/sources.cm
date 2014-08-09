@@ -20,5 +20,6 @@ is
     occurs.sml
     subst.sml
 	two-in-a-row.sml
+	sum-of-prefixes.sml
 
     sexp-functions.sml
