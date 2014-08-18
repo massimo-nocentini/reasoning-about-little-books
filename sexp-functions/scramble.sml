@@ -6,7 +6,7 @@ signature SEXP_SCRAMBLE =
 		val scramble : int sexp -> int sexp
 	end
 
-functor SexpScrambleUnprotected (
+functor SexpScramble (
 	structure Sexp : SEXP
 	structure SexpPickFunction : SEXP_PICK
 	sharing type Sexp.sexp = SexpPickFunction.sexp)
@@ -16,13 +16,6 @@ functor SexpScrambleUnprotected (
 
 		open Sexp
 
-		fun scramble_helper _ Null = Null
-		|	scramble_helper reversed_prefix (Cons (car_sexp as Atom anIndex, cdr_slist)) = 
-			let
-				val reversed_prefix' = Cons (car_sexp, reversed_prefix)
-				val picked = SexpPickFunction.pick (List reversed_prefix') anIndex 
-				val rest = scramble_helper reversed_prefix' cdr_slist
-			in Cons (picked, rest) end
 		   
 		(* the function `scramble_unprotected' takes a non-empty flat sexp
 		 (tup for short) of integers in which no number is greater than
@@ -31,6 +24,14 @@ functor SexpScrambleUnprotected (
 		 position to a point earlier in the tup. The result at each
 		 position is found by counting backward from the current position
 		 according to this index.*)
-		fun scramble (List conses) = List (scramble_helper Null conses)
+		fun scramble (List conses) = 
+			let fun scramble_helper _ Null = Null
+				|	scramble_helper reversed_prefix (Cons (car_sexp as Atom anIndex, cdr_slist)) = 
+					let
+						val reversed_prefix' = Cons (car_sexp, reversed_prefix)
+						val picked = SexpPickFunction.pick (List reversed_prefix') anIndex 
+						val rest = scramble_helper reversed_prefix' cdr_slist
+					in Cons (picked, rest) end
+			in  List (scramble_helper Null conses) end
 
 	end

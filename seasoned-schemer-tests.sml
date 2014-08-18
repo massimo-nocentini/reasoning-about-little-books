@@ -111,7 +111,7 @@ struct
 		structure SexpPickFunction = SexpPick (
 				structure Sexp = SexpStr)
 
-		structure SexpScrambleUnprotectedFunction = SexpScrambleUnprotected (
+		structure SexpScrambleUnprotectedFunction = SexpScramble (
 			structure Sexp = SexpStr
 			structure SexpPickFunction = SexpPickFunction)
 	in
@@ -125,8 +125,8 @@ struct
 	end
 
 	local
-		structure SexpMultiremberNaiveFunction =
-				SexpMultiremberNaive(
+		structure SexpMultiremberFunction =
+				SexpMultirember(
 						structure Sexp = SexpStr
 						structure SexpEqualFunction = SexpEqualFunction)
 	in
@@ -135,11 +135,11 @@ struct
 				val first_sexp 	= parse `(^(1) ^(1) ^(1) ^(3) ^(4) ^(2) ^(1) ^(1) ^(9) ^(2))`
 				val first_sexp_without_ones	= parse `(^(3) ^(4) ^(2) ^(9) ^(2))`
 			in 
-				(
+				((* Extract both assertions in a test function that consumes multirember function under test. *)
 				 assertPred (op =) Int.toString first_sexp 
-					 (SexpMultiremberNaiveFunction.multirember first_sexp (Atom 8) curried_equal);
+					 (SexpMultiremberFunction.multirember first_sexp (Atom 8) curried_equal);
 				 assertPred (op =) Int.toString first_sexp_without_ones 
-					 (SexpMultiremberNaiveFunction.multirember first_sexp (Atom 1) curried_equal)) 
+					 (SexpMultiremberFunction.multirember first_sexp (Atom 1) curried_equal)) 
 			end
 	end
 

@@ -19,7 +19,7 @@ is
     little-schemer.sml (with: parser.quotations=true)
     little-schemer-tests.sml (with: parser.quotations=true)
 
-    seasoned-schemer.sml (with: parser.quotations=true)
+(*    seasoned-schemer.sml (with: parser.quotations=true) *)
     seasoned-schemer-tests.sml (with: parser.quotations=true)
 
     chains.sml
