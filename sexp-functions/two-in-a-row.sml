@@ -116,17 +116,17 @@ functor SexpTwoInARowRecursionOnlyThroughHelper(
 				changes all the time because, as the name of the argument
 				says, the first argument is always the atom that precedes
 				the current `list' in the list of sexp that `L' received.
-					Here the `preceding' argument always occurs just before 
-					the second argument, `list', in the original list.*)
+				Here the `preceding' argument always occurs just before 
+				the second argument, `list', in the original list.*)
 				fun is_first_in _ 			Null = false
-				|	is_first_in preceding 	(list as Cons (car_sexp, cdr_slist)) = 
+				|	is_first_in preceding 	(Cons (car_sexp, cdr_slist)) = 
 					SexpEqualFunction.equal comparer preceding car_sexp orelse 
 						is_first_in car_sexp cdr_slist
 
 				fun S (Atom _) = false
-				  | S (List slist) = L slist
+				|	S (List slist) = L slist
 				and L Null = false
-				  | L (Cons (car_sexp, cdr_slist)) = is_first_in car_sexp cdr_slist 
+				|	L (Cons (car_sexp, cdr_slist)) = is_first_in car_sexp cdr_slist 
 				
 			in
 				S sexp
