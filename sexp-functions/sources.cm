@@ -23,5 +23,6 @@ is
 	sum-of-prefixes.sml
 	scramble.sml
 	multirember.sml
+	member.sml
 
     sexp-functions.sml

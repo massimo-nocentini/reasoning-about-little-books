@@ -15,6 +15,7 @@ structure SexpToStringFunction = SexpToString(
 structure SexpCombineCurriedFunction = CombineSexpCurried(structure Sexp = SexpStr)
 structure SexpCombineStagedFunction = CombineSexpStaged(structure Sexp = SexpStr)
 structure SexpPickFunction = SexpPick (structure Sexp = SexpStr)
+structure SexpEqualFunction = SexpEqual (structure Sexp = SexpStr)
 
   open SexpStr 
   open SexpParser 
@@ -134,6 +135,29 @@ structure SexpPickFunction = SexpPick (structure Sexp = SexpStr)
 	  Assert.assertEqualInt 3 should_be_three
       end
 
+	local
+		structure SexpMemberFunction = SexpMember (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction)
+	in
+		fun test_member () = 
+			let
+				fun equality_comparer (a: int) b = a = b
+				val true	= SexpMemberFunction.member 
+								(parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)  
+								(parse `^(1)`) 
+								equality_comparer
+				val false 	= SexpMemberFunction.member 
+								(parse `(^(4) ^(3) (^(1) ^(1) ^(1)))`)  
+								(parse `^(1)`) 
+								equality_comparer
+				val true 	= SexpMemberFunction.member 
+								(parse `(^(4) ^(3) (^(1) ^(1) ^(1)))`)  
+								(parse `(^(1) ^(1) ^(1))`) 
+								equality_comparer
+			in () (* nothing to check here since we use pattern matching in the naming box *) end
+	end
+
   fun suite () =
       Test.labelTests
 	  [
@@ -176,7 +200,8 @@ structure SexpPickFunction = SexpPick (structure Sexp = SexpStr)
 	    ("combining two non empty lists should build a new list containing their elements using staged slist combination strategy",
 	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements SexpCombineStagedFunction.combine),
 
-	    ("test_pick", test_pick)
+	    ("test_pick", test_pick),
+		("test_member", test_member)
 
 
 	  ]
