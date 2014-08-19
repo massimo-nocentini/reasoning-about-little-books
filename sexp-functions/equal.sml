@@ -1,4 +1,72 @@
 
+(*
+ The following is an attempt to include in the generation of 
+ an SexpEqual structure the comparer function for atoms, but
+ it doesn't type checks.
+ *)
+(*************************************************************
+signature EQ_KEY = 
+	sig
+		type key
+		type other
+
+		val equal : key -> other -> bool
+	end
+
+functor KeyEqualityFnct (
+	type key
+	type other
+	val equal : key -> other -> bool)
+	:> EQ_KEY 	where type key = key
+				where type other = other
+	=
+	struct
+		type key 	= key
+		type other 	= other
+		val equal 	= equal
+	end
+
+structure KeyEqualityComparer = KeyEqualityFnct(
+	type key 	= int
+	type other	= int
+	fun equal f s = f = s)
+
+
+signature SEXP_EQUAL_2 = 
+	sig
+		structure KeyEqualityComparer : EQ_KEY
+		type 'a sexp
+		val equal: KeyEqualityComparer.key sexp -> KeyEqualityComparer.other sexp -> bool
+	end
+
+functor SexpTypeSpecializer (
+	structure Sexp : SEXP
+	type t)
+	:> SEXP where type 'a sexp = t Sexp.sexp
+	=
+	struct
+		(* 
+		 very ugly to duplicate here the definitions
+		 contained already in the signature.
+		 *)
+		datatype 	'a slist = 	Null
+		| 						Cons of t sexp * t slist
+		and 		'b sexp = 	Atom of t 
+		|						List of t slist
+	end
+
+functor SexpEqualAbridged(
+	structure KeyEqualityComparer : EQ_KEY
+	type 'a sexp
+	structure Sexp : SEXP where type 'a sexp = KeyEqualityComparer.key sexp)
+	:> SEXP_EQUAL_2 where type 'a sexp = 'a Sexp.sexp
+	=
+	struct
+		open Sexp
+		structure KeyEqualityComparer = KeyEqualityComparer
+		fun equal (Atom key) (Atom other) = KeyEqualityComparer.equal key other
+	end
+************************************************************)
 
 signature SEXP_EQUAL = 
 	sig

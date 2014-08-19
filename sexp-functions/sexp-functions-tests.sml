@@ -16,6 +16,14 @@ structure SexpCombineCurriedFunction = CombineSexpCurried(structure Sexp = SexpS
 structure SexpCombineStagedFunction = CombineSexpStaged(structure Sexp = SexpStr)
 structure SexpPickFunction = SexpPick (structure Sexp = SexpStr)
 structure SexpEqualFunction = SexpEqual (structure Sexp = SexpStr)
+(* the following is an instantiation of the abridged SexpEqual 
+	structure that embeds the comparison function.
+
+structure SexpEqualFunctionAbridged = SexpEqualAbridged(
+	structure KeyEqualityComparer = KeyEqualityComparer
+	type 'a sexp = 'a SexpStr.sexp
+	structure Sexp = SexpStr)
+*)
 
   open SexpStr 
   open SexpParser 

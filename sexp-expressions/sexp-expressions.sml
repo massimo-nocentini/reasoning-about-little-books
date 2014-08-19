@@ -2,10 +2,10 @@ signature SEXP =
 sig
     (* essentially here we're providing pattern matching capabilities
      as basic building blocks for these types.*)
-    datatype 'a slist = Null
-		      | Cons of 'a sexp * 'a slist
-	 and 'b sexp = Atom of 'b
-		     | List of 'b slist
+    datatype 	'a slist = 	Null
+  	| 						Cons of 'a sexp * 'a slist
+	and 		'b sexp = 	Atom of 'b
+	|						List of 'b slist
 
 	(* 
 	 Just a remainder to consider later, we choose to not

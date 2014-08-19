@@ -48,20 +48,11 @@ happens, we see that the print invocation NEVER happen at all. *)
 (* 	    f (fn v => Cont.throw current_continuation v)) *)
 
 fun letcc_general (SOME before_throwing) f = 
-    Cont.callcc 
-	(fn current_continuation => 
-	    f (fn v => 
-		  let 
-		      val () = before_throwing ()
-		  in 
-		      Cont.throw current_continuation v
-		  end
-	      )
-	)
-  | letcc_general NONE f = 
-    Cont.callcc 
-	(fn current_continuation => 
-	    f (fn v => Cont.throw current_continuation v))
+    Cont.callcc (fn current_continuation => 
+					f (fn v => 
+						let val () = before_throwing () in Cont.throw current_continuation v end))
+	  | letcc_general NONE f = 
+		Cont.callcc (fn current_continuation => f (fn v => Cont.throw current_continuation v))
 
 
 fun letcc f = letcc_general NONE f
