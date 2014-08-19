@@ -166,6 +166,117 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			in () (* nothing to check here since we use pattern matching in the naming box *) end
 	end
 
+	local
+		structure SexpMemberFunction = SexpMember (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction)
+
+		structure SexpUnionFunction = SexpUnion (
+			structure Sexp = SexpStr
+			structure SexpMemberFunction = SexpMemberFunction)
+	in 
+		fun test_union () = 
+			let
+				fun equality_comparer (a: int) b = a = b
+
+				val fourThreeSevenOne	= SexpUnionFunction.union 
+								(parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)  
+								(parse `(^(7) ^(1))`) 
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								fourThreeSevenOne 
+								(parse `(^(4) ^(3) ^(7) ^(1))`)  
+
+				val identity	= SexpUnionFunction.union 
+								(parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)  
+								(parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)  
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								identity 
+								(parse `(^(4) ^(3) ^(1) ^(1) ^(1))`)  
+			in () end
+	end
+
+	local
+		structure SexpMemberFunction = SexpMember (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction)
+
+		structure SexpIntersectFunction = SexpIntersect (
+			structure Sexp = SexpStr
+			structure SexpMemberFunction = SexpMemberFunction)
+	in 
+		fun test_intersect () = 
+			let
+				fun equality_comparer (a: int) b = a = b
+
+				val fourThreeSevenOne	= SexpIntersectFunction.intersect 
+								(parse `(^(4) ^(3) ^(1))`)  
+								(parse `(^(7) ^(1))`) 
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								fourThreeSevenOne 
+								(parse `(^(1))`)  
+
+				val empty	= SexpIntersectFunction.intersect 
+								(parse `(^(4) ^(3) ^(1) )`)  
+								(parse `(^(5) ^(9) ^(2) ^(7) )`)  
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								empty 
+								(parse `()`)  
+			in () end
+	end
+
+	local
+		structure SexpMemberFunction = SexpMember (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction)
+
+		structure SexpIntersectFunction = SexpIntersect (
+			structure Sexp = SexpStr
+			structure SexpMemberFunction = SexpMemberFunction)
+
+		structure SexpIntersectAllFunction = SexpIntersectAll (
+			structure Sexp = SexpStr
+			structure SexpIntersectFunction = SexpIntersectFunction)
+
+		datatype strange = Three | Mango | Hamburger | Kiwi | And | Diet
+
+	in 
+		fun test_intersect_all () = 
+			let
+				fun equality_comparer (a: strange) b = a = b
+
+				val fourThreeSevenOne	= SexpIntersectAllFunction.intersect_all 
+								(parse `( 	(^(Three) ^(Mango) 		^(And)) 
+											(^(Three) ^(Kiwi) 		^(And)) 
+											(^(Three) ^(Hamburger)  	))` )  
+								equality_comparer
+
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								fourThreeSevenOne 
+								(parse `(^(Three))`)  
+
+
+				val empty	= SexpIntersectAllFunction.intersect_all 
+								(parse `( 	(^(Three) ^(Mango) 	^(And)) 
+											() 
+											(^(Three) ^(Diet) 	^(Hamburger)))` )  
+								equality_comparer
+
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								empty 
+								(parse `()`)  
+			in () end
+	end
+
   fun suite () =
       Test.labelTests
 	  [
@@ -209,7 +320,10 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 	     combining_two_non_empty_lists_should_build_a_new_list_containing_their_elements SexpCombineStagedFunction.combine),
 
 	    ("test_pick", test_pick),
-		("test_member", test_member)
+		("test_member", test_member),
+		("test_union", test_union),
+		("test_intersect", test_intersect),
+		("test_intersect_all", test_intersect_all)
 
 
 	  ]

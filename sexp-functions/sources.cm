@@ -24,5 +24,8 @@ is
 	scramble.sml
 	multirember.sml
 	member.sml
+	union.sml
+	intersect.sml
+	intersect-all.sml
 
     sexp-functions.sml
