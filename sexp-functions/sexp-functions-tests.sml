@@ -233,6 +233,7 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 	end
 
 	local
+
 		structure SexpMemberFunction = SexpMember (
 			structure Sexp = SexpStr
 			structure SexpEqualFunction = SexpEqualFunction)
@@ -245,14 +246,31 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			structure Sexp = SexpStr
 			structure SexpIntersectFunction = SexpIntersectFunction)
 
-		datatype strange = Three | Mango | Hamburger | Kiwi | And | Diet
+		structure SexpIntersectAllWithLetccFunction = SexpIntersectAllWithLetcc (
+			structure Sexp = SexpStr
+			structure SexpIntersectFunction = SexpIntersectFunction
+			structure HopSkipAndJump = HopSkipAndJump)
+
+		structure SexpIntersectAllWithLetccIntersectEmbeddedFunction = 
+			SexpIntersectAllWithLetccIntersectEmbedded (
+					structure Sexp = SexpStr
+					structure SexpMemberFunction = SexpMemberFunction
+					structure HopSkipAndJump = HopSkipAndJump)
+
+		datatype strange = Three | Mango | Hamburger | Kiwi | And | Diet | Baked | Potato
 
 	in 
 		fun test_intersect_all () = 
 			let
+				val () = test_intersect_all_helper SexpIntersectAllFunction.intersect_all
+				val () = test_intersect_all_helper SexpIntersectAllWithLetccFunction.intersect_all
+				val () = test_intersect_all_helper SexpIntersectAllWithLetccIntersectEmbeddedFunction.intersect_all
+			in () end
+		and test_intersect_all_helper intersect_all_function  = 
+			let
 				fun equality_comparer (a: strange) b = a = b
 
-				val fourThreeSevenOne	= SexpIntersectAllFunction.intersect_all 
+				val fourThreeSevenOne	= intersect_all_function 
 								(parse `( 	(^(Three) ^(Mango) 		^(And)) 
 											(^(Three) ^(Kiwi) 		^(And)) 
 											(^(Three) ^(Hamburger)  	))` )  
@@ -264,7 +282,7 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 								(parse `(^(Three))`)  
 
 
-				val empty	= SexpIntersectAllFunction.intersect_all 
+				val empty	= intersect_all_function 
 								(parse `( 	(^(Three) ^(Mango) 	^(And)) 
 											() 
 											(^(Three) ^(Diet) 	^(Hamburger)))` )  
@@ -273,6 +291,18 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 				val true = SexpEqualFunction.equal 
 								equality_comparer 
 								empty 
+								(parse `()`)  
+
+				val empty_complex	= intersect_all_function 
+								(parse `( 	(^(Three) ^(Mango) 		^(And)) 
+											(^(Three) ^(Kiwi) 		^(And)) 
+											(^(Baked) ^(Potato)) 
+											(^(Three) ^(Hamburger)  	))` )  
+								equality_comparer
+
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								empty_complex 
 								(parse `()`)  
 			in () end
 	end
