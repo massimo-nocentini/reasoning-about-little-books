@@ -365,13 +365,22 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 	local
 		structure SexpLeftmostFunction = SexpLeftmost (
 			structure Sexp = SexpStr)
+
+		structure SexpLeftmostWithLetccFunction = SexpLeftmostWithLetcc (
+			structure Sexp = SexpStr
+			structure HopSkipAndJump = HopSkipAndJump)
 	in 
 		fun test_leftmost () = 
+			let 
+				val _ = test_leftmost_helper SexpLeftmostFunction.leftmost
+				val _ = test_leftmost_helper SexpLeftmostWithLetccFunction.leftmost
+			in () end
+		and test_leftmost_helper leftmost_fn = 
 			let
-				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((^(4)) ^(3)) (^(1) ^(1)))`)  
-				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((^(4)) ()) () ^(1))`)  
-				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((() ^(4)) ()))`)  
-				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((()) ()) () ^(4))`)  
+				val (Atom 4) = leftmost_fn (parse `(((^(4)) ^(3)) (^(1) ^(1)))`)  
+				val (Atom 4) = leftmost_fn (parse `(((^(4)) ()) () ^(1))`)  
+				val (Atom 4) = leftmost_fn (parse `(((() ^(4)) ()))`)  
+				val (Atom 4) = leftmost_fn (parse `(((()) ()) () ^(4))`)  
 			in () end
 	end
 

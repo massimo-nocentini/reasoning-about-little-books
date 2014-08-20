@@ -36,3 +36,28 @@ functor SexpLeftmost (
 			|	_ => leftmost_slist cdr_slist
 		*)
 	end
+
+functor SexpLeftmostWithLetcc (
+	structure Sexp : SEXP
+	structure HopSkipAndJump : HOP_SKIP_AND_JUMP)
+	:> SEXP_LEFTMOST where type 'a sexp = 'a Sexp.sexp
+	=
+	struct
+
+	open Sexp
+
+	fun leftmost sexp = HopSkipAndJump.letcc (fn skip =>
+		let
+			fun	leftmost_sexp (atom as Atom _) = skip atom
+			|	leftmost_sexp (List slist) = leftmost_slist slist
+			and leftmost_slist (empty as Null) = List empty
+			| 	leftmost_slist (Cons (car_sexp, cdr_slist)) =
+					let val something = leftmost_sexp car_sexp
+					in	case something of 
+							Atom _ 	=> something
+						|	_		=> leftmost_slist cdr_slist
+					end
+		in leftmost_sexp sexp end
+	)
+
+	end
