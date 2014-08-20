@@ -398,6 +398,19 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			in () end
 	end
 
+	local
+		structure SexpDepthStarFunction = SexpDepthStar (
+			structure Sexp = SexpStr)
+
+		datatype strange = Pickled | Peppers
+	in
+		fun test_depth_star () = 
+			let
+				val 2 = SexpDepthStarFunction.depth_star (parse `((^(Pickled)) ^(Peppers) (^(Peppers) ^(Pickled)))`)
+				val 5 = SexpDepthStarFunction.depth_star (parse `((^(Pickled)) ((((^(Peppers))))) (^(Peppers) ^(Pickled)))`)
+			in () end
+	end
+
   fun suite () =
       Test.labelTests
 	  [
@@ -447,7 +460,8 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 		("test_intersect_all", test_intersect_all),
 		("test_rember_upto_last", test_rember_upto_last),
 		("test_leftmost", test_leftmost),
-		("test_rember_one_star", test_rember_one_star)
+		("test_rember_one_star", test_rember_one_star),
+		("test_rember_depth_star", test_depth_star)
 
 
 	  ]

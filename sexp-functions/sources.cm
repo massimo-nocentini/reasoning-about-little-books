@@ -32,5 +32,6 @@ is
 	rember-upto-last.sml
 	leftmost.sml
 	rember-one-star.sml
+	depth-star.sml
 
     sexp-functions.sml
