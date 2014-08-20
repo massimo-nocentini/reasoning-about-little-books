@@ -371,6 +371,30 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((^(4)) ^(3)) (^(1) ^(1)))`)  
 				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((^(4)) ()) () ^(1))`)  
 				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((() ^(4)) ()))`)  
+				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((()) ()) () ^(4))`)  
+			in () end
+	end
+
+	local
+		structure SexpRemberOneStarFunction = SexpRemberOneStar (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction)
+
+		datatype strange = Swedish | Rye | French | Mustard | Salad | Turkey
+	in
+		fun test_rember_one_star () = 
+			let
+				fun equality_comparer (a: strange) b = a = b
+
+				val fourThreeSevenOne	= SexpRemberOneStarFunction.rember_one_star 
+								(parse `((^(Swedish) ^(Rye)) (^(French) (^(Mustard) ^(Salad) ^(Turkey))) ^(Salad))`)  
+								(parse `^(Salad)`) 
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								fourThreeSevenOne 
+								(parse `((^(Swedish) ^(Rye)) (^(French) (^(Mustard) ^(Turkey))) ^(Salad))`)  
+
 			in () end
 	end
 
@@ -422,7 +446,8 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 		("test_intersect", test_intersect),
 		("test_intersect_all", test_intersect_all),
 		("test_rember_upto_last", test_rember_upto_last),
-		("test_leftmost", test_leftmost)
+		("test_leftmost", test_leftmost),
+		("test_rember_one_star", test_rember_one_star)
 
 
 	  ]

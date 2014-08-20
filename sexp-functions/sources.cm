@@ -31,5 +31,6 @@ is
 	intersect-all.sml
 	rember-upto-last.sml
 	leftmost.sml
+	rember-one-star.sml
 
     sexp-functions.sml
