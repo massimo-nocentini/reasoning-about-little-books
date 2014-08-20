@@ -29,5 +29,6 @@ is
 	union.sml
 	intersect.sml
 	intersect-all.sml
+	rember-upto-last.sml
 
     sexp-functions.sml

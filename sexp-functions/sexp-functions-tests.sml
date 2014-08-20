@@ -307,6 +307,60 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			in () end
 	end
 
+	local
+		structure SexpRemberUptoLastFunction = SexpRemberUptoLast (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction
+			structure HopSkipAndJump = HopSkipAndJump)
+
+		datatype strange = Cookies | Chocolate | Mints |
+							Caramel | Delight | Ginger |
+							Snaps | Desserts | Mousse |
+							Vanilla | Ice | Cream |
+							German | Cake |
+							More | Gingerbreadman | Chip | Brownies | NotPresent
+	in 
+		fun test_rember_upto_last () = 
+			let
+				fun equality_comparer (a: strange) b = a = b
+
+				val fourThreeSevenOne	= SexpRemberUptoLastFunction.rember_upto_last 
+								(parse `(^(Cookies) ^(Chocolate) ^(Mints)
+											^(Caramel) ^(Delight) ^(Ginger) ^(Snaps)
+											^(Desserts) ^(Chocolate) ^(Mousse) ^(Vanilla)
+											^(Ice) ^(Cream) ^(German) ^(Chocolate) ^(Cake)
+											^(More) ^(Cookies) ^(Gingerbreadman) ^(Chocolate)
+											^(Chip) ^(Brownies)
+											)`)  
+								(parse `^(Cookies)`) 
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								fourThreeSevenOne 
+								(parse `(^(Gingerbreadman) ^(Chocolate) ^(Chip) ^(Brownies))`)  
+
+				val identity	= SexpRemberUptoLastFunction.rember_upto_last 
+								(parse `(^(Cookies) ^(Chocolate) ^(Mints)
+											^(Caramel) ^(Delight) ^(Ginger) ^(Snaps)
+											^(Desserts) ^(Chocolate) ^(Mousse) ^(Vanilla)
+											^(Ice) ^(Cream) ^(German) ^(Chocolate) ^(Cake)
+											^(More) ^(Cookies) ^(Gingerbreadman) ^(Chocolate)
+											^(Chip) ^(Brownies)
+											)`)  
+								(parse `^(NotPresent)`) 
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								identity 
+								(parse `(^(Cookies) ^(Chocolate) ^(Mints)
+											^(Caramel) ^(Delight) ^(Ginger) ^(Snaps)
+											^(Desserts) ^(Chocolate) ^(Mousse) ^(Vanilla)
+											^(Ice) ^(Cream) ^(German) ^(Chocolate) ^(Cake)
+											^(More) ^(Cookies) ^(Gingerbreadman) ^(Chocolate)
+											^(Chip) ^(Brownies)
+											)`)  
+			in () end
+	end
   fun suite () =
       Test.labelTests
 	  [
@@ -353,7 +407,8 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 		("test_member", test_member),
 		("test_union", test_union),
 		("test_intersect", test_intersect),
-		("test_intersect_all", test_intersect_all)
+		("test_intersect_all", test_intersect_all),
+		("test_rember_upto_last", test_rember_upto_last) 
 
 
 	  ]
