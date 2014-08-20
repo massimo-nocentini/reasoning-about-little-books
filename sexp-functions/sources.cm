@@ -30,5 +30,6 @@ is
 	intersect.sml
 	intersect-all.sml
 	rember-upto-last.sml
+	leftmost.sml
 
     sexp-functions.sml

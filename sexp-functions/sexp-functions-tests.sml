@@ -361,6 +361,19 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 											)`)  
 			in () end
 	end
+
+	local
+		structure SexpLeftmostFunction = SexpLeftmost (
+			structure Sexp = SexpStr)
+	in 
+		fun test_leftmost () = 
+			let
+				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((^(4)) ^(3)) (^(1) ^(1)))`)  
+				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((^(4)) ()) () ^(1))`)  
+				val (Atom 4) = SexpLeftmostFunction.leftmost (parse `(((() ^(4)) ()))`)  
+			in () end
+	end
+
   fun suite () =
       Test.labelTests
 	  [
@@ -408,7 +421,8 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 		("test_union", test_union),
 		("test_intersect", test_intersect),
 		("test_intersect_all", test_intersect_all),
-		("test_rember_upto_last", test_rember_upto_last) 
+		("test_rember_upto_last", test_rember_upto_last),
+		("test_leftmost", test_leftmost)
 
 
 	  ]
