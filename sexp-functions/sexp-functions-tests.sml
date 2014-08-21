@@ -394,12 +394,18 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			structure SexpEqualFunction = SexpEqualFunction
             structure HopSkipAndJump = HopSkipAndJump)
 
+		structure SexpRemberOneStarWithTryFunction = SexpRemberOneStarWithTry (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction
+            structure HopSkipAndJump = HopSkipAndJump)
+
 		datatype strange = Swedish | Rye | French | Mustard | Salad | Turkey
 	in
 		fun test_rember_one_star () = 
             let 
                 val _ = tester SexpRemberOneStarFunction.rember_one_star 
                 val _ = tester SexpRemberOneStarWithLetccFunction.rember_one_star 
+                val _ = tester SexpRemberOneStarWithTryFunction.rember_one_star 
             in () end
         and tester rember_one_star =
 			let

@@ -5,6 +5,7 @@ signature HOP_SKIP_AND_JUMP =
 		structure Cont : CONT
 		val letcc_general : (unit -> unit) option -> (('a -> 'b) -> 'a) -> 'a
 		val letcc : (('a -> 'b) -> 'a) -> 'a
+        val try : (('a -> 'b) -> 'c) -> (unit -> 'c) -> 'c
 	end
 
 
@@ -71,50 +72,10 @@ functor HopSkipAndJumpFunctor (
 
 	fun letcc f = letcc_general NONE f
 
-	fun rember_up_to_last a lat =
-		letcc (fn skip => 		(* as Alonzo Church would have written *)
-			  let
-			  fun R (empty as []) = empty
-				| R (car::rest) = 
-				  if a = car
-				  then skip (R rest)
-				  else car :: (R rest)
-			  in 
-			  R lat
-			  end
-		  )
+    fun try trying default =    letcc (fn success => 
+                                    let val _ = letcc (fn escape => success (trying escape))
+                                    in default () end)
 
-	fun rember_up_to_last_debugging a lat =
-		let
-		val counter = ref 0
-		val before_thunk = fn () => print ("before_thunk: " ^ 
-						   (Int.toString (!counter)))
-		in
-		(* as Alonzo Church would  have written  *)
-		letcc_general (SOME before_thunk)
-				  (fn skip => 		
-				  let
-					  fun R (empty as []) = empty
-					| R (car::rest) = 
-					  if a = car
-					  then 
-						  let
-						  val _ = counter := !counter + 1
-						  val res = skip (R rest)
-						  val _ = counter := !counter - 1
-						  in
-						  (print (Int.toString (!counter));
-						   res)
-						  end
-						  (* ( *)
-						  (* counter := !counter + 1; *)
-						  (* skip (R rest)) *)
-					  else car :: (R rest)
-				  in 
-					  R lat
-				  end
-				  )
-		end
 	end
 
 structure HopSkipAndJump = HopSkipAndJumpFunctor (
