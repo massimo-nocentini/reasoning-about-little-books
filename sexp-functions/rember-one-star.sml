@@ -96,23 +96,26 @@ functor SexpRemberOneStarWithTry (
     fun rember_one_star (sexp as List slist) (target_sexp as Atom target) comparer = 
         let
 
-            fun rm Null oh = oh TargetNotPresent
-            |	rm (Cons ((atom_sexp as Atom atom), cdr_slist)) oh = 
+            fun rm Null is_target_present = is_target_present TargetNotPresent
+            |	rm (Cons ((atom_sexp as Atom atom), cdr_slist)) if_target_is_in_cdr_slist = 
                     if comparer atom target
                     then SListWithoutTarget cdr_slist
-                    else let val SListWithoutTarget processed_cdr = rm cdr_slist oh
+                    else let val SListWithoutTarget processed_cdr = rm cdr_slist if_target_is_in_cdr_slist 
                             in SListWithoutTarget (Cons (atom_sexp, processed_cdr)) end
-            |	rm (Cons (car_sexp as List car_slist, cdr_slist)) oh =
+            |	rm (Cons (car_sexp as List car_slist, cdr_slist)) if_target_is_in_cdr_slist =
                     HopSkipAndJump.try 
-                        (fn oh_car  => let val SListWithoutTarget processed_car = rm car_slist oh_car
-                                        in SListWithoutTarget (Cons (List processed_car, cdr_slist)) end ) 
-                        (fn ()      => let val SListWithoutTarget processed_cdr = rm cdr_slist oh
-                                        in SListWithoutTarget (Cons (car_sexp, processed_cdr)) end )
+                        (fn if_target_is_in_car_slist  => 
+                            let val SListWithoutTarget processed_car = rm car_slist if_target_is_in_car_slist
+                            in SListWithoutTarget (Cons (List processed_car, cdr_slist)) end ) 
+                        (fn otherwise => 
+                            let val SListWithoutTarget processed_cdr = rm cdr_slist if_target_is_in_cdr_slist
+                            in SListWithoutTarget (Cons (car_sexp, processed_cdr)) end )
 
         in HopSkipAndJump.try 
-            (fn oh => let val SListWithoutTarget processed_slist = rm slist oh
-                        in List processed_slist end ) 
-            (fn () => sexp)
+            (fn if_target_is_in_slist => 
+                let val SListWithoutTarget processed_slist = rm slist if_target_is_in_slist
+                in List processed_slist end ) 
+            (fn otherwise => sexp)
         end
 
 
