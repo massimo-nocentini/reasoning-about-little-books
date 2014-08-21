@@ -49,28 +49,28 @@ functor SexpRemberOneStarWithLetcc (
 
 	open Sexp
 
-	datatype 'a target_holder =     TargetNotPresent 
+	datatype 'a target_holder   =   TargetNotPresent 
 							    |	SListWithoutTarget of 'a slist
 
 
-    fun rember_one_star (sexp as List slist) target comparer = 
+    fun rember_one_star (sexp as List slist) (target_sexp as Atom target) comparer = 
         let
 
-            fun rm Null _ oh = oh TargetNotPresent
-            |	rm (Cons ((atom_sexp as Atom atom), cdr_slist)) (target_sexp as Atom target) oh = 
+            fun rm Null oh = oh TargetNotPresent
+            |	rm (Cons ((atom_sexp as Atom atom), cdr_slist)) oh = 
                     if comparer atom target
                     then SListWithoutTarget cdr_slist
-                    else let val SListWithoutTarget processed_cdr = rm cdr_slist target_sexp oh
+                    else let val SListWithoutTarget processed_cdr = rm cdr_slist oh
                             in SListWithoutTarget (Cons (atom_sexp, processed_cdr)) end
-            |	rm (Cons (car_sexp as List car_slist, cdr_slist)) target_sexp oh =
-                    case HopSkipAndJump.letcc (fn oh_car => rm car_slist target_sexp oh_car) 
+            |	rm (Cons (car_sexp as List car_slist, cdr_slist)) oh =
+                    case HopSkipAndJump.letcc (fn oh_car => rm car_slist oh_car) 
                     of	TargetNotPresent		            =>
-                            let val SListWithoutTarget processed_cdr = rm cdr_slist target_sexp oh
+                            let val SListWithoutTarget processed_cdr = rm cdr_slist oh
                             in SListWithoutTarget (Cons (car_sexp, processed_cdr)) end
                     |	SListWithoutTarget processed_car	=> 
                             SListWithoutTarget (Cons (List processed_car, cdr_slist))
 
-        in  case HopSkipAndJump.letcc (fn oh => rm slist target oh) 
+        in  case HopSkipAndJump.letcc (fn oh => rm slist oh) 
             of  TargetNotPresent                    => sexp
             |   SListWithoutTarget processed_slist  => List processed_slist 
         end

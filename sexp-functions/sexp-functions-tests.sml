@@ -389,13 +389,23 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			structure Sexp = SexpStr
 			structure SexpEqualFunction = SexpEqualFunction)
 
+		structure SexpRemberOneStarWithLetccFunction = SexpRemberOneStarWithLetcc (
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualFunction
+            structure HopSkipAndJump = HopSkipAndJump)
+
 		datatype strange = Swedish | Rye | French | Mustard | Salad | Turkey
 	in
 		fun test_rember_one_star () = 
+            let 
+                val _ = tester SexpRemberOneStarFunction.rember_one_star 
+                val _ = tester SexpRemberOneStarWithLetccFunction.rember_one_star 
+            in () end
+        and tester rember_one_star =
 			let
 				fun equality_comparer (a: strange) b = a = b
 
-				val fourThreeSevenOne	= SexpRemberOneStarFunction.rember_one_star 
+				val fourThreeSevenOne	= rember_one_star
 								(parse `((^(Swedish) ^(Rye)) (^(French) (^(Mustard) ^(Salad) ^(Turkey))) ^(Salad))`)  
 								(parse `^(Salad)`) 
 								equality_comparer
@@ -404,6 +414,14 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 								fourThreeSevenOne 
 								(parse `((^(Swedish) ^(Rye)) (^(French) (^(Mustard) ^(Turkey))) ^(Salad))`)  
 
+				val not_present	= rember_one_star
+								(parse `((^(Swedish)) ^(Rye) (^(French)))`)  
+								(parse `^(Salad)`) 
+								equality_comparer
+				val true = SexpEqualFunction.equal 
+								equality_comparer 
+								not_present 
+								(parse `((^(Swedish)) ^(Rye) (^(French)))`)  
 			in () end
 	end
 
