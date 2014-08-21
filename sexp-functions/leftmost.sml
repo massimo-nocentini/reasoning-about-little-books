@@ -52,11 +52,10 @@ functor SexpLeftmostWithLetcc (
 			|	leftmost_sexp (List slist) = leftmost_slist slist
 			and leftmost_slist (empty as Null) = List empty
 			| 	leftmost_slist (Cons (car_sexp, cdr_slist)) =
-					let val something = leftmost_sexp car_sexp
-					in	case something of 
-							Atom _ 	=> something
-						|	_		=> leftmost_slist cdr_slist
-					end
+					let 
+						val _ 			= leftmost_sexp car_sexp
+						val something 	= leftmost_slist cdr_slist
+					in something end
 		in leftmost_sexp sexp end
 	)
 
