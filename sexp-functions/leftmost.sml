@@ -37,6 +37,21 @@ functor SexpLeftmost (
 		*)
 	end
 
+(*
+ Previous implementation, when used on the list `(((a)) b (c))'
+ recur down on the left finding atom 'a but after it finds it, leftmost
+ has to give it a name and check if it is an atom , which is the case, for 
+ three times, that is it does this checks for the natural recursions performed.
+ Have we been here before? Yes, we have. When we discussed `intersect_all', we 
+ also discovered that we really had the final answer long before we could say so.
+ And what did we do then? We used `letcc'. The function `leftmost' sets up a
+ North Pole in `skip' and then determines the value of `leftmost_sexp'
+ consuming the given sexp. This function looks at every atom in the sexp
+ from left to right until it finds an atom and then uses `skip' to return
+ this atom adruptly and promptly, forgetting all the things (ie: checking 
+     if it is really an atom) it remembers to do and resume its work with 
+ `letcc skip a', where a is 'a.
+ *)
 functor SexpLeftmostWithLetcc (
 	structure Sexp : SEXP
 	structure HopSkipAndJump : HOP_SKIP_AND_JUMP)
