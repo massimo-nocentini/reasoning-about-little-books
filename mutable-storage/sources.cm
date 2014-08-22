@@ -17,5 +17,5 @@ is
     ../sexp-functions/sources.cm
 
 	sweet-tooth-remember.sml 
-
+    deep.sml
 
