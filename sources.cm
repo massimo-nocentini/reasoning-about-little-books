@@ -29,3 +29,7 @@ is
     fix-point-combinators/sources.cm
 
     scheme-interpreter/sources.cm
+
+	mutable-storage/sources.cm
+
+	unit-tests/sources.cm 

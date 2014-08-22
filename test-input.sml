@@ -29,3 +29,7 @@ val _ = SMLUnit.TextUITestRunner.runTest
 val _ = SMLUnit.TextUITestRunner.runTest
 	    {output = TextIO.stdOut}
 	    (SeasonedSchemerTests.suite ());
+
+val _ = SMLUnit.TextUITestRunner.runTest
+	    {output = TextIO.stdOut}
+	    (MutableStorageTests.suite ());

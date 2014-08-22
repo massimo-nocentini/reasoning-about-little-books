@@ -143,6 +143,8 @@ struct
 			end
 	end
 
+	(* Before the following we should move all the tests relative to sexp functions.  *)
+
 	fun suite () = Test.labelTests [
 		("test_two_in_a_row of first version: use `is_first_in' helper", test_two_in_a_row ),
 		("test_sum_of_prefixes", test_sum_of_prefixes),

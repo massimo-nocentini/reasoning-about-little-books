@@ -63,6 +63,10 @@ functor SexpRemberOneStarWithLetcc (
 
 	open Sexp
 
+	(*
+	 There is an easier way other than define the following datatype:
+	 	USE THE BUILT-IN 'a option type!
+	 *)
 	datatype 'a target_holder   =   TargetNotPresent 
 							    |	SListWithoutTarget of 'a slist
 
