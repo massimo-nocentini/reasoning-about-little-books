@@ -19,5 +19,7 @@ is
     ../mutable-storage/sources.cm
 
     mutable-storage.sml (with: parser.quotations=true)
+    y-combinator-imperative.sml (with: parser.quotations=true)
 
+    
 
