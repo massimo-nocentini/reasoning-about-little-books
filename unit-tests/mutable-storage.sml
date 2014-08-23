@@ -66,13 +66,18 @@ struct
             val value = Pizza
             structure Sexp = SexpStr)
 
+        structure DeepRememberFunction = DeepRemember (
+            type t = pizza
+            val value = Pizza
+            structure Sexp = SexpStr)
+
+        structure DeepMemoFunction = DeepMemo (
+            type t = pizza
+            val value = Pizza
+            structure Sexp = SexpStr)
+
         val pizza_sexp_to_string = SexpToStringFunction.to_string pizza_to_string
     in 
-        fun test_deep () = 
-            let
-                val _ =  ()
-            in () end
-
         fun test_deep_simple () = 
             let
                 open DeepSimpleFunction
@@ -96,11 +101,98 @@ struct
                 val "(((pizza)))" = pizza_sexp_to_string result
 
             in () end 
+
+        fun test_deep_remember () = 
+            let
+                open DeepRememberFunction
+
+                val {   result,
+                        memo_table = [(3, value)]  } = deep 3
+                val "(((pizza)))" = pizza_sexp_to_string value
+                val "(((pizza)))" = pizza_sexp_to_string result
+
+                val {   result,
+                        memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep 5
+                val "(((pizza)))" = pizza_sexp_to_string three_sexp
+                val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
+                val "(((((pizza)))))" = pizza_sexp_to_string result
+
+                val {   result,
+                        memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep 3
+                val "(((pizza)))" = pizza_sexp_to_string result
+
+                val {   result,
+                        memo_table = [(6, six_sexp),(5, five_sexp),(3, three_sexp)]  } = deep 6
+                val "((((((pizza))))))" = pizza_sexp_to_string six_sexp
+                val "((((((pizza))))))" = pizza_sexp_to_string result
+
+                val {   result,
+                        memo_table = [(9, nine_sexp),(6, six_sexp),(5, five_sexp),(3, three_sexp)]  } = deep 9
+                val "(((((((((pizza)))))))))" = pizza_sexp_to_string nine_sexp
+                val "(((((((((pizza)))))))))" = pizza_sexp_to_string result
+
+            in () end
+
+        fun test_deep_memo () = 
+            let
+                open DeepMemoFunction
+
+                val {   result,
+                        memo_table = [(3, three_sexp),(2, two_sexp),(1, one_sexp),(0, pizza_sexp)]  } = deep 3
+                val "pizza" = pizza_sexp_to_string pizza_sexp
+                val "(pizza)" = pizza_sexp_to_string one_sexp
+                val "((pizza))" = pizza_sexp_to_string two_sexp
+                val "(((pizza)))" = pizza_sexp_to_string three_sexp
+                val "(((pizza)))" = pizza_sexp_to_string result 
+
+                val {   result,
+                        memo_table = [(5, five_sexp),(4, four_sexp),
+                            (3, three_sexp),(2, two_sexp),(1, one_sexp),(0, pizza_sexp)]  } = deep 5
+                val "pizza" = pizza_sexp_to_string pizza_sexp
+                val "(pizza)" = pizza_sexp_to_string one_sexp
+                val "((pizza))" = pizza_sexp_to_string two_sexp
+                val "(((pizza)))" = pizza_sexp_to_string three_sexp
+                val "((((pizza))))" = pizza_sexp_to_string four_sexp
+                val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
+                val "(((((pizza)))))" = pizza_sexp_to_string result 
+
+                val {   result,
+                        memo_table = [(6, six_sexp), (5, five_sexp),(4, four_sexp),
+                                 (3, three_sexp),(2, two_sexp), (1, one_sexp),(0, pizza_sexp)]  } = deep 6
+                val "pizza" = pizza_sexp_to_string pizza_sexp
+                val "(pizza)" = pizza_sexp_to_string one_sexp
+                val "((pizza))" = pizza_sexp_to_string two_sexp
+                val "(((pizza)))" = pizza_sexp_to_string three_sexp
+                val "((((pizza))))" = pizza_sexp_to_string four_sexp
+                val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
+                val "((((((pizza))))))" = pizza_sexp_to_string six_sexp
+                val "((((((pizza))))))" = pizza_sexp_to_string result 
+
+                val {   result,
+                        memo_table = [(9, nine_sexp),(8, eight_sexp),(7, seven_sexp),(6, six_sexp),
+                            (5, five_sexp),(4, four_sexp), (3, three_sexp),(2, two_sexp),
+                            (1, one_sexp),(0, pizza_sexp)]  } = deep 9
+                val "pizza" = pizza_sexp_to_string pizza_sexp
+                val "(pizza)" = pizza_sexp_to_string one_sexp
+                val "((pizza))" = pizza_sexp_to_string two_sexp
+                val "(((pizza)))" = pizza_sexp_to_string three_sexp
+                val "((((pizza))))" = pizza_sexp_to_string four_sexp
+                val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
+                val "((((((pizza))))))" = pizza_sexp_to_string six_sexp
+                val "(((((((pizza)))))))" = pizza_sexp_to_string seven_sexp
+                val "((((((((pizza))))))))" = pizza_sexp_to_string eight_sexp
+                val "(((((((((pizza)))))))))" = pizza_sexp_to_string nine_sexp
+                val "(((((((((pizza)))))))))" = pizza_sexp_to_string result 
+
+            in () end
+
     end
 
 	fun suite () = Test.labelTests [
         ("test_sweet_tooth_remember", test_sweet_tooth_remember),
-        ("test_deep_simple", test_deep_simple)
+        ("test_deep_simple", test_deep_simple),
+        ("test_deep_remember", test_deep_remember),
+        ("test_deep_memo", test_deep_memo)
 	]
 
 	end
