@@ -122,34 +122,21 @@ functor DeepMemo (
     in 
 
         fun find (n : int) =
-            let fun A ((arg, value) :: pairs_cdr) = 
-                    if arg = n then value else A pairs_cdr
+            let fun A [] = NONE 
+                |   A ((arg, value) :: pairs_cdr) = 
+                    if arg = n then SOME value else A pairs_cdr
             in A (!memoization_table) end
-
-        fun member (n : int) =
-            let fun M [] = false
-                |   M ((arg, _) :: pairs_cdr) = 
-                        if arg = n then true else M pairs_cdr
-            in M (!memoization_table) end
-        
 
                      
         fun deep_builder 0 = Atom value
         |   deep_builder n =
                 let val {result, ...} = deep_memo (n-1) 
                 in List (Cons (result, Null)) end
-        and deep_remember n = 
-            let val result = deep_builder n 
-                val _ = memoization_table := (n, result) :: !memoization_table
-            in result end 
-        and deep_memo n = 
-            if member n
-            then let val sexp = find n 
-                    in {result = sexp, memo_table = !memoization_table} end
-            else let val sexp = deep_remember n 
-                    in {result = sexp, memo_table = !memoization_table} end
-
-
+        and deep_memo n = case find n 
+                            of  NONE => let val sexp = deep_builder n 
+                                            val _ = memoization_table := (n, sexp) :: !memoization_table
+                                        in {result = sexp, memo_table = !memoization_table} end
+                            |   SOME sexp => {result = sexp, memo_table = !memoization_table}
                  
     end
 
