@@ -1,4 +1,29 @@
 
+signature SEXP_EQUAL_ABRIDGED =
+    sig
+        type 'a sexp
+
+        val equal : 'a sexp -> 'a sexp -> bool
+    end
+
+functor SexpEqualWithComparer (
+    type t
+    val comparer : t -> t -> bool
+    structure Sexp : SEXP)
+    :> SEXP_EQUAL_ABRIDGED where type 'a sexp = t Sexp.sexp 
+    =
+    struct
+    
+    type 'a sexp = t Sexp.sexp
+    
+    local open Sexp in
+        fun equal (Atom fst) (Atom snd) = comparer fst snd
+    end
+
+    end
+
+
+    
 (*
  The following is an attempt to include in the generation of 
  an SexpEqual structure the comparer function for atoms, but

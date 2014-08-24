@@ -16,6 +16,12 @@ structure SexpCombineCurriedFunction = CombineSexpCurried(structure Sexp = SexpS
 structure SexpCombineStagedFunction = CombineSexpStaged(structure Sexp = SexpStr)
 structure SexpPickFunction = SexpPick (structure Sexp = SexpStr)
 structure SexpEqualFunction = SexpEqual (structure Sexp = SexpStr)
+
+structure SexpEqualWithComparerFunction = SexpEqualWithComparer (
+    type t = int
+    fun comparer fst snd = fst = snd
+    structure Sexp = SexpStr)
+
 (* the following is an instantiation of the abridged SexpEqual 
 	structure that embeds the comparison function.
 
@@ -134,19 +140,23 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 	  assert_pred_on_integers (op =) expected computed
       end      
 
-  fun test_pick () = 
-      let
-	  val Atom should_be_one = SexpPickFunction.pick (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`) 4
-	  val Atom should_be_three = SexpPickFunction.pick (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`) 2
-      in
-	  Assert.assertEqualInt 1 should_be_one;
-	  Assert.assertEqualInt 3 should_be_three
-      end
+    fun test_pick () = 
+        let val Atom should_be_one = SexpPickFunction.pick (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`) 4
+            val Atom should_be_three = SexpPickFunction.pick (parse `(^(4) ^(3) ^(1) ^(1) ^(1))`) 2
+        in
+            Assert.assertEqualInt 1 should_be_one;
+            Assert.assertEqualInt 3 should_be_three
+        end
 
 	local
 		structure SexpMemberFunction = SexpMember (
 			structure Sexp = SexpStr
 			structure SexpEqualFunction = SexpEqualFunction)
+
+(*		structure SexpMemberWithComparerFunction = SexpMemberWithComparer (
+            type 'a sexp = int SexpStr.sexp
+			structure Sexp = SexpStr
+			structure SexpEqualFunction = SexpEqualWithComparerFunction) *)
 	in
 		fun test_member () = 
 			let

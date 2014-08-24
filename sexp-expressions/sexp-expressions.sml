@@ -56,9 +56,8 @@ functor MakeSexpTypeCompatible(
 	:> SEXP where type 'a sexp = t Sexp.sexp
 	=
 	struct
+        open Sexp
+        type 	'a slist = t Sexp.slist
+        and 		'b sexp = 	t Sexp.sexp
+	end*)
 
-		open Sexp
-		type 'a sexp = t Sexp.sexp
-
-	end
-*)
