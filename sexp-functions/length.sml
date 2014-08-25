@@ -13,10 +13,7 @@ functor SexpLengthViaImperativeY (
 
     type 'a sexp = 'a Sexp.sexp
 
-    structure ImperativeY = Y_imperative (
-        type t = int 
-        val initial_value = 0
-        structure Sexp = Sexp)
+    structure ImperativeY = Y_imperative_one_arg ()
 
     local open Sexp
     in  fun length (List slist) =  
@@ -27,7 +24,7 @@ functor SexpLengthViaImperativeY (
                         (* The following is just an attempt to use multiple args, for instance a collector 
                         val L' = ImperativeY.Y_bang_multi_args ImperativeY.Ariety.two_args L
                         *) 
-                    in ImperativeY.Y_bang L end
+                    in ImperativeY.Y_bang 0 L end
             in length' slist end
     end
 
