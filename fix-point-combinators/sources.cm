@@ -12,4 +12,5 @@ is
     self-application.sig
     self-application.sml
 
+    y-signatures.sml
     y-imperative.sml

@@ -14,6 +14,8 @@ is
 
 	../continuations/sources.cm
 
+    ../fix-point-combinators/sources.cm
+
     sexp-functions-tests.sml (with: parser.quotations=true)
 
     combine.sml
@@ -33,5 +35,6 @@ is
 	leftmost.sml
 	rember-one-star.sml
 	depth-star.sml
+    length.sml
 
     sexp-functions.sml
