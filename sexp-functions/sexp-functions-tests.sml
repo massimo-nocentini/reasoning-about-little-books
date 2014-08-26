@@ -464,6 +464,26 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 			in () end
 	end
 
+    local
+        structure SexpLengthViaImperativeYFunction = 
+            SexpLengthViaImperativeY (
+                structure Sexp = SexpStr
+                structure ImperativeY = Y_imperative_one_arg ())
+
+		datatype strange = Pickled | Peppers
+    in
+        fun test_length () = 
+            let val _ = tester SexpLengthViaImperativeYFunction.length
+            in () end
+        and tester length_fn = 
+            let
+				val 4 = length_fn (parse `(^(Pickled) ^(Peppers) ^(Peppers) ^(Pickled))`)
+				val 3 = length_fn (parse `((^(Pickled)) ^(Peppers) (^(Peppers) ^(Pickled)))`)
+				val 2 = length_fn (parse `((^(Pickled)) ((((^(Peppers)))) (^(Peppers) ^(Pickled))))`)
+				val 0 = length_fn (parse `()`)
+            in () end
+    end
+
   fun suite () =
       Test.labelTests
 	  [
@@ -514,8 +534,8 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 		("test_rember_upto_last", test_rember_upto_last),
 		("test_leftmost", test_leftmost),
 		("test_rember_one_star", test_rember_one_star),
-		("test_rember_depth_star", test_depth_star)
-
+		("test_rember_depth_star", test_depth_star),
+        ("test_length", test_length)
 
 	  ]
 
