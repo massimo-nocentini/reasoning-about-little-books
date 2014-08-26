@@ -188,11 +188,38 @@ struct
 
     end
 
+    local 
+        structure SexpBizarreForImperativeYFunction = 
+            SexpBizarreForImperativeY (
+                structure ImperativeY = Y_imperative_one_arg ())
+    in
+
+        (*
+         For this test we do not use our pattern for testing multiple implementation
+         of the same function since for some test cases the implementation via
+         Y imperative doesn't halt at all!. Soon we provide test cases for the implementation
+         via Y applicative, which should always halt.
+         *)
+        fun test_bizarre_for_y_imperative () =
+            let 
+                val bizarre_via_y_imperative =  SexpBizarreForImperativeYFunction.bizarre
+                val 0 = bizarre_via_y_imperative 1
+                (* The two following test do not halt :) 
+                val 0 = bizarre_via_y_imperative 5
+                val 0 = bizarre_via_y_imperative 0
+                *)
+
+                (* TODO: put here the same test cases using Y applicative combinator *)
+            in () end
+
+    end
+
 	fun suite () = Test.labelTests [
         ("test_sweet_tooth_remember", test_sweet_tooth_remember),
         ("test_deep_simple", test_deep_simple),
         ("test_deep_remember", test_deep_remember),
-        ("test_deep_memo", test_deep_memo)
+        ("test_deep_memo", test_deep_memo),
+        ("test_bizarre_for_y_imperative", test_bizarre_for_y_imperative)
 	]
 
 	end

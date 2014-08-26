@@ -113,4 +113,25 @@ functor Y_imperative_derivation (
      suspension changing compiler directives in sources.cm
      *)
     (*fun Y_bang f = let val rec h = (fn f => f (fn arg => h arg))  in h f end*)
+
+    (*************************************************************
+     You have just worked through the derivation of a function called
+     "the applicative-order, imperative Y combinator." The interesting
+     aspect of `Y_bang' is that it produces recursive definitions without
+     requiring that functions be named by `fun...'. 
+     How do we go from a recursive function definition to a function `fun f...'
+     such that `Y_bang f' builds the corresponding recursive function
+     without `fun ...'? Felleisen and Friedman words: " `f' is like the
+     recursive function except that the name of the recursive function is
+     replaced by the name `recfun' and the whole expression is wrapped in
+     `(fn recfun => ...)'. 
+     Is it true that the value of `Y f' (Y is the "standard" applicative Y 
+     combinator) is the same recursive function as the value of `Y_bang f'?
+     Yes, the combinator `Y_bang' produces the same recursive functions as `Y'
+     for all function `f' that has this shape (ie. the shape described in the 
+     previous paragraph). What happens when we use `Y' and `Y_bang' with
+     a function that does not have this shape? Look at definition in 
+     SexpBizarreForImperativeY functor and the corresponding test cases :) 
+    *************************************************************)
+
     end
