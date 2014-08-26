@@ -1,5 +1,4 @@
 
-(* Give me time, we'll write our signatures very soon :) *)
 signature Y_COMBINATOR_APPLICATIVE_DERIVATION_FROM_LITTLE_LISPER =
     sig
         type 'a sexp
@@ -8,6 +7,11 @@ signature Y_COMBINATOR_APPLICATIVE_DERIVATION_FROM_LITTLE_LISPER =
         val rember_star'' : 'a sexp -> ('a -> bool) -> 'a sexp
         val rember_star''' : 'a sexp -> ('a -> bool) -> 'a sexp
         val rember_star'''' : 'a sexp -> ('a -> bool) -> 'a sexp
+        val rember_star''''' : 'a sexp -> ('a -> bool) -> 'a sexp
+        val rember_star'''''' : 'a sexp -> ('a -> bool) -> 'a sexp
+        val rember_star''''''' : 'a sexp -> ('a -> bool) -> 'a sexp
+        val rember_star'''''''' : 'a sexp -> ('a -> bool) -> 'a sexp
+        val rember_star''''''''' : 'a sexp -> ('a -> bool) -> 'a sexp
     end
 
 functor Y_applicative_derivation_from_little_lisper (
@@ -44,9 +48,9 @@ functor Y_applicative_derivation_from_little_lisper (
             in List (R_from_slist slist) end
 
         (* 
-         The function `rember_star''  is like the function `rember_star' : it takes one
+         The function `curry_maker'  is like the function `R_from_slist' : it takes one
          extra-argument `hukairs' and, when it is applied to an argument (namely, *any* argument),
-         it produces a function that looks like `rember_star'
+         it produces a function that looks like `R_from_slist'
          except for the application ``curry_maker hukairs alist''. 
          *)
         fun rember_star'' (List slist) pred = 
