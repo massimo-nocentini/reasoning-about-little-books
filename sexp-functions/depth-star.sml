@@ -35,3 +35,28 @@ functor SexpDepthStar (
 		in D' slist end
 
 	end
+
+functor SexpDepthStarViaImperativeY (
+    structure Sexp : SEXP
+    structure ImperativeY : Y_COMBINATOR_IMPERATIVE)
+    :> SEXP_DEPTH_STAR where type 'a sexp = 'a Sexp.sexp
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+
+    local open Sexp open ImperativeY in
+
+        fun depth_star (Atom _)     = 0
+        |   depth_star (List slist) =
+            let fun D depth_fn Null = 1
+                |   D depth_fn (Cons (Atom _, cdr_slist)) = depth_fn cdr_slist
+                |   D depth_fn (Cons (List car_slist, cdr_slist)) = 
+                    let val car_depth = 1 + depth_fn car_slist
+                        val cdr_depth = depth_fn cdr_slist
+                    in Int.max (car_depth, cdr_depth) end
+            in Y_bang 0 D slist end
+
+    end
+
+    end

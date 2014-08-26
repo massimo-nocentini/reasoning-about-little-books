@@ -445,12 +445,22 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 		structure SexpDepthStarFunction = SexpDepthStar (
 			structure Sexp = SexpStr)
 
+        structure SexpDepthStarViaImperativeYFunction = 
+            SexpDepthStarViaImperativeY (
+                structure Sexp = SexpStr
+                structure ImperativeY = Y_imperative_one_arg ())
+
 		datatype strange = Pickled | Peppers
 	in
 		fun test_depth_star () = 
+            let val _ = tester SexpDepthStarFunction.depth_star
+                val _ = tester SexpDepthStarViaImperativeYFunction.depth_star
+            in () end
+        and tester depth_fn = 
 			let
-				val 2 = SexpDepthStarFunction.depth_star (parse `((^(Pickled)) ^(Peppers) (^(Peppers) ^(Pickled)))`)
-				val 5 = SexpDepthStarFunction.depth_star (parse `((^(Pickled)) ((((^(Peppers))))) (^(Peppers) ^(Pickled)))`)
+				val 1 = depth_fn (parse `(^(Pickled) ^(Peppers) ^(Peppers) ^(Pickled))`)
+				val 2 = depth_fn (parse `((^(Pickled)) ^(Peppers) (^(Peppers) ^(Pickled)))`)
+				val 5 = depth_fn (parse `((^(Pickled)) ((((^(Peppers))))) (^(Peppers) ^(Pickled)))`)
 			in () end
 	end
 

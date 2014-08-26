@@ -41,12 +41,3 @@ functor Y_imperative_multiargs ()
      
 
     end
-(*
-structure ImperativeY = Y_imperative_one_arg (
-    type codomain = int 
-    val initial_value = 0)
-
-structure ImperativeMultiArgsY  = Y_imperative_multiargs (
-    type codomain = int 
-    val initial_value = 0)
-*)
