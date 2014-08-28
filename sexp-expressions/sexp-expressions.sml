@@ -61,3 +61,26 @@ functor MakeSexpTypeCompatible(
         and 		'b sexp = 	t Sexp.sexp
 	end*)
 
+signature SEXP_CONS_CTOR = 
+    sig
+        type 'a sexp
+        type 'a slist
+        
+        val cons: 'a sexp -> 'a slist -> 'a slist
+    end
+
+functor SexpConsCtor (
+    structure Sexp : SEXP) 
+    :> SEXP_CONS_CTOR   where type 'a sexp = 'a Sexp.sexp
+                        where type 'a slist = 'a Sexp.slist
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+    type 'a slist = 'a Sexp.slist
+    
+    fun cons sexp slist = Sexp.Cons (sexp, slist)
+
+    end
+
+

@@ -61,37 +61,45 @@ struct
 
         fun pizza_to_string Pizza = "pizza"
 
+        structure SexpConsCtorCountingForDeepSimple = 
+            SexpConsCtorCounting (
+                structure Sexp = SexpStr)
         structure DeepSimpleFunction = DeepSimple (
-            type t = pizza
-            val value = Pizza
-            structure Sexp = SexpStr)
+            structure Sexp = SexpStr
+            structure SexpConsCtor = SexpConsCtorCountingForDeepSimple)
 
+        structure SexpConsCtorCountingForDeepRemember = 
+            SexpConsCtorCounting (
+                structure Sexp = SexpStr)
         structure DeepRememberFunction = DeepRemember (
-            type t = pizza
-            val value = Pizza
-            structure Sexp = SexpStr)
+            structure Sexp = SexpStr
+            structure SexpConsCtor = SexpConsCtorCountingForDeepRemember)
 
+        structure SexpConsCtorCountingForDeepMemo = 
+            SexpConsCtorCounting (
+                structure Sexp = SexpStr)
         structure DeepMemoFunction = DeepMemo (
-            type t = pizza
-            val value = Pizza
-            structure Sexp = SexpStr)
+            structure Sexp = SexpStr
+            structure SexpConsCtor = SexpConsCtorCountingForDeepMemo)
 
         val pizza_sexp_to_string = SexpToStringFunction.to_string pizza_to_string
     in 
         fun test_deep_simple () = 
             let
-                open DeepSimpleFunction
+                val deep = DeepSimpleFunction.deep Pizza
 
                 val {   result,
                         memo_table = [(3, value)]  } = deep 3
                 val "(((pizza)))" = pizza_sexp_to_string value
                 val "(((pizza)))" = pizza_sexp_to_string result
+                val 3 = SexpConsCtorCountingForDeepSimple.get_counter ()
 
                 val {   result,
                         memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep 5
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string result
+                val 8 = SexpConsCtorCountingForDeepSimple.get_counter ()
 
                 val {   result,
                         memo_table = [(3, three_sexp_doubled),(5, five_sexp),(3, three_sexp)]  } = deep 3
@@ -99,43 +107,49 @@ struct
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp_doubled
                 val "(((pizza)))" = pizza_sexp_to_string result
+                val 11 = SexpConsCtorCountingForDeepSimple.get_counter ()
 
             in () end 
 
         fun test_deep_remember () = 
             let
-                open DeepRememberFunction
+                val deep = DeepRememberFunction.deep Pizza
 
                 val {   result,
                         memo_table = [(3, value)]  } = deep 3
                 val "(((pizza)))" = pizza_sexp_to_string value
                 val "(((pizza)))" = pizza_sexp_to_string result
+                val 3 = SexpConsCtorCountingForDeepRemember.get_counter () 
 
                 val {   result,
                         memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep 5
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string result
+                val 8 = SexpConsCtorCountingForDeepRemember.get_counter ()
 
                 val {   result,
                         memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep 3
                 val "(((pizza)))" = pizza_sexp_to_string result
+                val 8 = SexpConsCtorCountingForDeepRemember.get_counter () 
 
                 val {   result,
                         memo_table = [(6, six_sexp),(5, five_sexp),(3, three_sexp)]  } = deep 6
                 val "((((((pizza))))))" = pizza_sexp_to_string six_sexp
                 val "((((((pizza))))))" = pizza_sexp_to_string result
+                val 14 = SexpConsCtorCountingForDeepRemember.get_counter () 
 
                 val {   result,
                         memo_table = [(9, nine_sexp),(6, six_sexp),(5, five_sexp),(3, three_sexp)]  } = deep 9
                 val "(((((((((pizza)))))))))" = pizza_sexp_to_string nine_sexp
                 val "(((((((((pizza)))))))))" = pizza_sexp_to_string result
+                val 23 = SexpConsCtorCountingForDeepRemember.get_counter ()
 
             in () end
 
         fun test_deep_memo () = 
             let
-                open DeepMemoFunction
+                val deep = DeepMemoFunction.deep Pizza
 
                 val {   result,
                         memo_table = [(3, three_sexp),(2, two_sexp),(1, one_sexp),(0, pizza_sexp)]  } = deep 3
@@ -144,6 +158,7 @@ struct
                 val "((pizza))" = pizza_sexp_to_string two_sexp
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp
                 val "(((pizza)))" = pizza_sexp_to_string result 
+                val 3 = SexpConsCtorCountingForDeepMemo.get_counter () 
 
                 val {   result,
                         memo_table = [(5, five_sexp),(4, four_sexp),
@@ -155,6 +170,7 @@ struct
                 val "((((pizza))))" = pizza_sexp_to_string four_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string result 
+                val 5 = SexpConsCtorCountingForDeepMemo.get_counter () 
 
                 val {   result,
                         memo_table = [(6, six_sexp), (5, five_sexp),(4, four_sexp),
@@ -167,6 +183,7 @@ struct
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "((((((pizza))))))" = pizza_sexp_to_string six_sexp
                 val "((((((pizza))))))" = pizza_sexp_to_string result 
+                val 6 = SexpConsCtorCountingForDeepMemo.get_counter () 
 
                 val {   result,
                         memo_table = [(9, nine_sexp),(8, eight_sexp),(7, seven_sexp),(6, six_sexp),
@@ -183,6 +200,7 @@ struct
                 val "((((((((pizza))))))))" = pizza_sexp_to_string eight_sexp
                 val "(((((((((pizza)))))))))" = pizza_sexp_to_string nine_sexp
                 val "(((((((((pizza)))))))))" = pizza_sexp_to_string result 
+                val 9 = SexpConsCtorCountingForDeepMemo.get_counter () 
 
             in () end
 
@@ -221,6 +239,7 @@ struct
                 val 0 = bizarre_via_y_imperative 5
                 *)
 
+                val 0 = AnotherSexpBizarreForApplicativeYFunction.bizarre 1
                 val 0 = AnotherSexpBizarreForApplicativeYFunction.bizarre 5
                 (* 
                  The following invocation doesn't work because, since the Y 
