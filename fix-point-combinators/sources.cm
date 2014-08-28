@@ -13,7 +13,7 @@ is
     self-application.sig
     self-application.sml
 
-    y-signatures.sml
     y-imperative.sml
     y-imperative-derivation.sml
+    y-applicative.sml
     y-applicative-derivation-from-little-lisper.sml

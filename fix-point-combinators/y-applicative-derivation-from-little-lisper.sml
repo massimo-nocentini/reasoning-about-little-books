@@ -1,6 +1,7 @@
 
 signature Y_COMBINATOR_APPLICATIVE_DERIVATION_FROM_LITTLE_LISPER =
     sig
+        include Y_COMBINATOR_APPLICATIVE
         type 'a sexp
         val rember_star : 'a sexp -> ('a -> bool) -> 'a sexp
         val rember_star' : 'a sexp -> ('a -> bool) -> 'a sexp
