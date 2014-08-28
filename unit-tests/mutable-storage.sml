@@ -189,11 +189,17 @@ struct
     end
 
     local 
+
         structure SexpBizarreForImperativeYFunction = 
             SexpBizarreForImperativeY (
                 structure ImperativeY = Y_imperative_one_arg ())
 
         structure SexpBizarreForApplicativeYFunction = 
+            SexpBizarreForApplicativeY(
+                structure ApplicativeY = Y_applicative_one_arg_from_little_lisper (
+                    structure SelfApplication = SelfApplication()))
+
+        structure AnotherSexpBizarreForApplicativeYFunction = 
             SexpBizarreForApplicativeY(
                 structure ApplicativeY = Y_applicative_one_arg_from_little_lisper (
                     structure SelfApplication = SelfApplication()))
@@ -213,10 +219,21 @@ struct
                 val 0 = bizarre_via_y_imperative 1
                 (* The two following test do not halt :) 
                 val 0 = bizarre_via_y_imperative 5
-                val 0 = bizarre_via_y_imperative 0
                 *)
 
+                val 0 = AnotherSexpBizarreForApplicativeYFunction.bizarre 5
+                (* 
+                 The following invocation doesn't work because, since the Y 
+                 applicative does increment the reference cell defined in `bizarre',
+                 moving it to 5 will evaluate all the following equality checks with 2 
+                 to false, incrementing the counter again and again. Hence
+                 we've to define another structure, such that a new reference cell
+                 is created, in particular, a new environment for `bizarre' is created.
+                 *)
+                (* val 0 = AnotherSexpBizarreForApplicativeYFunction.bizarre 2 *)
                 val 0 = SexpBizarreForApplicativeYFunction.bizarre 1
+
+                (* Finally observe that it does not make sense to invoke `bizarre 0' :)*)
             in () end
 
     end
