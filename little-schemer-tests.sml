@@ -161,29 +161,7 @@ struct
         ("remove from complex tree of eights using abridged version of remove step 8 should return an empty tree",
 	 remove_from_complex_tree_of_eights remove_from_sexp_abridged_toward_Y_step_8),
         ("remove from complex shuffled tree using abridged version of remove step 8 should produce a shorted shuffled tree",
-	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_8),
-
-        ("length of atom eight using length defined with Y combinator",
-	 length_of_atom_eight LittleSchemerStr.length),
-        ("length of atom eight using length defined with Y combinator using accumulator technique",
-	 length_of_atom_eight LittleSchemerStr.length_with_accumulator),
-        ("length of atom eight using length defined with Y combinator using collector technique",
-	 length_of_atom_eight (LittleSchemerStr.length_with_collector (fn length => length))),
-
-        ("length of flat list of ints using length defined with Y combinator",
-	 length_of_flat_integer_list LittleSchemerStr.length),
-        ("length of flat list of ints using length defined with Y combinator using accumulator technique",
-	 length_of_flat_integer_list LittleSchemerStr.length_with_accumulator),
-        ("length of flat list of ints using length defined with Y combinator using collector technique",
-	 length_of_flat_integer_list (LittleSchemerStr.length_with_collector_functorized (fn length => length))),
-
-        ("length of complex shuffled tree using length defined with Y combinator",
-	 length_of_complex_shuffled_tree LittleSchemerStr.length),
-        ("length of complex shuffled tree using length defined with Y combinator using accumulator technique",
-	 length_of_complex_shuffled_tree LittleSchemerStr.length_with_accumulator),
-        ("length of complex shuffled tree using length defined with Y combinator using collector technique",
-	 length_of_complex_shuffled_tree (LittleSchemerStr.length_with_collector (fn length => length)))
-
+	 remove_from_complex_shuffled_tree remove_from_sexp_abridged_toward_Y_step_8)
 
       ]
 

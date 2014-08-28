@@ -10,7 +10,6 @@ is
     ../sexp-expressions/sources.cm
     ../types-utilities/sources.cm
     
-    self-application.sig
     self-application.sml
 
     y-imperative.sml

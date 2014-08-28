@@ -36,5 +36,6 @@ is
 	rember-one-star.sml
 	depth-star.sml
     length.sml
+    length-star.sml
 
     sexp-functions.sml

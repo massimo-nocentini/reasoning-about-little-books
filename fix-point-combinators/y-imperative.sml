@@ -4,8 +4,6 @@ signature Y_COMBINATOR_IMPERATIVE =
         val Y_bang : 'a -> (('b -> 'a) -> 'b -> 'a) -> 'b -> 'a 
     end    
 
-    
-
 functor Y_imperative_one_arg ()
     :> Y_COMBINATOR_IMPERATIVE
     =

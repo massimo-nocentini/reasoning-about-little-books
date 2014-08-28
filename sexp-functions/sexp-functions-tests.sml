@@ -470,16 +470,49 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
                 structure Sexp = SexpStr
                 structure ImperativeY = Y_imperative_one_arg ())
 
+        structure SelfApplicationStr = SelfApplication()
+
+        structure SexpLengthViaApplicativeYFunction = 
+            SexpLengthViaApplicativeY(
+                structure Sexp = SexpStr
+                structure ApplicativeY = Y_applicative_one_arg_from_little_lisper(
+                    structure SelfApplication = SelfApplicationStr)) 
+
+        structure SexpLengthViaApplicativeYwithAccumulatorFunction = 
+            SexpLengthViaApplicativeYwithAccumulator (
+                structure Sexp = SexpStr
+                structure SelfApplication = SelfApplicationStr
+                structure ApplicativeY = Y_applicative_multiargs_from_little_lisper(
+                    structure SelfApplication = SelfApplicationStr)) 
+
+        structure SexpLengthStarViaApplicativeYwithCollectorFunction = 
+            SexpLengthStarViaApplicativeYwithCollector (
+                structure Sexp = SexpStr
+                structure SelfApplication = SelfApplicationStr
+                structure ApplicativeY = Y_applicative_multiargs_from_little_lisper(
+                    structure SelfApplication = SelfApplicationStr)) 
+
 		datatype strange = Pickled | Peppers
     in
         fun test_length () = 
             let val _ = tester SexpLengthViaImperativeYFunction.length
+                val _ = tester SexpLengthViaApplicativeYFunction.length
+                val _ = tester SexpLengthViaApplicativeYwithAccumulatorFunction.length
+
+                val _ = tester_star SexpLengthStarViaApplicativeYwithCollectorFunction.length
             in () end
         and tester length_fn = 
             let
 				val 4 = length_fn (parse `(^(Pickled) ^(Peppers) ^(Peppers) ^(Pickled))`)
 				val 3 = length_fn (parse `((^(Pickled)) ^(Peppers) (^(Peppers) ^(Pickled)))`)
 				val 2 = length_fn (parse `((^(Pickled)) ((((^(Peppers)))) (^(Peppers) ^(Pickled))))`)
+				val 0 = length_fn (parse `()`)
+            in () end
+        and tester_star length_fn = 
+            let
+				val 4 = length_fn (parse `(^(Pickled) ^(Peppers) ^(Peppers) ^(Pickled))`)
+				val 4 = length_fn (parse `((^(Pickled)) ^(Peppers) (^(Peppers) ^(Pickled)))`)
+				val 4 = length_fn (parse `((^(Pickled)) ((((^(Peppers)))) (^(Peppers) ^(Pickled))))`)
 				val 0 = length_fn (parse `()`)
             in () end
     end

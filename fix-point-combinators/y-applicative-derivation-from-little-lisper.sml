@@ -16,6 +16,7 @@ signature Y_COMBINATOR_APPLICATIVE_DERIVATION_FROM_LITTLE_LISPER =
     end
 
 functor Y_applicative_derivation_from_little_lisper (
+    structure SelfApplication : SELF_APPLICATION
     structure Sexp : SEXP)
     :> Y_COMBINATOR_APPLICATIVE_DERIVATION_FROM_LITTLE_LISPER where type 'a sexp = 'a Sexp.sexp
     =
@@ -23,7 +24,7 @@ functor Y_applicative_derivation_from_little_lisper (
 
     type 'a sexp = 'a Sexp.sexp
 
-    local open Sexp in
+    local open Sexp open SelfApplication in
 
         (* Here it is the verbose version, using the Commandments *)
         fun rember_star sexp pred = 
@@ -95,15 +96,8 @@ functor Y_applicative_derivation_from_little_lisper (
                 val rember_from_slist = rember_from_slist_maker rember_from_slist_maker
             in List (rember_from_slist slist) end
 
-        datatype 'a T = Into of 'a T -> 'a
-
-        (* fun Y f = H f (Into (H f)) *)
-        (* (* and H f into = f (G into) *) *)
-        (* and H f = f o G *)
-        fun self_apply (into as Into aFn) x = aFn into x
-        (* using the following definition the type-checker takes very long
-         time to type-check the phrase.*)
-        (* and G (into as Into aFn) = aFn into *)
+        (* The following is simply a shortcut to have short name for `self_apply' *)
+        val self_apply = SelfApplication.self_apply_one_arg
 
         (* 
          Take a look at this application, which occurs three times in the
@@ -256,6 +250,25 @@ functor Y_applicative_derivation_from_little_lisper (
         val Y =  fn R => 
                     (fn (hukairs as (Into _)) => R (fn arg => self_apply hukairs arg)) 
                         (Into (fn (hukairs as (Into _)) => R (fn arg => self_apply hukairs arg)))
+
+        (* Does your hat still fit? Perhaps not, if your mind has been
+        stretched. *)
+
+        (* All the previous derivation weren't been possible without the following
+         http://www.cs.cornell.edu/courses/cs3110/2008fa/recitations/rec26.html *)
+
+        (* datatype factFun = Fun of factFun -> int -> int *)
+
+        (* val fact = *)
+        (* 	let fun fact' (f: factFun) n = *)
+        (* 		case f of Fun(f'') => *)
+        (* 			  if n = 0 then 1 else n * (f'' f) (n-1) *)
+        (* 	in *)
+        (* 	    fact' (Fun(fact')) *)
+        (* 	end *)
+
+        (* val result = fact(5) *)
+
     end
     
     

@@ -28,3 +28,48 @@ functor SexpLengthViaImperativeY (
     end
 
     end
+
+functor SexpLengthViaApplicativeY (
+    structure Sexp : SEXP
+    structure ApplicativeY : Y_COMBINATOR_APPLICATIVE)
+    :> SEXP_LENGTH where type 'a sexp = 'a Sexp.sexp
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+
+    local open Sexp open ApplicativeY in
+
+        fun length (List slist) =
+            let val L = fn recfun =>
+                            fn  Null => 0
+                            |   (Cons (_, cdr_slist)) => 1 + recfun cdr_slist
+            in Y L slist end
+
+    end
+
+    end
+
+functor SexpLengthViaApplicativeYwithAccumulator (
+    structure Sexp : SEXP
+    structure SelfApplication : SELF_APPLICATION
+    structure ApplicativeY : Y_COMBINATOR_APPLICATIVE_MULTIARGS
+    sharing type SelfApplication.self = ApplicativeY.self)
+    :> SEXP_LENGTH where type 'a sexp = 'a Sexp.sexp
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+
+    local open Sexp open ApplicativeY open SelfApplication in
+
+        fun length (List slist) =
+            let val L = fn recfun =>
+                            fn acc => 
+                                fn  Null => acc 
+                                |   (Cons (_, cdr_slist)) => recfun (1 + acc) cdr_slist
+            in Y_multi_args self_apply_two_args L 0 slist end
+
+    end
+
+    end

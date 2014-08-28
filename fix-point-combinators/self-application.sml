@@ -1,41 +1,35 @@
 
+signature SELF_APPLICATION = 
+    sig
+        datatype 'a self = Into of 'a self -> 'a
 
-functor SelfApplication () :> SELF_APPLICATION = struct
+        val self_apply_one_arg : ('a -> 'b) self -> 'a -> 'b
+        val self_apply_two_args : ('a -> 'b -> 'c)  self -> 'a -> 'b -> 'c
+        val self_apply_three_args : ('a -> 'b -> 'c -> 'd)  self -> 'a -> 'b -> 'c -> 'd
+    end
 
-	datatype 'a T = Into of 'a T -> 'a
+functor SelfApplication () 
+    :> SELF_APPLICATION 
+    = 
+    struct
 
-	end
+	datatype 'a self = Into of 'a self -> 'a
 
-functor SelfApplicationOperators (
-    structure SelfApplication : SELF_APPLICATION)
-	:> SELF_APPLICATION_OPERATORS where type 'a T = 'a SelfApplication.T
-	=
-	struct
+    fun self_apply_one_arg (into as Into aFn) x1 = aFn into x1
+    fun self_apply_two_args (into as Into aFn) x1 x2 = aFn into x1 x2
+    fun self_apply_three_args (into as Into aFn) x1 x2 x3 = aFn into x1 x2 x3
 
-	type 'a T = 'a SelfApplication.T
+    (*
+     The following is another way to implement self application, 
+     inspired by Little MLer book, in the last page of the book.
+     *)
+    (* fun Y f = H f (Into (H f)) *)
+    (* (* and H f into = f (G into) *) *)
+    (* and H f = f o G *)
 
-	fun G0 (into as SelfApplication.Into aFn) = 
-	    aFn into ()
-	fun G1 (into as SelfApplication.Into aFn) x1 = 
-	    aFn into x1
-	fun G2 (into as SelfApplication.Into aFn) x1 x2 = 
-	    aFn into x1 x2
-	fun G3 (into as SelfApplication.Into aFn) x1 x2 x3 = 
-	    aFn into x1 x2 x3
-	fun G4 (into as SelfApplication.Into aFn) x1 x2 x3 x4 = 
-	    aFn into x1 x2 x3 x4
-	fun G5 (into as SelfApplication.Into aFn) x1 x2 x3 x4 x5 = 
-	    aFn into x1 x2 x3 x4 x5
-	fun G6 (into as SelfApplication.Into aFn) x1 x2 x3 x4 x5 x6 =
-	    aFn into x1 x2 x3 x4 x5 x6 
-	fun G7 (into as SelfApplication.Into aFn) x1 x2 x3 x4 x5 x6 x7 = 
-	    aFn into x1 x2 x3 x4 x5 x6 x7
-	fun G8 (into as SelfApplication.Into aFn) x1 x2 x3 x4 x5 x6 x7 x8 = 
-	    aFn into x1 x2 x3 x4 x5 x6 x7 x8
-	fun G9 (into as SelfApplication.Into aFn) x1 x2 x3 x4 x5 x6 x7 x8 x9 = 
-	    aFn into x1 x2 x3 x4 x5 x6 x7 x8 x9
-	fun G10 (into as SelfApplication.Into aFn) x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 = 
-	    aFn into x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 
-
+    (* using the following definition the type-checker takes very long
+     time to type-check the phrase.*)
+    (* and G (into as Into aFn) = aFn into *)
 
 	end
+    

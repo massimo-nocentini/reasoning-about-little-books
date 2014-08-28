@@ -192,6 +192,11 @@ struct
         structure SexpBizarreForImperativeYFunction = 
             SexpBizarreForImperativeY (
                 structure ImperativeY = Y_imperative_one_arg ())
+
+        structure SexpBizarreForApplicativeYFunction = 
+            SexpBizarreForApplicativeY(
+                structure ApplicativeY = Y_applicative_one_arg_from_little_lisper (
+                    structure SelfApplication = SelfApplication()))
     in
 
         (*
@@ -203,13 +208,15 @@ struct
         fun test_bizarre_for_y_imperative () =
             let 
                 val bizarre_via_y_imperative =  SexpBizarreForImperativeYFunction.bizarre
+                val bizarre_via_y_applicative =  SexpBizarreForApplicativeYFunction.bizarre
+
                 val 0 = bizarre_via_y_imperative 1
                 (* The two following test do not halt :) 
                 val 0 = bizarre_via_y_imperative 5
                 val 0 = bizarre_via_y_imperative 0
                 *)
 
-                (* TODO: put here the same test cases using Y applicative combinator *)
+                val 0 = SexpBizarreForApplicativeYFunction.bizarre 1
             in () end
 
     end
