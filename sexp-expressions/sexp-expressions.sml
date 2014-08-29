@@ -37,6 +37,28 @@ functor MakeSexp ()
 
 	end
 
+signature SEXP_BEWARE_SHADOWS =
+    sig
+        type 'a sexp
+        type 'a slist
+
+        val Cons : 'a sexp -> 'a slist -> 'a slist
+        val null : 'a slist
+        val Kons : ('a -> int) -> 'a slist
+    end
+
+functor SexpBewareShadows () 
+    : SEXP_BEWARE_SHADOWS
+    =
+    struct
+    
+    type 'a sexp = int
+    datatype 'a slist =     Kons of 'a -> int
+                        |   null
+    
+    fun Cons sexp slist = Kons (fn x => 3)        
+    end
+
 functor MakeSexpTyped(type t) 
 	=
 	struct 
