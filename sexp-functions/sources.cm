@@ -16,6 +16,8 @@ is
 
     ../fix-point-combinators/sources.cm
 
+    ../counting/sources.cm
+
     sexp-functions-tests.sml (with: parser.quotations=true)
 
     combine.sml

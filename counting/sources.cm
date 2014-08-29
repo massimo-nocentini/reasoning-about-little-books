@@ -14,10 +14,8 @@ is
 
 	../continuations/sources.cm
 
-    ../sexp-functions/sources.cm
 
-    ../counting/sources.cm
 
-	sweet-tooth-remember.sml 
-    deep.sml
-    bizarre-for-y-imperative.sml
+    counting.sml
+    counting-sexp-cons-ctor.sml
+    counting-super-counter.sml

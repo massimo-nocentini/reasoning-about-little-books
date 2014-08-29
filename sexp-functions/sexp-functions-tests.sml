@@ -395,29 +395,53 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 	end
 
 	local
+        structure SexpConsCtorCountingForRemberOneStar = 
+            SexpConsCtorCounting (
+                structure Sexp = SexpStr)
+
+        structure SexpConsCtorCountingForRemberOneStarWithLetcc = 
+            SexpConsCtorCounting (
+                structure Sexp = SexpStr)
+
+        structure SexpConsCtorCountingForRemberOneStarWithTry = 
+            SexpConsCtorCounting (
+                structure Sexp = SexpStr)
+
 		structure SexpRemberOneStarFunction = SexpRemberOneStar (
 			structure Sexp = SexpStr
-			structure SexpEqualFunction = SexpEqualFunction)
+			structure SexpEqualFunction = SexpEqualFunction
+            structure SexpConsCtor = SexpConsCtorCountingForRemberOneStar)
 
 		structure SexpRemberOneStarWithLetccFunction = SexpRemberOneStarWithLetcc (
 			structure Sexp = SexpStr
 			structure SexpEqualFunction = SexpEqualFunction
-            structure HopSkipAndJump = HopSkipAndJump)
+            structure HopSkipAndJump = HopSkipAndJump
+            structure SexpConsCtor = SexpConsCtorCountingForRemberOneStarWithLetcc)
 
 		structure SexpRemberOneStarWithTryFunction = SexpRemberOneStarWithTry (
 			structure Sexp = SexpStr
 			structure SexpEqualFunction = SexpEqualFunction
-            structure HopSkipAndJump = HopSkipAndJump)
+            structure HopSkipAndJump = HopSkipAndJump
+            structure SexpConsCtor = SexpConsCtorCountingForRemberOneStarWithTry)
 
 		datatype strange = Swedish | Rye | French | Mustard | Salad | Turkey
 	in
 		fun test_rember_one_star () = 
             let 
                 val _ = tester SexpRemberOneStarFunction.rember_one_star 
+                            (fn () => SexpConsCtorCountingForRemberOneStar.set_counter 0) 
+                            (fn () => let val 5 = SexpConsCtorCountingForRemberOneStar.get_counter () 
+                                        in () end)
                 val _ = tester SexpRemberOneStarWithLetccFunction.rember_one_star 
+                            (fn () => SexpConsCtorCountingForRemberOneStar.set_counter 0) 
+                            (fn () => let val 0 = SexpConsCtorCountingForRemberOneStarWithLetcc.get_counter () 
+                                        in () end)
                 val _ = tester SexpRemberOneStarWithTryFunction.rember_one_star 
+                            (fn () => SexpConsCtorCountingForRemberOneStar.set_counter 0) 
+                            (fn () => let val 0 = SexpConsCtorCountingForRemberOneStarWithTry.get_counter ()
+                                        in () end)
             in () end
-        and tester rember_one_star =
+        and tester rember_one_star reset_counter test_counter =
 			let
 				fun equality_comparer (a: strange) b = a = b
 
@@ -430,6 +454,7 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 								fourThreeSevenOne 
 								(parse `((^(Swedish) ^(Rye)) (^(French) (^(Mustard) ^(Turkey))) ^(Salad))`)  
 
+                val _ = reset_counter ()
 				val not_present	= rember_one_star
 								(parse `((^(Swedish)) ^(Rye) (^(French)))`)  
 								(parse `^(Salad)`) 
@@ -438,6 +463,7 @@ structure SexpEqualFunctionAbridged = SexpEqualAbridged(
 								equality_comparer 
 								not_present 
 								(parse `((^(Swedish)) ^(Rye) (^(French)))`)  
+                val _ = test_counter ()
 			in () end
 	end
 

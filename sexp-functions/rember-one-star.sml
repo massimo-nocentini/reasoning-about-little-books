@@ -12,7 +12,10 @@ signature SEXP_REMBER_ONE_STAR =
 functor SexpRemberOneStar (
 	structure Sexp : SEXP 
 	structure SexpEqualFunction : SEXP_EQUAL 
-	sharing type Sexp.sexp = SexpEqualFunction.sexp )
+	sharing type Sexp.sexp = SexpEqualFunction.sexp 
+    structure SexpConsCtor : SEXP_CONS_CTOR
+    sharing type Sexp.sexp = SexpConsCtor.sexp
+    sharing type Sexp.slist = SexpConsCtor.slist)
 	:> SEXP_REMBER_ONE_STAR where type 'a sexp = 'a Sexp.sexp
 	=
 	struct
@@ -24,12 +27,12 @@ functor SexpRemberOneStar (
 			fun R (empty as Null) = empty
 			|	R (Cons ((atom_sexp as Atom atom), cdr_slist)) = 
 					if comparer atom target
-					then cdr_slist else Cons (atom_sexp, R cdr_slist)
+					then cdr_slist else SexpConsCtor.cons atom_sexp (R cdr_slist)
 			|	R (Cons ((list_sexp as List slist), cdr_slist)) =
 					let val processed = List (R slist) in	
 						if SexpEqualFunction.equal comparer list_sexp processed
-						then Cons (list_sexp, R cdr_slist) 
-						else Cons (processed, cdr_slist) 
+						then SexpConsCtor.cons list_sexp (R cdr_slist) 
+						else SexpConsCtor.cons processed cdr_slist 
 					end
 
 
