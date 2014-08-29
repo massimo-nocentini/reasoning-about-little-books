@@ -37,6 +37,37 @@ functor SexpConsCtorCounting (
 
     end
 
+signature UNDER_COUNTING =
+    sig
+        type codomain
+        val function : int -> codomain
+        val get_counter : unit -> int
+    end
+
+signature COUNTER_ITERATOR =
+    sig
+        structure UnderCounting : UNDER_COUNTING
+        val super_counter : int -> int
+    end
+
+functor CounterIterator (
+    structure UnderCounting : UNDER_COUNTING)
+    :> COUNTER_ITERATOR
+    =
+    struct
+
+    structure UnderCounting = UnderCounting
+    
+    val super_counter = 
+        fn n =>
+            let fun sc (zero as 0) = UnderCounting.function zero
+                |   sc  n = let val _ = UnderCounting.function n
+                            in sc (n-1) end
+
+                val _ = sc n
+            in UnderCounting.get_counter () end
+    end
+
 functor DeepSimple (
     structure Sexp : SEXP
     structure SexpConsCtor : SEXP_CONS_CTOR

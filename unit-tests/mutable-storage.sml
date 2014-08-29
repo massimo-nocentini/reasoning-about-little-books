@@ -83,31 +83,62 @@ struct
             structure SexpConsCtor = SexpConsCtorCountingForDeepMemo)
 
         val pizza_sexp_to_string = SexpToStringFunction.to_string pizza_to_string
+
+        val deep_simple = DeepSimpleFunction.deep Pizza
+        val deep_remember = DeepRememberFunction.deep Pizza
+        val deep_memo = DeepMemoFunction.deep Pizza
+
+        structure CounterIteratorForDeepSimple = CounterIterator(
+            structure UnderCounting = 
+                struct
+                    type codomain = { result : pizza SexpStr.sexp, memo_table : (int * pizza SexpStr.sexp) list}
+                    val function = deep_simple
+                    val get_counter = SexpConsCtorCountingForDeepSimple.get_counter
+                end)
+
+        structure CounterIteratorForDeepRemember = CounterIterator(
+            structure UnderCounting = 
+                struct
+                    type codomain = { result : pizza SexpStr.sexp, memo_table : (int * pizza SexpStr.sexp) list}
+                    val function = deep_remember
+                    val get_counter = SexpConsCtorCountingForDeepRemember.get_counter
+                end)
+
+        structure CounterIteratorForDeepMemo = CounterIterator(
+            structure UnderCounting = 
+                struct
+                    type codomain = { result : pizza SexpStr.sexp, memo_table : (int * pizza SexpStr.sexp) list}
+                    val function = deep_memo
+                    val get_counter = SexpConsCtorCountingForDeepMemo.get_counter
+                end)
     in 
         fun test_deep_simple () = 
             let
-                val deep = DeepSimpleFunction.deep Pizza
 
                 val {   result,
-                        memo_table = [(3, value)]  } = deep 3
+                        memo_table = [(3, value)]  } = deep_simple 3
                 val "(((pizza)))" = pizza_sexp_to_string value
                 val "(((pizza)))" = pizza_sexp_to_string result
                 val 3 = SexpConsCtorCountingForDeepSimple.get_counter ()
 
                 val {   result,
-                        memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep 5
+                        memo_table = [(5, five_sexp),(3, three_sexp)]  } = deep_simple 5
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string result
                 val 8 = SexpConsCtorCountingForDeepSimple.get_counter ()
 
                 val {   result,
-                        memo_table = [(3, three_sexp_doubled),(5, five_sexp),(3, three_sexp)]  } = deep 3
+                        memo_table = [(3, three_sexp_doubled),(5, five_sexp),(3, three_sexp)]  } = deep_simple 3
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp
                 val "(((((pizza)))))" = pizza_sexp_to_string five_sexp
                 val "(((pizza)))" = pizza_sexp_to_string three_sexp_doubled
                 val "(((pizza)))" = pizza_sexp_to_string result
                 val 11 = SexpConsCtorCountingForDeepSimple.get_counter ()
+
+                val _ = SexpConsCtorCountingForDeepSimple.set_counter 0
+                val 0 = SexpConsCtorCountingForDeepSimple.get_counter ()
+                val 500500 = CounterIteratorForDeepSimple.super_counter 1000  
 
             in () end 
 
@@ -145,6 +176,9 @@ struct
                 val "(((((((((pizza)))))))))" = pizza_sexp_to_string result
                 val 23 = SexpConsCtorCountingForDeepRemember.get_counter ()
 
+                val _ = SexpConsCtorCountingForDeepRemember.set_counter 0
+                val 0 = SexpConsCtorCountingForDeepRemember.get_counter ()
+                val 500500 = CounterIteratorForDeepRemember.super_counter 1000  
             in () end
 
         fun test_deep_memo () = 
@@ -202,6 +236,9 @@ struct
                 val "(((((((((pizza)))))))))" = pizza_sexp_to_string result 
                 val 9 = SexpConsCtorCountingForDeepMemo.get_counter () 
 
+                val _ = SexpConsCtorCountingForDeepMemo.set_counter 0
+                val 0 = SexpConsCtorCountingForDeepMemo.get_counter ()
+                val 1000 = CounterIteratorForDeepMemo.super_counter 1000  
             in () end
 
     end
