@@ -19,3 +19,7 @@ is
 	sweet-tooth-remember.sml 
     deep.sml
     bizarre-for-y-imperative.sml
+
+    counting.sml
+    counting-sexp-cons-ctor.sml
+    counting-super-counter.sml
