@@ -240,6 +240,33 @@ struct
 
     end
 
+    local
+        datatype pizza = Pizza | Mozzarella | Cake
+
+        fun pizza_to_string Pizza = "pizza"
+        |   pizza_to_string Mozzarella = "mozzarella"
+        |   pizza_to_string Cake = "cake"
+
+        val pizza_sexp_to_string = SexpToStringFunction.to_string pizza_to_string
+
+        structure DeepToppingsWithLetccFunction = DeepToppingsWithLetcc (
+            structure Sexp = SexpStr
+            structure HopSkipAndJump = HopSkipAndJumpFunctor (
+                structure Cont = SMLofNJ.Cont))
+
+(*        local val deep = DeepToppingsWithLetccFunction.deep 6 in
+            fun deep_six_layer (p : pizza) = deep p
+        end *)
+        val deep_zero_layer = DeepToppingsWithLetccFunction.deep Pizza 0
+    in 
+        fun test_deep_toppings_with_letcc () =
+            let 
+                val "pizza" = pizza_sexp_to_string (deep_zero_layer Pizza) 
+(*                val "((((((mozzarella))))))" = pizza_sexp_to_string (deep_six_layer Mozzarella)
+                val "((((((cake))))))" = pizza_sexp_to_string (deep_six_layer Cake) *)
+            in () end 
+    end
+
     local 
 
         structure SexpBizarreForImperativeYFunction = 
@@ -296,7 +323,8 @@ struct
         ("test_deep_simple", test_deep_simple),
         ("test_deep_remember", test_deep_remember),
         ("test_deep_memo", test_deep_memo),
-        ("test_bizarre_for_y_imperative", test_bizarre_for_y_imperative)
+        ("test_bizarre_for_y_imperative", test_bizarre_for_y_imperative),
+        ("test_deep_toppings_with_letcc", test_deep_toppings_with_letcc)
 	]
 
 	end

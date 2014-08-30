@@ -8,7 +8,7 @@ interactive:
 	sml -Cprint.depth=1000 -Cparser.quotations=true -Ccm.debug=true sources.cm 
 
 compile:
-	rm -r .cm/
+	rm -rf .cm/
 	sml -m sources.cm < /dev/null
 
 tags:

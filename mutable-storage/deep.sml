@@ -39,9 +39,8 @@ functor DeepSimple (
 
 functor DeepRemember (
     structure Sexp : SEXP
-    structure SexpConsCtor : SEXP_CONS_CTOR
-    sharing type Sexp.sexp = SexpConsCtor.sexp
-    sharing type Sexp.slist = SexpConsCtor.slist)
+    structure SexpConsCtor : SEXP_CONS_CTOR sharing type Sexp.sexp = SexpConsCtor.sexp
+                                            and type Sexp.slist = SexpConsCtor.slist)
     :> DEEP where type 'a sexp = 'a Sexp.sexp
     =
     struct
@@ -77,8 +76,6 @@ functor DeepRemember (
                     else let val sexp = deep_remember n 
                             in {result = sexp, memo_table = !memoization_table} end
             in deep_memo end
-
-
                  
     end
 
@@ -123,3 +120,70 @@ functor DeepMemo (
 
 
     end
+
+signature DEEP_TOPPINGS = 
+    sig
+        type 'a sexp
+        val deep : 'a -> int -> 'a -> 'a sexp
+    end
+
+functor DeepToppingsWithLetcc (
+    structure Sexp : SEXP
+    structure HopSkipAndJump : HOP_SKIP_AND_JUMP)
+    :> DEEP_TOPPINGS where type 'a sexp = 'a Sexp.sexp
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+
+    local open Sexp  in
+
+        fun deep initial_value m = 
+            let 
+                (*val toppings_ref = ref (fn Atom _ => Atom initial_value)*)
+                val toppings_ref = ref (fn atom_sexp as Atom _ => atom_sexp)
+
+                fun deep_rec 0 = HopSkipAndJump.letcc (
+                        fn jump => let val _ = toppings_ref := jump in Atom initial_value end)
+                |   deep_rec m  = List (Cons (deep_rec (m-1), Null))
+
+                val _ = deep_rec m
+            in  fn atom => (!toppings_ref) (Atom atom)  end
+
+
+    end
+
+    end
+(*
+signature DEEP_WITH_TOPPINGS = 
+    sig
+        type 'a sexp
+        val deep : int -> 'a sexp
+        val toppings : 'a -> 'a sexp
+    end
+
+
+functor DeepWithToppingsWithLetcc (
+    structure Sexp : SEXP
+    structure HopSkipAndJump : HOP_SKIP_AND_JUMP)
+    :> DEEP_WITH_TOPPINGS where type 'a sexp = 'a Sexp.sexp
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+
+    open Sexp
+
+    local val toppings_ref = ref (fn atom_sexp as Atom _ => atom_sexp) in
+
+        fun toppings atom = !toppings_ref (Atom atom)
+
+        fun deep 0 = HopSkipAndJump.letcc (fn jump => let val _ = toppings_ref := jump in List Null end)
+        |   deep m = List (Cons (deep (m-1), Null))
+
+    end
+
+    end
+
+*)
+
