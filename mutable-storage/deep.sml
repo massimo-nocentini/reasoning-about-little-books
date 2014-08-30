@@ -148,18 +148,20 @@ functor DeepToppingsWithLetcc (
                 |   deep_rec m  = List (Cons (deep_rec (m-1), Null))
 
                 val _ = deep_rec m
-            in  fn atom => (!toppings_ref) (Atom atom)  end
+
+(*            in  fn atom => !toppings_ref (Atom atom)  end *)
+            in  fn atom => !toppings_ref (Atom atom)  end
 
 
     end
 
     end
-(*
+
 signature DEEP_WITH_TOPPINGS = 
     sig
         type 'a sexp
-        val deep : int -> 'a sexp
-        val toppings : 'a -> 'a sexp
+        val deep : int -> 'a -> {   result : 'a sexp,
+                                    toppings : 'a -> 'a sexp }
     end
 
 
@@ -174,16 +176,21 @@ functor DeepWithToppingsWithLetcc (
 
     open Sexp
 
-    local val toppings_ref = ref (fn atom_sexp as Atom _ => atom_sexp) in
-
-        fun toppings atom = !toppings_ref (Atom atom)
-
-        fun deep 0 = HopSkipAndJump.letcc (fn jump => let val _ = toppings_ref := jump in List Null end)
-        |   deep m = List (Cons (deep (m-1), Null))
+    fun deep m initial_atom =
+        let
+            fun deep_h 0 = HopSkipAndJump.letcc (
+                fn jump => 
+                    let fun toppings atom = 
+                        let (*val _ = print "hello"  *)
+                            val _ = jump {   result = (Atom atom), toppings = toppings } 
+                        in Atom atom end
+                    in {    result = Atom initial_atom , toppings = toppings } end ) 
+            |   deep_h m = 
+                let val { result, toppings } = deep_h (m - 1)
+                in {result = List (Cons (result, Null)), toppings = toppings} end
+        in deep_h m end
 
     end
 
-    end
 
-*)
 
