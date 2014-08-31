@@ -157,6 +157,38 @@ functor DeepToppingsWithLetcc (
 
     end
 
+functor DeepToppingsWithCont (
+    structure Sexp : SEXP
+    structure HopSkipAndJump : HOP_SKIP_AND_JUMP)
+    :> DEEP_TOPPINGS where type 'a sexp = 'a Sexp.sexp
+    =
+    struct
+
+    type 'a sexp = 'a Sexp.sexp
+
+    local open Sexp  in
+
+        fun deep initial_value m = 
+            let 
+                (*val toppings_ref = ref (fn Atom _ => Atom initial_value)*)
+                val toppings_ref = ref NONE
+
+                fun deep_rec 0 = SMLofNJ.Cont.callcc (
+                        fn current_cont => 
+                            let val _ = toppings_ref := (SOME current_cont) 
+                            in Atom initial_value end)
+                |   deep_rec m  = List (Cons (deep_rec (m-1), Null))
+
+                val _ = deep_rec m
+
+(*            in  fn atom => !toppings_ref (Atom atom)  end *)
+            in  fn atom => let val SOME toppings_cont = !toppings_ref in
+                            SMLofNJ.Cont.throw toppings_cont (Atom atom) end end
+
+
+    end
+
+    end
 signature DEEP_WITH_TOPPINGS = 
     sig
         type 'a sexp
