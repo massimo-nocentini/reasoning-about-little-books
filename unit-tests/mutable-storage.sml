@@ -263,6 +263,11 @@ struct
             structure Sexp = SexpStr
             structure HopSkipAndJump = HopSkipAndJumpFunctor (
                 structure Cont = SMLofNJ.Cont))
+
+        structure DeepContWithLetccFunction = DeepContWithLetcc (
+            structure Sexp = SexpStr
+            structure HopSkipAndJump = HopSkipAndJumpFunctor (
+                structure Cont = SMLofNJ.Cont))
     in 
         fun test_deep_toppings_with_letcc () =
             let 
@@ -273,13 +278,29 @@ struct
 (*                val "pizza" = pizza_sexp_to_string (six_layer_toppings Pizza) 
                 val "mozzarella" = pizza_sexp_to_string (six_layer_toppings Pizza) *)
                 
-                val six_layer = DeepToppingsWithContFunction.deep Pizza 6
-                val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza)
+(*                val six_layer = DeepToppingsWithContFunction.deep Pizza 6
+                val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza) *)
 
 (*                val six_layer = DeepToppingsWithLetccFunction.deep Pizza 6
                 val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza) 
                 val "((((((mozzarella))))))" = pizza_sexp_to_string (deep_six_layer Mozzarella)
                 val "((((((cake))))))" = pizza_sexp_to_string (deep_six_layer Cake) *)
+ 
+                val six_layer_option_ref = ref NONE
+                val _ = DeepContWithLetccFunction.deep Pizza 6 (
+                    fn six_layer => 
+                        let 
+                            val _ = six_layer_option_ref := SOME six_layer
+                            val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza)
+                            val "((((((mozzarella))))))" = pizza_sexp_to_string (six_layer Mozzarella)
+                            val "((((((cake))))))" = pizza_sexp_to_string (six_layer Cake)
+                            val "((((((cake))))))" = pizza_sexp_to_string (List (Cons (six_layer Cake, Null)))
+                            val "((((((mozzarella))))))" = pizza_sexp_to_string 
+                                (List (Cons (List (Cons (List (Cons (six_layer Mozzarella, Null)), Null)), Null)))
+                        in () end)
+(*                val SOME six_layer = !six_layer_option_ref
+                val "((((((mozzarella))))))" = pizza_sexp_to_string 
+                    (List (Cons (List (Cons (List (Cons (six_layer Mozzarella, Null)), Null)), Null))) *)
             in () end 
     end
 
