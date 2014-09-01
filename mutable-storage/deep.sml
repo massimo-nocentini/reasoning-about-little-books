@@ -172,23 +172,35 @@ functor DeepToppingsWithCont (
             let 
                 (*val toppings_ref = ref (fn Atom _ => Atom initial_value)*)
                 val toppings_ref = ref NONE
+                val toppings_swap_ref = ref NONE
 
-                fun deep_rec 0 = SMLofNJ.Cont.callcc (
-                        fn current_cont => 
-                            let val _ = toppings_ref := (SOME current_cont) 
-                            in Atom initial_value end)
-                |   deep_rec m  = List (Cons (deep_rec (m-1), Null))
+                val result = ref (Atom initial_value)
 
-                val _ = deep_rec m
+                fun deep_rec 0 = 
+                        SMLofNJ.Cont.callcc (
+                            fn current_cont => 
+                                let val _ = toppings_ref := (SOME current_cont) 
+                                in Atom initial_value end)
+                |   deep_rec m  = (
+                        result := List (Cons (deep_rec (m-1), Null));
+                        !result)
 
-(*            in  fn atom => !toppings_ref (Atom atom)  end *)
-            in  fn atom => let val SOME toppings_cont = !toppings_ref in
-                            SMLofNJ.Cont.throw toppings_cont (Atom atom) end end
+                val _ =  (deep_rec m)
+
+            in  fn atom =>  case !toppings_ref 
+                            of  current_toppings_cont as SOME toppings_cont => (
+                                    toppings_ref := NONE; 
+                                    toppings_swap_ref := current_toppings_cont;
+                                    SMLofNJ.Cont.throw toppings_cont (Atom atom))
+                            |   NONE => 
+                                    (toppings_ref := !toppings_swap_ref; 
+                                    !result)     end
 
 
     end
 
     end
+
 signature DEEP_WITH_TOPPINGS = 
     sig
         type 'a sexp

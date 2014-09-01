@@ -133,3 +133,72 @@ functor SexpTwoInARowRecursionOnlyThroughHelper(
 			end
 
 	end
+
+
+functor SexpTwoInARowStar(
+	structure Sexp : SEXP)
+	:> SEXP_TWO_IN_A_ROW where type 'a sexp = 'a Sexp.sexp
+	=
+	struct
+		
+    open Sexp
+    open SMLofNJ.Cont
+
+    (* When `is_first_in' determines the value of `L list',
+    `two_in_a_row' will request the value of `is_first_in car_sexp
+    cdr_slist' since `list' isn't empty. This does mean that we could
+    write a function like `is_first_in' that doesn't use `L' at all*)
+    fun two_in_a_row (List slist) comparer =
+        let
+            val fill_ref = ref NONE
+            val leave_ref = ref NONE 
+        
+            val get_next = fn () => callcc (fn here_again => (
+                                        leave_ref := SOME here_again; 
+                                        throw (valOf (!fill_ref)) ()))
+
+            fun waddle Null = NONE
+            |   waddle (Cons ((Atom a), cdr_slist)) =
+                    let val _ = callcc (fn rest => (fill_ref := SOME rest; throw (valOf (!leave_ref)) (SOME a)))
+                    in waddle cdr_slist end
+            |   waddle (Cons (List car_slist, cdr_slist)) = (waddle car_slist; waddle cdr_slist)
+
+            fun T a = let val n = get_next () 
+                            in  case n 
+                                of  NONE => false
+                                |   SOME a' => comparer a a' orelse T a' end
+
+            val heading = fn () =>  let val fst = callcc (
+                                            fn here => (leave_ref := SOME here; 
+                                                        waddle slist;
+                                                        throw (valOf (!leave_ref)) NONE))
+                                    in case fst
+                                        of  NONE => false
+                                        |   SOME atom => T atom end 
+                
+        
+        
+        in heading ()  end 
+
+    end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

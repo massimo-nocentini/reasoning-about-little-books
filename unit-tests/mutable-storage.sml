@@ -278,9 +278,10 @@ struct
 (*                val "pizza" = pizza_sexp_to_string (six_layer_toppings Pizza) 
                 val "mozzarella" = pizza_sexp_to_string (six_layer_toppings Pizza) *)
                 
-(*                val six_layer = DeepToppingsWithContFunction.deep Pizza 6
-                val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza) *)
-
+                val six_layer = DeepToppingsWithContFunction.deep Pizza 6
+                (*val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza) *)
+                val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza) 
+(*                val moz = pizza_sexp_to_string (six_layer Mozzarella)  *)
 (*                val six_layer = DeepToppingsWithLetccFunction.deep Pizza 6
                 val "((((((pizza))))))" = pizza_sexp_to_string (six_layer Pizza) 
                 val "((((((mozzarella))))))" = pizza_sexp_to_string (deep_six_layer Mozzarella)

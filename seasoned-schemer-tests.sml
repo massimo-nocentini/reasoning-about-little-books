@@ -63,6 +63,7 @@ struct
 				SexpTwoInARowRecursionOnlyThroughHelper(
 						structure Sexp = SexpStr
 						structure SexpEqualFunction = SexpEqualFunction)
+
 	in
 		fun test_two_in_a_row  () = (
 			Assert.assertFalse (SexpTwoInARowWithIndependentHelperFunction.two_in_a_row   
@@ -90,6 +91,40 @@ struct
 			Assert.assertTrue (SexpTwoInARowRecursionOnlyThroughHelperFunction.two_in_a_row
 				sexp_with_a_sexp_in_two_in_a_row curried_equal))
 	end
+
+    local
+        structure SexpTwoInARowStarFunction = SexpTwoInARowStar(
+            structure Sexp = SexpStr)
+
+        datatype food = Donuts | Cheerios | Spaghettios | Mozzarella | Pizza | Cake
+                        | Potato | Chip | With | Fish
+    in
+        fun test_two_in_a_row_star () = 
+            let 
+                val two_in_a_row = SexpTwoInARowStarFunction.two_in_a_row 
+                val comparer = (fn a => fn b => a = b)
+                val false = two_in_a_row 
+                                (parse `(^(Mozzarella) ^(Cake) ^(Mozzarella))`)
+                                comparer 
+
+                val false = two_in_a_row 
+                                (parse `((^(Mozzarella)) (^(Cake)) ^(Mozzarella))`)
+                                comparer 
+
+                val true = two_in_a_row 
+                                (parse `((^(Mozzarella)) (^(Cake)) ^(Mozzarella) ((((^(Mozzarella))))))`)
+                                comparer 
+
+                val true = two_in_a_row 
+                                (parse `((^(Potato)) (^(Chip)) (^(Chip) (^(With)) ^(Fish)))`)
+                                comparer 
+
+                val false = two_in_a_row 
+                                (parse `((^(Donuts)) (^(Cheerios) (^(Chip) (^(With)))) ^(Fish))`)
+                                comparer 
+            in () end
+    end
+
 
 	local
 		structure SexpSumOfPrefixesFunction = 
@@ -149,7 +184,8 @@ struct
 		("test_two_in_a_row of first version: use `is_first_in' helper", test_two_in_a_row ),
 		("test_sum_of_prefixes", test_sum_of_prefixes),
 		("test_scramble", test_scramble),
-		("test_multirember", test_multirember)
+		("test_multirember", test_multirember),
+        ("test_two_in_a_row_star", test_two_in_a_row_star)
 
 	]
 
