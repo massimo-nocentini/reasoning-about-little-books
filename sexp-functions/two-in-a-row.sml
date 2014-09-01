@@ -144,10 +144,6 @@ functor SexpTwoInARowStar(
     open Sexp
     open SMLofNJ.Cont
 
-    (* When `is_first_in' determines the value of `L list',
-    `two_in_a_row' will request the value of `is_first_in car_sexp
-    cdr_slist' since `list' isn't empty. This does mean that we could
-    write a function like `is_first_in' that doesn't use `L' at all*)
     fun two_in_a_row (List slist) comparer =
         let
             val fill_ref = ref NONE
@@ -181,24 +177,3 @@ functor SexpTwoInARowStar(
         in heading ()  end 
 
     end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

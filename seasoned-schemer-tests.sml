@@ -98,31 +98,42 @@ struct
 
         datatype food = Donuts | Cheerios | Spaghettios | Mozzarella | Pizza | Cake
                         | Potato | Chip | With | Fish
+
+        val counter = ref 0
     in
         fun test_two_in_a_row_star () = 
             let 
                 val two_in_a_row = SexpTwoInARowStarFunction.two_in_a_row 
                 val comparer = (fn a => fn b => a = b)
+
+                val _ = counter := !counter + 1
                 val false = two_in_a_row 
                                 (parse `(^(Mozzarella) ^(Cake) ^(Mozzarella))`)
                                 comparer 
 
+                val _ = counter := !counter + 1
                 val false = two_in_a_row 
                                 (parse `((^(Mozzarella)) (^(Cake)) ^(Mozzarella))`)
                                 comparer 
 
+                val _ = counter := !counter + 1
                 val true = two_in_a_row 
-                                (parse `((^(Mozzarella)) (^(Cake)) ^(Mozzarella) ((((^(Mozzarella))))))`)
+                                (parse `((^(Mozzarella)) (^(Cake)) ^(Mozzarella) ((()) ((((()) ^(Mozzarella))))))`)
                                 comparer 
 
+                val _ = counter := !counter + 1
                 val true = two_in_a_row 
-                                (parse `((^(Potato)) (^(Chip)) (^(Chip) (^(With)) ^(Fish)))`)
+                                (parse `((^(Potato)) (^(Chip)) ((()) ^(Chip) (^(With)) ^(Fish)))`)
                                 comparer 
 
+                val _ = counter := !counter + 1
                 val false = two_in_a_row 
-                                (parse `((^(Donuts)) (^(Cheerios) (^(Chip) (^(With)))) ^(Fish))`)
+                                (parse `((^(Donuts)) (^(Cheerios) (() ^(Chip) (^(With)))) ^(Fish))`)
                                 comparer 
             in () end
+
+        fun check_counter_about_two_in_a_row_star () =
+            let val 5 = !counter in () end
     end
 
 
@@ -185,7 +196,8 @@ struct
 		("test_sum_of_prefixes", test_sum_of_prefixes),
 		("test_scramble", test_scramble),
 		("test_multirember", test_multirember),
-        ("test_two_in_a_row_star", test_two_in_a_row_star)
+        ("test_two_in_a_row_star", test_two_in_a_row_star),
+        ("check_counter_about_two_in_a_row_star", check_counter_about_two_in_a_row_star)
 
 	]
 
