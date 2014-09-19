@@ -271,11 +271,21 @@ struct
     in 
         fun test_deep_toppings_with_letcc () =
             let 
-                val deep_zero_layer = DeepToppingsWithLetccFunction.deep Pizza 0
+                (*val deep_six_layer = DeepToppingsWithLetccFunction.deep Pizza 6*)
+                (*
+                 The following is another test in order to "catch" the continuation using a 
+                 single ML expression, ie wrapping everything inside a pair of brackets ().
+                 However it is not sufficient since the test will loop once more.
+                 *)
+                (*val test = ref NONE
+                val "((((((mozzarella))))))" = pizza_sexp_to_string (
+                    (test := SOME (DeepToppingsWithLetccFunction.deep Pizza 6);
+                     (valOf (!test))  Mozzarella))*)
+
                 val {result = six_layer_pizza_sexp, toppings = six_layer_toppings } = 
                     DeepWithToppingsWithLetccFunction.deep 6 Pizza
                 val "((((((pizza))))))" = pizza_sexp_to_string six_layer_pizza_sexp
-(*                val "pizza" = pizza_sexp_to_string (six_layer_toppings Pizza) 
+                (*val "pizza" = pizza_sexp_to_string (six_layer_toppings Pizza) 
                 val "mozzarella" = pizza_sexp_to_string (six_layer_toppings Pizza) *)
                 
                 val six_layer = DeepToppingsWithContFunction.deep Pizza 6

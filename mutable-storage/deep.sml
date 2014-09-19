@@ -141,16 +141,17 @@ functor DeepToppingsWithLetcc (
         fun deep initial_value m = 
             let 
                 (*val toppings_ref = ref (fn Atom _ => Atom initial_value)*)
-                val toppings_ref = ref (fn atom_sexp as Atom _ => atom_sexp)
+                (*val toppings_ref = ref (fn atom_sexp as Atom _ => atom_sexp)*)
+                val toppings_ref = ref NONE
 
                 fun deep_rec 0 = HopSkipAndJump.letcc (
-                        fn jump => let val _ = toppings_ref := jump in Atom initial_value end)
+                        fn jump => (toppings_ref := SOME jump; Atom initial_value) )
                 |   deep_rec m  = List (Cons (deep_rec (m-1), Null))
 
                 val _ = deep_rec m
 
 (*            in  fn atom => !toppings_ref (Atom atom)  end *)
-            in  fn atom => !toppings_ref (Atom atom)  end
+            in  fn atom => (valOf (!toppings_ref)) (Atom atom)  end
 
 
     end
