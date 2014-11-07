@@ -1,4 +1,13 @@
 
+(* 
+ In the following we would like to define a signature
+ that allow us to count how many times the Cons 
+ constructor will be applied. In order to do this
+ just put together the signature that define the 
+ cons operation mapping to Cons constructor and
+ pair it with the idea of a generic counter, very
+ orthogonal an simple to understand.
+*)
 signature SEXP_CONS_CTOR_COUNTING = 
     sig
         include SEXP_CONS_CTOR
