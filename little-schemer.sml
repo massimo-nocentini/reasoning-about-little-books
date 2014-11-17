@@ -184,9 +184,7 @@ functor LittleSchemer (structure SexpStr : SEXP) =
 			     (fn arg => G future arg) snList)
 
 	    val Mrember_curry = function_maker (Into function_maker)
-    	in
-	    List (Mrember_curry slist)
-    	end
+    	in List (Mrember_curry slist) end
       | remove_from_sexp_abridged_toward_Y_step_4 _ _ =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
@@ -212,9 +210,7 @@ functor LittleSchemer (structure SexpStr : SEXP) =
 		    (fn arg => G future arg)
 
 	    val Mrember_curry = function_maker (Into function_maker)
-    	in
-	    List (Mrember_curry slist)
-    	end
+    	in List (Mrember_curry slist) end
       | remove_from_sexp_abridged_toward_Y_step_5 _ _ =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
@@ -239,9 +235,7 @@ functor LittleSchemer (structure SexpStr : SEXP) =
 		M (fn arg => G future arg)
 
 	    val Mrember_curry = function_maker (Into function_maker)
-    	in
-	    List (Mrember_curry slist)
-    	end
+    	in List (Mrember_curry slist) end
       | remove_from_sexp_abridged_toward_Y_step_6 _ _ =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
@@ -268,9 +262,7 @@ functor LittleSchemer (structure SexpStr : SEXP) =
 		(fn (future as (Into _)) => M (fn arg => G future arg)) 
 		    (Into (fn (future as (Into _)) =>
 			      M (fn arg => G future arg)))
-    	in
-	    List (Mrember_curry slist)
-    	end
+    	in List (Mrember_curry slist) end
       | remove_from_sexp_abridged_toward_Y_step_7 _ _ =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
@@ -279,31 +271,29 @@ functor LittleSchemer (structure SexpStr : SEXP) =
      the definition...*)
     fun remove_from_sexp_abridged_toward_Y_step_8 pred (List slist)=
     	let
-	    (* M's type: *)
-	    (* ('a SExpressions.slist -> 'a SExpressions.slist) ->  *)
-	    (* 'a SExpressions.slist -> 'a SExpressions.slist *)
-	    val M = fn recfun => 
-		   fn slist =>
-		      case slist of 
-			  Null => Null
-			| Cons (atom as Atom a, alist) =>
-			  if pred a 
-			  then recfun alist
-			  else Cons (atom, recfun alist)
-			| Cons (List fsList, snList) => 
-			  Cons (List (recfun fsList), recfun snList)
+            (* M's type: *)
+            (* ('a SExpressions.slist -> 'a SExpressions.slist) ->  *)
+            (* 'a SExpressions.slist -> 'a SExpressions.slist *)
+            val M = fn recfun => 
+               fn slist =>
+                  case slist of 
+                  Null => Null
+                | Cons (atom as Atom a, alist) =>
+                  if pred a 
+                  then recfun alist
+                  else Cons (atom, recfun alist)
+                | Cons (List fsList, snList) => 
+                  Cons (List (recfun fsList), recfun snList)
 
-	    (* Y's type: *)
-	    (* (('b -> 'c) -> 'b -> 'c) -> 'b -> 'c *)
-	    val Y = fn M => 
-		       (fn (future as (Into _)) => M (fn arg => G future arg)) 
-			   (Into (fn (future as (Into _)) =>
-				     M (fn arg => G future arg)))
+            (* Y's type: *)
+            (* (('b -> 'c) -> 'b -> 'c) -> 'b -> 'c *)
+            val Y = fn M => 
+                   (fn (future as (Into _)) => M (fn arg => G future arg)) 
+                   (Into (fn (future as (Into _)) =>
+                         M (fn arg => G future arg)))
 
-	    val Mrember_curry = Y M
-    	in
-	    List (Mrember_curry slist)
-    	end
+            val Mrember_curry = Y M
+    	in List (Mrember_curry slist) end
       | remove_from_sexp_abridged_toward_Y_step_8 _ _ =
     	raise RemoveCannotBeAppliedToAtomicSexp
 
